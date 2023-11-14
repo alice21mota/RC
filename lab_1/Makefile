@@ -1,3 +1,5 @@
+# FIXME make not working
+
 test: test.c
 	gcc test.c -o test
 
