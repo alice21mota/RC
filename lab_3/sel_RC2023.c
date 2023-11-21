@@ -19,7 +19,7 @@ int main(void)
 {
     char in_str[128];
 
-    fd_set inputs, testfds;
+    fd_set inputs, testfds;     //fd_set -> mascara. Corresponde a descitores.
     struct timeval timeout;
 
     int i,out_fds,n,errcode, ret;
@@ -29,9 +29,9 @@ int main(void)
 
 // socket variables
     struct addrinfo hints, *res;
-    struct sockaddr_in udp_useraddr;
+    struct sockaddr_in udp_useraddr, tcp_useraddr;
     socklen_t addrlen;
-    int ufd;
+    int ufd, tfd;
 
     char host[NI_MAXHOST], service[NI_MAXSERV];
 
@@ -58,9 +58,37 @@ int main(void)
     if(res!=NULL)
         freeaddrinfo(res);
 
+// TCP SERVER SELECTION
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags=AI_PASSIVE|AI_NUMERICSERV;
+
+    if((errcode=getaddrinfo(NULL,MYPORT,&hints,&res))!=0)
+    exit(1);// On error
+
+    tfd=socket(res->ai_family,res->ai_socktype,res->ai_protocol);
+    if(tfd==-1)
+        exit(1);
+
+    if(bind(tfd,res->ai_addr,res->ai_addrlen)==-1)
+    {
+        sprintf(prt_str,"Bind error TCP server\n");
+        write(1,prt_str,strlen(prt_str));
+        exit(1);// On error
+    }
+    if(res!=NULL)
+        freeaddrinfo(res);
+
+    if (listen(tfd, 5) == -1) {
+        exit(1);
+    }
+
+
     FD_ZERO(&inputs); // Clear input mask
     FD_SET(0,&inputs); // Set standard input channel on
     FD_SET(ufd,&inputs); // Set UDP channel on
+    FD_SET(tfd,&inputs); // Set TCP channel on
 
 //    printf("Size of fd_set: %d\n",sizeof(fd_set));
 //    printf("Value of FD_SETSIZE: %d\n",FD_SETSIZE);
@@ -68,8 +96,10 @@ int main(void)
     while(1)
     {
         testfds=inputs; // Reload mask
+        // TODO: socket do TCP a 0 -> FD_SET(new_tfd,&inputs); // Set TCP channel on
+
 //        printf("testfds byte: %d\n",((char *)&testfds)[0]); // Debug
-        memset((void *)&timeout,0,sizeof(timeout));
+        memset((void *)&timeout,0,sizeof(timeout));  //Meter a 0 o timeout
         timeout.tv_sec=10;
 
         out_fds=select(FD_SETSIZE,&testfds,(fd_set *)NULL,(fd_set *)NULL,(struct timeval *) &timeout);
@@ -84,12 +114,12 @@ int main(void)
                 perror("select");
                 exit(1);
             default:
-                if(FD_ISSET(0,&testfds))
+                if(FD_ISSET(0,&testfds))        //Vê se a posição 0 foi ativada. Se foi, foi por causa do teclado.
                 {
                     fgets(in_str,50,stdin);
                     printf("---Input at keyboard: %s\n",in_str);
                 }
-                if(FD_ISSET(ufd,&testfds))
+                if(FD_ISSET(ufd,&testfds))      //Vê se foi pelo socket do UDP
                 {
                     addrlen = sizeof(udp_useraddr);
                     ret=recvfrom(ufd,prt_str,80,0,(struct sockaddr *)&udp_useraddr,&addrlen);
@@ -104,6 +134,14 @@ int main(void)
 
                     }
                 }
+                if(FD_ISSET(tfd,&testfds))      //Vê se foi pelo socket do UDP
+                {
+                    // TODO accept
+                    
+
+                    printf("---TCP socket:\n");
+                }
+                if(){} //TODO read socket (TCP)
         }
     }
 }
