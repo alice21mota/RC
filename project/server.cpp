@@ -20,7 +20,7 @@ using namespace std;
 int main(void)
 {
     char in_str[128];
-    fd_set inputs, testfds; // fd_set -> mascara. Corresponde a descitores.
+    fd_set inputs, testfds; // fd_set -> mascara. Corresponde a descritores.
     struct timeval timeout;
     int i, out_fds, n, errcode, ret;
     char prt_str[90];
@@ -38,6 +38,7 @@ int main(void)
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_flags = AI_PASSIVE | AI_NUMERICSERV;
 
+    //NULL adress indicates that we are the host
     if ((errcode = getaddrinfo(NULL, MYPORT, &hints, &res)) != 0)
         exit(1); // On error
 

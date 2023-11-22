@@ -24,7 +24,7 @@ int main(void){
     hints.ai_family=AF_INET; //IPv4
     hints.ai_socktype=SOCK_STREAM; //TCP socket
 
-    errcode=getaddrinfo("douro.tecnico.ulisboa.pt",PORT,&hints,&res);
+    errcode=getaddrinfo("tejo.tecnico.ulisboa.pt",PORT,&hints,&res);
     if(errcode!=0)/*error*/exit(1);
     
     n=connect(fd,res->ai_addr,res->ai_addrlen);
