@@ -15,10 +15,24 @@
 #include <iostream>
 using namespace std;
 
-#define MYPORT "58000"
+string myPort = "58000";
+bool verbose = false;
 
-int main(void)
+void getArgs(int argc, char *argv[])
 {
+    for (int i = 1; i < argc; i += 2)
+    {
+        if (!strcmp(argv[i], "-v"))
+            verbose = true;
+        if (!strcmp(argv[i], "-p"))
+            myPort = argv[i + 1];
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    getArgs(argc, argv);
+
     char in_str[128];
     fd_set inputs, testfds; // fd_set -> mascara. Corresponde a descitores.
     struct timeval timeout;
@@ -39,7 +53,7 @@ int main(void)
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_flags = AI_PASSIVE | AI_NUMERICSERV;
 
-    if ((errcode = getaddrinfo(NULL, MYPORT, &hints, &res)) != 0)
+    if ((errcode = getaddrinfo(NULL, myPort.c_str(), &hints, &res)) != 0)
         exit(1); // On error
 
     ufd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
@@ -61,7 +75,7 @@ int main(void)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE | AI_NUMERICSERV;
 
-    if ((errcode = getaddrinfo(NULL, MYPORT, &hints, &res)) != 0)
+    if ((errcode = getaddrinfo(NULL, myPort.c_str(), &hints, &res)) != 0)
         exit(1); // On error
 
     tfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
@@ -125,10 +139,10 @@ int main(void)
                 fgets(in_str, 50, stdin);
                 cout << "---Input at keyboard: " << in_str << endl;
                 // FIXME -> check if its easy extra points :)
-                if (strcmp(in_str, "exit")){
+                if (strcmp(in_str, "exit"))
+                {
                     goto exit_loop;
                 }
-                cout << "sai" << endl;
             }
             if (FD_ISSET(ufd, &testfds)) // Vê se foi pelo socket do UDP
             {
@@ -165,5 +179,5 @@ int main(void)
             }
         }
     }
-    exit_loop: ;
+exit_loop:;
 }
