@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     getArgs(argc, argv);
 
     char in_str[128];
-    fd_set inputs, testfds; // fd_set -> mascara. Corresponde a descitores.
+    fd_set inputs, testfds; // fd_set -> mascara. Corresponde a descritores.
     struct timeval timeout;
     int i, out_fds, n, errcode, ret;
     char prt_str[90];
