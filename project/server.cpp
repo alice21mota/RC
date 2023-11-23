@@ -15,21 +15,36 @@
 #include <iostream>
 using namespace std;
 
-#define MYPORT "58000"
+string myPort = "58000";
+bool verbose = false;
 
-int main(void)
+void getArgs(int argc, char *argv[])
 {
+    for (int i = 1; i < argc; i += 2)
+    {
+        if (!strcmp(argv[i], "-v"))
+            verbose = true;
+        if (!strcmp(argv[i], "-p"))
+            myPort = argv[i + 1];
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    getArgs(argc, argv);
+
     char in_str[128];
     fd_set inputs, testfds; // fd_set -> mascara. Corresponde a descritores.
     struct timeval timeout;
     int i, out_fds, n, errcode, ret;
     char prt_str[90];
+    char buffer[128];
 
     // socket variables
     struct addrinfo hints, *res;
     struct sockaddr_in udp_useraddr, tcp_useraddr;
     socklen_t addrlen;
-    int ufd, tfd;
+    int ufd, tfd, new_tfd = -1;
     char host[NI_MAXHOST], service[NI_MAXSERV];
 
     // UDP SERVER SECTION
@@ -38,8 +53,7 @@ int main(void)
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_flags = AI_PASSIVE | AI_NUMERICSERV;
 
-    //NULL adress indicates that we are the host
-    if ((errcode = getaddrinfo(NULL, MYPORT, &hints, &res)) != 0)
+    if ((errcode = getaddrinfo(NULL, myPort.c_str(), &hints, &res)) != 0)
         exit(1); // On error
 
     ufd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
@@ -61,7 +75,7 @@ int main(void)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE | AI_NUMERICSERV;
 
-    if ((errcode = getaddrinfo(NULL, MYPORT, &hints, &res)) != 0)
+    if ((errcode = getaddrinfo(NULL, myPort.c_str(), &hints, &res)) != 0)
         exit(1); // On error
 
     tfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
@@ -77,6 +91,7 @@ int main(void)
     if (res != NULL)
         freeaddrinfo(res);
 
+    // FIXME not sure how many connections we should allow
     if (listen(tfd, 5) == -1)
     {
         exit(1);
@@ -94,7 +109,12 @@ int main(void)
     while (1)
     {
         testfds = inputs; // Reload mask
-        // TODO: socket do TCP a 0 -> FD_SET(new_tfd,&inputs); // Set TCP channel on
+        // FIXME -> check if this is working properly
+        if (new_tfd != -1) // Set TCP read channel on
+        {
+            cout << "new_tfd"; // Debug
+            FD_SET(new_tfd, &inputs);
+        }
 
         // printf("testfds byte: %d\n",((char *)&testfds)[0]); // Debug
 
@@ -118,6 +138,11 @@ int main(void)
             {
                 fgets(in_str, 50, stdin);
                 cout << "---Input at keyboard: " << in_str << endl;
+                // FIXME -> check if its easy extra points :)
+                if (strcmp(in_str, "exit"))
+                {
+                    goto exit_loop;
+                }
             }
             if (FD_ISSET(ufd, &testfds)) // Vê se foi pelo socket do UDP
             {
@@ -133,12 +158,26 @@ int main(void)
                         cout << "       Sent by [" << host << ":" << service << "]" << endl;
                 }
             }
-            if (FD_ISSET(tfd, &testfds)) // Vê se foi pelo socket do UDP
+            if (FD_ISSET(tfd, &testfds)) // Vê se foi pelo socket do TCP
             {
-                // TODO accept
-                cout << "---TCP socket:" << endl;
+                addrlen = sizeof(tcp_useraddr);
+                if ((new_tfd = accept(tfd, (struct sockaddr *)&tcp_useraddr, &addrlen)) == -1)
+                {
+                    exit(1);
+                }
+                cout << "Accepted TCP socket" << endl;
             }
-            // if(){} //TODO read socket (TCP)
+            if (FD_ISSET(new_tfd, &testfds)) // Depois do accept tem de voltar a entrar no select
+            {
+                // FIXME: read with an while loop
+                n = read(new_tfd, buffer, 128);
+                if (n == -1)
+                {
+                    exit(1);
+                }
+                cout << "---TCP socket: " << buffer << endl;
+            }
         }
     }
+exit_loop:;
 }
