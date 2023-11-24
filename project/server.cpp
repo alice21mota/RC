@@ -154,8 +154,12 @@ int main(int argc, char *argv[])
                         prt_str[ret - 1] = 0;
                     cout << "---UDP socket: " << prt_str << endl;
                     errcode = getnameinfo((struct sockaddr *)&udp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
-                    if (errcode == 0)
+                    if (errcode == 0 && verbose)
                         cout << "       Sent by [" << host << ":" << service << "]" << endl;
+
+                    n = sendto(ufd, prt_str, ret, 0, (struct sockaddr *)&udp_useraddr, addrlen);
+                    if (n == -1) /*error*/
+                        exit(1);
                 }
             }
             if (FD_ISSET(tfd, &testfds)) // Vê se foi pelo socket do TCP
@@ -166,6 +170,11 @@ int main(int argc, char *argv[])
                     exit(1);
                 }
                 cout << "Accepted TCP socket" << endl;
+
+                errcode = getnameinfo((struct sockaddr *)&tcp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
+
+                if (errcode == 0 && verbose)
+                    cout << "       Sent by [" << host << ":" << service << "]" << endl;
             }
             if (FD_ISSET(new_tfd, &testfds)) // Depois do accept tem de voltar a entrar no select
             {
