@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     struct addrinfo hints, *res;
     struct sockaddr_in udp_useraddr, tcp_useraddr;
     socklen_t addrlen;
-    int ufd, tfd, new_tfd = -1;
+    int ufd, tfd, new_tfd;
     char host[NI_MAXHOST], service[NI_MAXSERV];
 
     // UDP SERVER SECTION
@@ -109,12 +109,6 @@ int main(int argc, char *argv[])
     while (1)
     {
         testfds = inputs; // Reload mask
-        // FIXME -> check if this is working properly
-        if (new_tfd != -1) // Set TCP read channel on
-        {
-            cout << "new_tfd"; // Debug
-            FD_SET(new_tfd, &inputs);
-        }
 
         // printf("testfds byte: %d\n",((char *)&testfds)[0]); // Debug
 
@@ -172,9 +166,10 @@ int main(int argc, char *argv[])
                 cout << "Accepted TCP socket" << endl;
 
                 errcode = getnameinfo((struct sockaddr *)&tcp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
-
                 if (errcode == 0 && verbose)
                     cout << "       Sent by [" << host << ":" << service << "]" << endl;
+
+                FD_SET(new_tfd, &inputs); // Set TCP read channel on 
             }
             if (FD_ISSET(new_tfd, &testfds)) // Depois do accept tem de voltar a entrar no select
             {
@@ -185,6 +180,11 @@ int main(int argc, char *argv[])
                     exit(1);
                 }
                 cout << "---TCP socket: " << buffer << endl;
+
+                close(new_tfd);
+                FD_CLR(new_tfd, &inputs); // Set TCP read channel off
+                cout << "TCP socket closed" << endl;
+
             }
         }
     }
