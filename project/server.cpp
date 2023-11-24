@@ -147,11 +147,12 @@ int main(int argc, char *argv[])
                     if (strlen(prt_str) > 0)
                         prt_str[ret - 1] = 0;
                     cout << "---UDP socket: " << prt_str << endl;
+
                     errcode = getnameinfo((struct sockaddr *)&udp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
                     if (errcode == 0 && verbose)
                         cout << "       Sent by [" << host << ":" << service << "]" << endl;
 
-                    n = sendto(ufd, prt_str, ret, 0, (struct sockaddr *)&udp_useraddr, addrlen);
+                    n = sendto(ufd, prt_str, ret, 0, (struct sockaddr *)&udp_useraddr, addrlen); // Send message to client
                     if (n == -1) /*error*/
                         exit(1);
                 }
@@ -163,13 +164,13 @@ int main(int argc, char *argv[])
                 {
                     exit(1);
                 }
-                cout << "Accepted TCP socket" << endl;
+                cout << "Accepted TCP socket" << endl; // Debug
 
                 errcode = getnameinfo((struct sockaddr *)&tcp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
                 if (errcode == 0 && verbose)
                     cout << "       Sent by [" << host << ":" << service << "]" << endl;
 
-                FD_SET(new_tfd, &inputs); // Set TCP read channel on 
+                FD_SET(new_tfd, &inputs); // Set TCP read channel on
             }
             if (FD_ISSET(new_tfd, &testfds)) // Depois do accept tem de voltar a entrar no select
             {
@@ -179,12 +180,18 @@ int main(int argc, char *argv[])
                 {
                     exit(1);
                 }
-                cout << "---TCP socket: " << buffer << endl;
+                cout << "---TCP socket: " << buffer << endl; // Debug
 
-                close(new_tfd);
+                n = write(new_tfd, buffer, n); // Send message to client
+                if (n == -1)
+                {
+                    exit(1);
+                }
+
+                
+                close(new_tfd); // Close socket
                 FD_CLR(new_tfd, &inputs); // Set TCP read channel off
-                cout << "TCP socket closed" << endl;
-
+                cout << "TCP socket closed" << endl; // Debug
             }
         }
     }

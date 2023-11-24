@@ -3,6 +3,7 @@
         "*.html": "html",
         "*.js": "javascript",
         "*.vue": "vue",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "ostream": "cpp"
     }
 }
