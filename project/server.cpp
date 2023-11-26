@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     struct addrinfo hints, *res;
     struct sockaddr_in udp_useraddr, tcp_useraddr;
     socklen_t addrlen;
-    int ufd, tfd, new_tfd;
+    int ufd, tfd, new_tfd = -1;
     char host[NI_MAXHOST], service[NI_MAXSERV];
 
     // UDP SERVER SECTION
@@ -133,7 +133,8 @@ int main(int argc, char *argv[])
                 fgets(in_str, 50, stdin);
                 cout << "---Input at keyboard: " << in_str << endl;
                 // FIXME -> check if its easy extra points :)
-                if (strcmp(in_str, "exit"))
+                // in_str[strcspn(in_str, "\n")] = '\0';
+                if (!strcmp(in_str, "exit\n"))
                 {
                     goto exit_loop;
                 }
@@ -141,6 +142,8 @@ int main(int argc, char *argv[])
             if (FD_ISSET(ufd, &testfds)) // Vê se foi pelo socket do UDP
             {
                 addrlen = sizeof(udp_useraddr);
+
+                // FIXME: read with an while loop
                 ret = recvfrom(ufd, prt_str, 80, 0, (struct sockaddr *)&udp_useraddr, &addrlen);
                 if (ret > 0)
                 {
@@ -174,16 +177,18 @@ int main(int argc, char *argv[])
             }
             if (FD_ISSET(new_tfd, &testfds)) // Depois do accept tem de voltar a entrar no select
             {
-                // FIXME: read with an while loop
-                n = read(new_tfd, buffer, 128);
-                if (n == -1)
+                int nWritten, nRead;
+                string finalBuffer;
+                while ((nRead = read(new_tfd, buffer, 128)) != 0)
                 {
-                    exit(1);
+                    if (nRead < 0)
+                        exit(1);
+                    finalBuffer.append(buffer, nRead);
                 }
-                cout << "---TCP socket: " << buffer << endl; // Debug
+                cout << "---TCP socket: " << finalBuffer << endl; // Debug
 
-                n = write(new_tfd, buffer, n); // Send message to client
-                if (n == -1)
+                nWritten = write(new_tfd, finalBuffer.c_str(), finalBuffer.length()); // Send message to client
+if (nWritten == -1) // Will always get an error when using 'nc'
                 {
                     exit(1);
                 }
