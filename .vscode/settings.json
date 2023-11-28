@@ -1,2 +1,9 @@
 {
+    "files.associations": {
+        "*.html": "html",
+        "*.js": "javascript",
+        "*.vue": "vue",
+        "iostream": "cpp",
+        "ostream": "cpp"
+    }
 }
