@@ -127,13 +127,11 @@ string login(string command){
             
         }
         else {
-            cout << "Incorrect login attempt" << std::endl;
-            return "Incorrect Login Attempt";               // TODO DAR CHECK NESTES RETURNS. PASSAR SEND_UDP PARA AQUI??
+            return "incorrect login";               // TODO DAR CHECK NESTES RETURNS. PASSAR SEND_UDP PARA AQUI??
         }
 
     } else {
-        cout << "Incorrect login attempt" << std::endl;
-        return "Incorrect Login Attempt";
+        return "incorrect login";
     }
 
     return "LIN " + userID + " " + password;
@@ -154,7 +152,6 @@ string unregister(){
 
 void exit(){
     //TODO Check if user is logged in. If it is -> logout
-
     //If locally we have values for UID and passowrd, then the user is logged in.
     if (userID != "" && password != "")
         cout << "Please logout before exiting the application\n";
@@ -215,6 +212,7 @@ void getCommand(string command){
         request = unregister();
         cout << request << "\n";
         //sendUDP(request);
+        //logout();
         cout << "unregister\n";
 
     } else if (whichCommand == "exit") {
