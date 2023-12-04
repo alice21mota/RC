@@ -126,11 +126,11 @@ string login(string command){
         }
 
         else {
-            return "incorrect login attempt";               // TODO DAR CHECK NESTES RETURNS. PASSAR SEND_UDP PARA AQUI??
+            return "INCORRECT LOGIN ATTEMPT";               // TODO DAR CHECK NESTES RETURNS. PASSAR SEND_UDP PARA AQUI??
         }
 
     } else {
-        return "incorrect login attempt";
+        return "INCORRECT LOGIN ATTEMPT";
     }
 
 }
@@ -150,12 +150,12 @@ void loginStatus(string status){
     
     //TODO check passing userID to ""
     else if (status == "RLI REG"){
-        userID = "";
-        password = "";
+        //userID = "";
+        //password = "";
         cout << "new user registered\n";
     }
 
-    else cout << "incorrect response\n";
+    else cout << "INCORRECT RESPONSE\n";
 }
 
 string logout(){
@@ -163,7 +163,7 @@ string logout(){
         return "LOU " + userID + " " + password;
     }
 
-    else return "user not logged in";
+    else return "USER NOT LOGGED IN";
     //TODO CHECK IF LOGOUT IS CORRECT
     //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
 }
@@ -184,12 +184,36 @@ void logoutStatus(string status){
         cout << "unknown user\n";
     }
 
-    else cout << "incorrect response";
+    else cout << "INCORRECT RESPONSE\n";
 }
 
 string unregister(){
+
+    if (userID != "" && password != ""){
+        return "UNR " + userID + " " + password;
+    }
+
+    else return "USER NOT KNOWN";
     //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
-    return "UNR " + userID + " " + password;
+}
+
+void unregisterStatus(string status){
+    
+    if (status == "RUR OK"){
+        //userID = "";
+        //password = "";
+        cout << "successful unregister\n";
+    }
+
+    else if (status == "RUR NOK"){
+        cout << "incorrect unregister attempt\n";
+    }
+    
+    else if (status == "RUR UNR"){
+        cout << "unknown user\n";
+    }
+
+    else cout << "INCORRECT RESPONSE\n";
 }
 
 void exit(){
@@ -233,7 +257,7 @@ void getCommand(string command){
     if (whichCommand == "login"){
         request = login(command);
 
-        if (request != "incorrect login attempt"){
+        if (request != "INCORRECT LOGIN ATTEMPT"){
             cout << request << "\n";
             result = sendUDP(request);
             status = result.substr(0, result.find('\n'));
@@ -248,7 +272,7 @@ void getCommand(string command){
     } else if (whichCommand == "logout") {
         request = logout();
 
-        if (request != "user not logged in"){
+        if (request != "USER NOT LOGGED IN"){
             cout << request << "\n";
             result = sendUDP(request);
             status = result.substr(0, result.find('\n'));
@@ -261,10 +285,18 @@ void getCommand(string command){
 
     } else if (whichCommand == "unregister") {
         request = unregister();
-        cout << request << "\n";
-        //sendUDP(request);
-        //logout();
-        cout << "unregister\n";
+
+        if (request != "USER NOT KNOWN"){
+            cout << request << "\n";
+            result = sendUDP(request);
+            status = result.substr(0, result.find('\n'));
+            cout << "Status is->" << status <<"\n";
+            cout << "RESPONSE:";
+            unregisterStatus(status);
+
+        } else {
+            cout << "INCORRECT UNREGISTER\n";
+        }
 
     } else if (whichCommand == "exit") {
         exit();
