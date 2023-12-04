@@ -20,7 +20,7 @@ using namespace std;
 
 string port = "58000";
 string ip = "localhost";
-string userID, password, tempUID, tempPassword;
+string userID, password;
 //#define PORT "58001"
 
 
@@ -119,13 +119,10 @@ string login(string command){
     string whichCommand;    //, userID, password;
     istringstream iss(command);
 
-    if (iss >> whichCommand >> tempUID >> tempPassword && iss.eof()) {
+    if (iss >> whichCommand >> userID >> password && iss.eof()) {
         // Use userID and password as needed
-        if (isUID(tempUID) && isPassword(tempPassword)){
-            //cout << "User_ID: " << userID << endl;
-            //cout << "User_password: " << password << endl;
-            return "LIN " + tempUID + " " + tempPassword;
-            
+        if (isUID(userID) && isPassword(password)){
+            return "LIN " + userID + " " + password;
         }
 
         else {
@@ -143,21 +140,18 @@ void loginStatus(string status){
     //cout << "IN LOGIN \n";
 
     if (status == "RLI OK"){
-        userID = tempUID;
-        password = tempPassword;
         cout << "successful login\n";
     }
 
     //TODO check if userId and password can be saved like this, when login is not performed
     else if (status == "RLI NOK"){
-        //userID = "";
-        //password = "";
         cout << "incorrect login attempt\n";
     }
     
+    //TODO check passing userID to ""
     else if (status == "RLI REG"){
-        //userID = "";
-        //password = "";
+        userID = "";
+        password = "";
         cout << "new user registered\n";
     }
 
@@ -177,18 +171,17 @@ string logout(){
 void logoutStatus(string status){
     
     if (status == "RLO OK"){
-        userID = "";
-        password = "";
+        //userID = "";
+        //password = "";
         cout << "successful logout\n";
     }
 
-    //TODO check if userId and password can be saved like this, when login is not performed
     else if (status == "RLO NOK"){
-        cout << "unknown user\n";
+        cout << "user not logged in\n";
     }
     
     else if (status == "RLO UNR"){
-        cout << "user not logged in\n";
+        cout << "unknown user\n";
     }
 
     else cout << "incorrect response";
