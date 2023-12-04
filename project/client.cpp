@@ -124,30 +124,68 @@ string login(string command){
         if (isUID(userID) && isPassword(password)){
             cout << "User_ID: " << userID << endl;
             cout << "User_password: " << password << endl;
+            return "LIN " + userID + " " + password;
             
         }
         else {
-            return "incorrect login";               // TODO DAR CHECK NESTES RETURNS. PASSAR SEND_UDP PARA AQUI??
+            return "incorrect login attempt";               // TODO DAR CHECK NESTES RETURNS. PASSAR SEND_UDP PARA AQUI??
         }
 
     } else {
-        return "incorrect login";
+        return "incorrect login attempt";
     }
 
-    return "LIN " + userID + " " + password;
+}
+
+void loginStatus(string status){
+    
+    if (status == "OK"){
+        cout << "successful login\n";
+    }
+
+    //TODO check if userId and password can be saved like this, when login is not performed
+    else if (status == "NOK"){
+        userID = "";
+        password = "";
+        cout << "incorrect login attempt\n";
+    }
+    
+    else if (status == "REG"){
+        cout << "new user registered\n";
+    }
+
+    else cout << "incorrect response";
 }
 
 string logout(){
     //TODO CHECK IF LOGOUT IS CORRECT
     //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
-    userID = "";
-    password = "";
-    return "LOU " + userID + " " + password + "\n";
+    return "LOU " + userID + " " + password;
+}
+
+void logoutStatus(string status){
+    
+    if (status == "OK"){
+        userID = "";
+        password = "";
+        cout << "successful logout\n";
+    }
+
+    //TODO check if userId and password can be saved like this, when login is not performed
+    else if (status == "NOK"){
+        cout << "unknown user\n";
+    }
+    
+    else if (status == "UNR"){
+        cout << "user not logged in\n";
+    }
+
+    else cout << "incorrect response";
 }
 
 string unregister(){
     //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
-    return "UNR " + userID + " " + password + "\n";
+    return "UNR " + userID + " " + password;
 }
 
 void exit(){
@@ -182,31 +220,31 @@ string show_record(){
     return "SRC";
 }
 
-
+//TODO Não esquecer de dar check do reply do server para cada command
 void getCommand(string command){
-    string whichCommand, request;
+    string whichCommand, request, status;
     //getline (command, whichCommand, " ");
     whichCommand = command.substr(0, command.find(" "));
-    cout << "command is: " << whichCommand << "\n";
 
     if (whichCommand == "login"){
         request = login(command);
 
-        if (request != "Incorrect Login Attempt"){
+        if (request != "incorrect login attempt"){
             cout << request << "\n";
-            //sendUDP(request);
-            cout << "Sucess login\n";
+            status = sendUDP(request);
+            cout << "Status is " << status << "\n";
+            loginStatus(status);
+            //Fazer o check do reply do server
 
         } else {
             cout << "INCORRECT LOGIN\n";
         }
 
-
     } else if (whichCommand == "logout") {
         request = logout();
-        cout << request << "\n";
-        //sendUDP(request);
-        cout << "logout\n";
+        status = sendUDP(request);
+        cout << "Status is " << status << "\n";
+        logoutStatus(status);
 
     } else if (whichCommand == "unregister") {
         request = unregister();
@@ -271,16 +309,15 @@ int main(int argc, char *argv[])
 
     getArgs(argc, argv);
 
-    cout << port << ip << endl;
+    //cout << port << ip << endl;
 
     while (1){
 
         user_command = readCommands();
         getCommand(user_command);
     }
-
+    cout << port << "\n" << ip << "\n";
     cout << "done\n";
-
     result = sendUDP("hello");
     cout << "--------" << result << endl; // Debug
 }
