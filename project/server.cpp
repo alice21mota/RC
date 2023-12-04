@@ -12,6 +12,10 @@
 #include <errno.h>
 #include <signal.h>
 
+#include <sstream>
+#include <fstream>
+#include <filesystem>
+
 #include <iostream>
 using namespace std;
 
@@ -29,9 +33,165 @@ void getArgs(int argc, char *argv[])
     }
 }
 
+/**
+ *
+ * @param directoryPath O caminho para a pasta a ser criada.
+ * @return Retorna 0 se a pasta for criada com sucesso, -1 em caso de erro.
+ *
+*/
+int createFolder(filesystem::path directoryPath) {
+    if (!filesystem::exists(directoryPath)) {
+        if (filesystem::create_directories(directoryPath)) {
+            cout << "Directory " << directoryPath << " created successfully." << endl; // Debug
+        }
+        else {
+            cerr << "Error creating directory." << endl; // Debug
+            return -1;
+        }
+    }
+    else {
+        cout << "The directory " << directoryPath << " already exists." << endl; // Debug
+    }
+    return 0;
+}
+
+/**
+ * @param path O caminho para o ficheiro a ser criado.
+ * @param content O conteúdo a ser escritop no ficheiro (opcional).
+ * @return Retorna 0 se o ficheiro for criado com sucesso, -1 em caso de erro.
+ *
+*/
+int createFile(string path, string content = "") {
+    ofstream file(path);
+    if (file.is_open()) {
+        if (!content.empty()) {
+            file << content;
+        }
+        file.close();
+        cout << "file created in " << path << endl; // Debug
+        return 0;
+    }
+    else {
+        cerr << "Erro ao criar o ficheiro: " << path << endl; // Debug
+        return -1;
+    }
+}
+
+/**
+ * Diretoria USERS contém toda a informação de cada utilizador
+*/
+void createUsersFolder() {
+    filesystem::path directoryPath("USERS");
+    createFolder(directoryPath);
+}
+
+/**
+ * O servidor AS criar´a dentro da directoria USERS uma directoria por cada utilizador que se regista. 
+ * A designa¸c˜ao da directoria de utilizador coincide com o UID do utilizador em causa.
+*/
+void createUserFolder(string userId) {
+    filesystem::path directoryPath("USERS/" + userId);
+    createFolder(directoryPath);
+}
+
+/**
+ * Um ﬁcheiro (uid) pass.txt que cont´em a password do utilizador.
+ * Este ﬁcheiro existir´a enquanto o utilizador permanecer registado.
+ */
+void createUserPasswordFile(string userId, string password) {
+    string filePath = "USERS/" + userId + "/" + userId + "_pass.txt";
+    createFile(filePath, password);
+}
+
+/**
+ * Um ﬁcheiro (uid) login.txt indicando que o utilizador está em sessão.
+ * Este ﬁcheiro existe apenas durante a sess˜ao do utilizador
+*/
+void createUserLoginFile(string userId) {
+    string filePath = "USERS/" + userId + "/" + userId + "_login.txt";
+    createFile(filePath);
+}
+
+/**
+ *
+ * Um ﬁcheiro (uid) login.txt indicando que o utilizador está em sessão.
+ * Este ﬁcheiro existe apenas durante a sess˜ao do utilizador
+*/
+// void deleteUserLoginFile(string userId) {
+//     string path = "USERS/" + userId + "/" + userId + "_login.txt";
+//     remove(path.c_str());
+// }
+
+/**
+ * Uma directoria designada HOSTED contendo informa¸c˜ao sobre todos os leil˜oes iniciados pelo utilizador.
+ * A cada leil˜ao iniciado pelo utilizador corresponde um ficheiro dentro da directoria HOSTED.
+*/
+void createHostedFolder(string userId) {
+    filesystem::path directoryPath("USERS/" + userId + "/HOSTED/");
+    createFolder(directoryPath);
+}
+
+/**
+ * Uma directoria designada BIDDED contendo informa¸c˜ao sobre todos os leil˜oes nos quais o utilizador licitou. A cada leil˜ao no qual o
+ * utilizador licitou, corresponde um ﬁcheiro dentro da directoria BIDDED
+*/
+void createBiddedFolder(string userId) {
+    filesystem::path directoryPath("USERS/" + userId + "/BIDDED/");
+    createFolder(directoryPath);
+}
+
+// void createAuctionsFolder() {
+//     filesystem::path directoryPath("AUCTIONS");
+//     createFolder(directoryPath);
+// }
+
+/**
+ * Cria todas as diretorias e ficheiros necessários para guardar as informações do utilizador.
+*/
+void createUser(string userId, string password) {
+    cout << "creating the folder struct" << endl; // Debug
+    createUserFolder(userId);
+    createHostedFolder(userId);
+    createBiddedFolder(userId);
+    createUserPasswordFile(userId, password);
+    createUserLoginFile(userId);
+    cout << "User folder struct created" << endl; // Debug
+}
+
+// string login(string user, string password) {
+//     string status = "NOK";
+//     cout << "login do user " << user << "com a password " << password << endl;
+
+//     // TODO: check if user and password are allowed (char number etc)
+
+//     // TODO: check if user already exists
+
+//     // createUser(user, password);
+
+
+
+
+//     return "RIN " + status;
+// }
+
+void getCommand(string command) {
+    istringstream iss(command);
+    string whichCommand;
+    iss >> whichCommand;
+
+    if (whichCommand == "LIN") {
+        string user, password, status;
+        iss >> user >> password;
+        // status = login(user, password);
+    }
+
+}
+
 int main(int argc, char *argv[])
 {
     getArgs(argc, argv);
+
+    createUser("bbb", "bbb");
 
     char in_str[128];
     fd_set inputs, testfds; // fd_set -> mascara. Corresponde a descritores.
@@ -151,6 +311,8 @@ int main(int argc, char *argv[])
                         prt_str[ret - 1] = 0;
                     cout << "---UDP socket: " << prt_str << endl;
 
+                    getCommand(prt_str);
+
                     errcode = getnameinfo((struct sockaddr *)&udp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
                     if (errcode == 0 && verbose)
                         cout << "       Sent by [" << host << ":" << service << "]" << endl;
@@ -188,12 +350,12 @@ int main(int argc, char *argv[])
                 cout << "---TCP socket: " << finalBuffer << endl; // Debug
 
                 nWritten = write(new_tfd, finalBuffer.c_str(), finalBuffer.length()); // Send message to client
-if (nWritten == -1) // Will always get an error when using 'nc'
+                if (nWritten == -1) // Will always get an error when using 'nc'
                 {
                     exit(1);
                 }
 
-                
+
                 close(new_tfd); // Close socket
                 FD_CLR(new_tfd, &inputs); // Set TCP read channel off
                 cout << "TCP socket closed" << endl; // Debug

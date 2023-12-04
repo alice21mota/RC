@@ -7,6 +7,10 @@
 - [X] enviar resposta no TCP
 - [ ] Ver se é mesmo suposto ter o `exit` como comando do server
 - [ ] Aproveitar "os eventos gerados pelas aplicações clientes que lhe acedem de forma concorrente, para veriﬁcar se um dado leilão se encontra expirado" (ver `2.1 a)` do guia do projeto)
+- [ ] Fazer as verificações dos valores recebidos
+- [ ] Checkar que não há espaços entre as mensagens trocadas com o client (se houverem, tem de dar erro)
+- [ ] Mensagens de erro ao ler do UDP (ver mail `Servidor AS/UDP - esclarecimento importante` do dia 23/11)
+- [X] As funções de criar os ficheiros estão bué redundantes mas não sei como lidar com os erros
 
 ```
 Note: No guia do projeto tem funções uteis
@@ -20,7 +24,8 @@ Note: No guia do projeto tem funções uteis
 # Client side:
 - [ ] Imprimir mensagens de erro antes de sair
 - [ ] Função de exit
-- [ ] Fechar sempre o socket do UDP ou deixar aberto?
+- [X] Fechar sempre o socket do UDP ou deixar aberto?  --> tanto faz mas o stor prefere que esteja sempre fechado
+- [ ] Checkar que não há espaços entre as mensagens trocadas com o server (se houverem, tem de dar erro)
 
 
 
