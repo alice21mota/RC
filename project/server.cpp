@@ -77,6 +77,28 @@ int createFile(string path, string content = "") {
     }
 }
 
+string readFromFile(filesystem::path filePath) {
+    // cout << filePath << endl; // Debug
+    if (!filesystem::exists(filePath)) {
+        cerr << "File don't exists" << endl;
+        // return -1; // FIXME: throw std::runtime_error("Error opening file: " + filePath);
+    }
+    string content, line;
+    ifstream file(filePath);
+    if (file.is_open()) {
+        while (getline(file, line)) {
+            content += line;
+        }
+        file.close();
+        return content;
+    }
+    else {
+        cerr << "Error reading the file: " << filePath << endl; // Debug
+        // return -1; // FIXME: throw std::runtime_error("Error opening file: " + filePath);
+        return "-1";
+    }
+}
+
 /**
  * Diretoria USERS contém toda a informação de cada utilizador
 */
@@ -86,7 +108,7 @@ void createUsersFolder() {
 }
 
 /**
- * O servidor AS criar´a dentro da directoria USERS uma directoria por cada utilizador que se regista. 
+ * O servidor AS criar´a dentro da directoria USERS uma directoria por cada utilizador que se regista.
  * A designa¸c˜ao da directoria de utilizador coincide com o UID do utilizador em causa.
 */
 void createUserFolder(string userId) {
@@ -99,7 +121,7 @@ void createUserFolder(string userId) {
  * Este ﬁcheiro existir´a enquanto o utilizador permanecer registado.
  */
 void createUserPasswordFile(string userId, string password) {
-    string filePath = "USERS/" + userId + "/" + userId + "_pass.txt";
+    string filePath = "USERS/" + userId + "/" + userId + "_pass.txt";  // FIXME: change to filestream::path type
     createFile(filePath, password);
 }
 
@@ -108,7 +130,7 @@ void createUserPasswordFile(string userId, string password) {
  * Este ﬁcheiro existe apenas durante a sess˜ao do utilizador
 */
 void createUserLoginFile(string userId) {
-    string filePath = "USERS/" + userId + "/" + userId + "_login.txt";
+    string filePath = "USERS/" + userId + "/" + userId + "_login.txt"; // FIXME: change to filestream::path type
     createFile(filePath);
 }
 
@@ -149,32 +171,49 @@ void createBiddedFolder(string userId) {
  * Cria todas as diretorias e ficheiros necessários para guardar as informações do utilizador.
 */
 void createUser(string userId, string password) {
-    cout << "creating the folder struct" << endl; // Debug
+    // cout << "creating the folder struct" << endl; // Debug
     createUserFolder(userId);
     createHostedFolder(userId);
     createBiddedFolder(userId);
     createUserPasswordFile(userId, password);
     createUserLoginFile(userId);
-    cout << "User folder struct created" << endl; // Debug
+    // cout << "User folder struct created" << endl; // Debug
 }
 
-// string login(string user, string password) {
-//     string status = "NOK";
-//     cout << "login do user " << user << "com a password " << password << endl;
+int userAlreadyExists(string userId) {
+    string directoryPath = "USERS/" + userId;
+    return filesystem::exists(directoryPath);
+}
 
-//     // TODO: check if user and password are allowed (char number etc)
+int isCorrectPassword(string userId, string passwordToTest) {
+    filesystem::path filePath = "USERS/" + userId + "/" + userId + "_pass.txt";
+    string corretPassword = readFromFile(filePath);
+    // cout << "corretPassword " << corretPassword << endl; // Debug
+    // cout << "passwordToTest " << passwordToTest << endl; // Debug
+    return corretPassword == passwordToTest ? 1 : 0;
+}
 
-//     // TODO: check if user already exists
+string login(string userId, string password) {
+    string status;
+    // cout << "login do user " << userId << "com a password " << password << endl; // Debug
 
-//     // createUser(user, password);
+    // TODO: check if user and password are allowed (char number etc)
 
+    if (userAlreadyExists(userId)) {
+        if (!isCorrectPassword(userId, password)) { status = "NOK"; }
+        else {
+            createUserLoginFile(userId);
+            status = "OK";
+        }
+    }
+    else {
+        createUser(userId, password);
+        status = "REG";
+    }
+    return "RLN " + status;
+}
 
-
-
-//     return "RIN " + status;
-// }
-
-void getCommand(string command) {
+string getCommand(string command) {
     istringstream iss(command);
     string whichCommand;
     iss >> whichCommand;
@@ -182,16 +221,18 @@ void getCommand(string command) {
     if (whichCommand == "LIN") {
         string user, password, status;
         iss >> user >> password;
-        // status = login(user, password);
+        return login(user, password);
     }
-
+    return "";
 }
 
 int main(int argc, char *argv[])
 {
     getArgs(argc, argv);
 
-    createUser("bbb", "bbb");
+    // createUser("bbb", "bbb");
+    // cout << readFromFile("todo.md");
+    // cout << "login: " << login("aaa", "babb");
 
     char in_str[128];
     fd_set inputs, testfds; // fd_set -> mascara. Corresponde a descritores.
@@ -311,13 +352,13 @@ int main(int argc, char *argv[])
                         prt_str[ret - 1] = 0;
                     cout << "---UDP socket: " << prt_str << endl;
 
-                    getCommand(prt_str);
+                    string returnString = getCommand(prt_str);
 
                     errcode = getnameinfo((struct sockaddr *)&udp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
                     if (errcode == 0 && verbose)
                         cout << "       Sent by [" << host << ":" << service << "]" << endl;
 
-                    n = sendto(ufd, prt_str, ret, 0, (struct sockaddr *)&udp_useraddr, addrlen); // Send message to client
+                    n = sendto(ufd, returnString.c_str(), returnString.length(), 0, (struct sockaddr *)&udp_useraddr, addrlen); // Send message to client
                     if (n == -1) /*error*/
                         exit(1);
                 }
