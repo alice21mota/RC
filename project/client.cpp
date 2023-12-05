@@ -13,6 +13,8 @@
 #include <signal.h>
 #include <iostream>
 #include <sstream>
+#include <fstream>
+#include <vector>
 #include <string>
 #include <cctype>
 #include <algorithm> 
@@ -76,6 +78,57 @@ string sendUDP(string message)
     return buffer;
 }
 
+string sendTCP(string message){
+    message = message + "\n";
+
+    int fd, errcode;
+    ssize_t n;
+    socklen_t addrlen;
+    char buffer[128];
+
+    struct addrinfo hints, *res;
+    struct sockaddr_in addr;
+
+    fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (fd == -1)
+    {
+        exit(1);
+    }
+
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_INET; // IPv4
+    hints.ai_socktype = SOCK_STREAM;
+
+    errcode = getaddrinfo(ip.c_str(), port.c_str(), &hints, &res);
+    if (errcode != 0)
+    {
+        exit(1);
+    }
+
+    n = connect(fd, res->ai_addr, res->ai_addrlen);
+    if (n == -1)
+    {
+        exit(1);
+    }
+
+    n = write(fd, message.c_str(), message.length());
+    if (n == -1)
+    {
+        exit(1);
+    }
+
+    n = read(fd, buffer, 128);
+    if (n == -1)
+    {
+        exit(1);
+    }
+
+    freeaddrinfo(res);
+    close(fd);
+
+    return buffer;
+}
+
 void getArgs(int argc, char *argv[])
 {
     for (int i = 1; i < argc; i += 2)
@@ -102,7 +155,70 @@ bool isUID(string uid){
 }
 
 bool isPassword(string password){
-    return (password.size()==8 && isAlphanumeric(password));
+    return (password.size()== 8 && isAlphanumeric(password));
+}
+
+bool isDescription(string description){
+    if (description.size() > 0 && description.size() <= 10){
+        if (isAlphanumeric(description))
+            return true;
+        return false;
+    }
+    return false;
+}
+
+bool isStartValue(string startValue){
+    if (startValue.size() > 0 && startValue.size() <= 6){
+        if (isNumeric(startValue))
+            return true;
+        return false;
+    }
+    return false;
+}
+
+bool isDuration(string duration){
+    if (duration.size() > 0 && duration.size() <= 5){
+        if (isNumeric(duration))
+            return true;
+        return false;
+    }
+    return false;
+}
+
+// Does file exists?
+bool fileExists(string asset_fname){
+    return filesystem::exists(asset_fname);
+}
+
+// Reads the contents of the selected file
+string getFileContents(string asset_fname) {
+    ifstream file(asset_fname, ios::binary);
+    if (!file) {
+        cerr << "Error opening file: " << asset_fname << endl;
+        exit(1);
+    }
+
+    ostringstream contents;
+    contents << file.rdbuf();
+    file.close();
+
+    return contents.str();
+}
+
+//Gets file size in bytes
+size_t getFileSize(string asset_fname) {
+    ifstream file(asset_fname, ios::binary | ios::ate);
+    size_t size = file.tellg();
+    file.close();
+    return size;
+}
+
+string fileSizeString(string asset_fname) {
+    size_t size = getFileSize(asset_fname);
+    ostringstream sizeStr;
+    sizeStr << size;
+
+    return sizeStr.str();
 }
 
 string readCommands(){
@@ -240,6 +356,57 @@ void exit(){
     }
 }
 
+string open(string command){
+    // name asset_fname start_value timeactive
+    // name = max 10 alphanumeric
+    // asset_fname = name of image or document file
+    // start_value = max 6 digits
+    // timeactive = max 5 digits (seconds)
+
+    string whichCommand, name, asset_fname, start_value, timeactive;
+    string toReturn, fName, fSize, fData;
+    istringstream iss(command);
+
+    if (userID != "" && password != ""){
+        if (iss >> whichCommand >> name >> asset_fname >> start_value >> timeactive && iss.eof()) {
+            cout << "W>Rnadhf\n";
+            if (isDescription(name) && isStartValue(start_value) && isDuration(timeactive)){
+                cout << "asdadads\n";
+                
+                //Check if the file exists
+                if (fileExists(asset_fname)) {
+
+                    fName = asset_fname;
+                    fSize = getFileContents(fName);
+                    fData = fileSizeString(fName);
+
+                    toReturn = "OPA " + userID + " " + password + " " + name + " " + start_value + " " +
+                            timeactive + " " + asset_fname + " " + fSize + " " + fData;
+                    return toReturn;
+                }
+
+                //TODO FILE SIZE (Fsize)
+                //TODO CONTENTS OF THE FILE (Fdata)
+                else {
+                    return "FILE NOT FOUND";
+                }
+            }
+
+            else {
+                //TODO -> Passar o userID e password a ""?
+                return "INCORRECT OPEN";               // TODO DAR CHECK NESTES RETURNS. PASSAR SEND_UDP PARA AQUI??
+            }
+
+        } else {
+            cout << "sdadadasasdadasd\n";
+            return "INCORRECT OPEN";
+        }
+        
+    }
+    return "NOT LOGGED IN USER APPLICATION";
+
+}
+
 string myauctions(){
     //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
     return "LMA " + userID;
@@ -315,8 +482,18 @@ void getCommand(string command){
         //cout << "exit\n";
 
     } else if (whichCommand == "open") {
-        // open(command);
-        cout << "open\n";
+        request = open(command);
+
+        if (request != "INCORRECT OPEN" && request != "FILE NOT FOUND" && request != "NOT LOGGED IN USER APPLICATION"){
+            cout << request << "\n";
+            result = sendTCP(request);
+            status = result.substr(0, result.find('\n'));
+            cout << "Status is->" << status <<"\n";
+            //cout << "RESPONSE:";
+
+        } else {
+            cout << "FAIL OPEN\n";
+        }
 
     } else if (whichCommand == "close") {
         // close(command);
@@ -375,6 +552,12 @@ int main(int argc, char *argv[])
     }
     cout << port << "\n" << ip << "\n";
     cout << "done\n";
-    result = sendUDP("hello");
+    //result = sendTCP("CLS 102500 passpass 123");
+    /*bool Exists = fileExists("TESTE REDES.pdf");
+    string contents = getFileContents("TESTE REDES.pdf");
+    size_t size = getFileSize("TESTE REDES.pdf");
+    string sizesize = fileSizeString("TESTE REDES.pdf");
+    cout << Exists << " false is 0 ?\n";
+    cout << contents << " <- contents; size -> " << size << "\n" << sizesize;*/
     cout << "--------" << result << endl; // Debug
 }
