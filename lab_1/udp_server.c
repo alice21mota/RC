@@ -37,9 +37,10 @@ int main(void){
             (struct sockaddr*)&addr,&addrlen);
 
         if(n==-1)/*error*/exit(1);
-        write(1,"received: ",10);write(1,buffer,n);
+        write(1,"received: ",10);
+        write(1,buffer,n);
         
-        n=sendto(fd,buffer,n,0,
+        n=sendto(fd,"OK",3,0,
             (struct sockaddr*)&addr,addrlen);
         if(n==-1)/*error*/exit(1);
     }

@@ -14,116 +14,17 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <cctype> 
+#include <cctype>
+#include <algorithm> 
 
 using namespace std;
 
 string port = "58000";
 string ip = "localhost";
+string userID, password;
 //#define PORT "58001"
+bool logged_in = false;
 
-// Checks if the string is composed only of numbers
-bool isNumeric(string str) {
-    return (all_of(str.begin(), str.end(), ::isdigit));
-}
-
-bool isAlphanumeric(string str) {
-    return (all_of(str.begin(), str.end(), ::isalnum));
-}
-
-// Check if UID is in correct format
-bool isUID(string uid){
-    return (uid.size()==6 && isNumeric(uid));
-}
-
-bool isPassword(string password){
-    return (password.size()==8 && isAlphanumeric(password));
-}
-
-string readCommands(){
-    string command;
-    getline(cin, command);
-    cout << "Command is: " << command << "\n";
-    return command;
-}
-
-void login(string command){
-
-    // login UID password
-    // UID = 6 numeros
-    // password = 8 alphabumeric numbers
-
-    string whichCommand, userID, password;
-    istringstream iss(command);
-
-    if (iss >> whichCommand >> userID >> password && iss.eof()) {
-        // Use userID and password as needed
-        if (isUID(userID) && isPassword(password)){
-            cout << "User_ID: " << userID << endl;
-            cout << "User_password: " << password << endl;
-        }
-        else {
-            cout << "incorrect login attempt" << std::endl;
-        }
-
-    } else {
-        cout << "incorrect login attempt" << std::endl;
-    }
-
-}
-
-void exit(){
-    //TODO Check if user is logged in. If it is -> logout
-    cout << "Exiting the program." << endl;
-    exit(0);
-}
-
-void getCommand(string command){
-    string whichCommand;
-    //getline (command, whichCommand, " ");
-    whichCommand = command.substr(0, command.find(" "));
-    cout << "command is: " << whichCommand << "\n";
-
-    if (whichCommand == "login"){
-        cout << "Going to login\n";
-        login(command);
-    } else if (whichCommand == "logout") {
-        // logout();
-        cout << "logout\n";
-    } else if (whichCommand == "unregister") {
-        // unregister(command);
-        cout << "unregister\n";
-    } else if (whichCommand == "exit") {
-        exit();
-        cout << "exit\n";
-    } else if (whichCommand == "open") {
-        // open(command);
-        cout << "open\n";
-    } else if (whichCommand == "close") {
-        // close(command);
-        cout << "close\n";
-    } else if (whichCommand == "myauctions" || whichCommand == "ma") {
-        // myauctions();
-        cout << "myauctions\n";
-    } else if (whichCommand == "mybids" || whichCommand == "mb") {
-        // mybids();
-        cout << "mybids\n";
-    } else if (whichCommand == "list" || whichCommand == "l") {
-        // list();
-        cout << "list\n";
-    } else if (whichCommand == "show_asset" || whichCommand == "sa") {
-        // show_asset(command);
-        cout << "show_asset\n";
-    } else if (whichCommand == "bid" || whichCommand == "b") {
-        // bid(command);
-        cout << "bid\n";
-    } else if (whichCommand == "show_record" || whichCommand == "sr") {
-        // show_record();
-        cout << "show_record\n";
-    } else {
-        cout << "Unknown command\n";
-    }
-}
 
 string sendUDP(string message)
 {
@@ -167,7 +68,7 @@ string sendUDP(string message)
         exit(1);
     }
 
-    cout << "UDP returned: " << buffer << endl; // Debug
+    //cout << "UDP returned: " << buffer << endl; // Debug
 
     freeaddrinfo(res);
     close(fd);
@@ -186,22 +87,294 @@ void getArgs(int argc, char *argv[])
     }
 }
 
+// Checks if the string is composed only of numbers
+bool isNumeric(string str) {
+    return (all_of(str.begin(), str.end(), ::isdigit));
+}
+
+bool isAlphanumeric(string str) {
+    return (all_of(str.begin(), str.end(), ::isalnum));
+}
+
+// Check if UID is in correct format
+bool isUID(string uid){
+    return (uid.size()==6 && isNumeric(uid));
+}
+
+bool isPassword(string password){
+    return (password.size()==8 && isAlphanumeric(password));
+}
+
+string readCommands(){
+    string command;
+    getline(cin, command);
+    cout << "Command is: " << command << "\n";
+    return command;
+}
+
+string login(string command){
+
+    // login UID password
+    // UID = 6 numeros
+    // password = 8 alphabumeric numbers
+
+    string whichCommand;    //, userID, password;
+    istringstream iss(command);
+
+    if (iss >> whichCommand >> userID >> password && iss.eof()) {
+        // Use userID and password as needed
+        if (isUID(userID) && isPassword(password)){
+            return "LIN " + userID + " " + password;
+        }
+
+        else {
+            //TODO -> Passar o userID e password a ""?
+            return "INCORRECT LOGIN ATTEMPT";               // TODO DAR CHECK NESTES RETURNS. PASSAR SEND_UDP PARA AQUI??
+        }
+
+    } else {
+        return "INCORRECT LOGIN ATTEMPT";
+    }
+
+}
+
+void loginStatus(string status){
+    
+    //cout << "IN LOGIN \n";
+
+    if (status == "RLI OK"){
+        logged_in = true;
+        cout << "successful login\n";
+    }
+
+    //TODO check if userId and password can be saved like this, when login is not performed
+    else if (status == "RLI NOK"){
+        cout << "incorrect login attempt\n";
+    }
+    
+    //TODO check passing userID to ""
+    else if (status == "RLI REG"){
+        //userID = "";
+        //password = "";
+        logged_in = true;
+        cout << "new user registered\n";
+    }
+
+    else cout << "INCORRECT RESPONSE\n";
+}
+
+string logout(){
+    if (userID != "" && password != ""){
+        return "LOU " + userID + " " + password;
+    }
+
+    else return "USER NOT LOGGED IN";
+    //TODO CHECK IF LOGOUT IS CORRECT
+    //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
+}
+
+void logoutStatus(string status){
+    
+    if (status == "RLO OK"){
+        //userID = "";
+        //password = "";
+        logged_in = false;
+        cout << "successful logout\n";
+    }
+
+    else if (status == "RLO NOK"){
+        cout << "user not logged in\n";
+    }
+    
+    else if (status == "RLO UNR"){
+        cout << "unknown user\n";
+    }
+
+    else cout << "INCORRECT RESPONSE\n";
+}
+
+string unregister(){
+
+    if (userID != "" && password != ""){
+        if (isUID(userID) && isPassword(password)){
+            return "UNR " + userID + " " + password;
+        } else return "USER NOT KNOWN";    
+    }
+
+    /*if (logged_in = true)
+        return "UNR " + userID + " " + password;*/
+
+    //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
+    else return "USER NOT KNOWN";
+}
+
+void unregisterStatus(string status){
+    
+    if (status == "RUR OK"){
+        //userID = "";
+        //password = "";
+        logged_in = false;
+        cout << "successful unregister\n";
+    }
+
+    else if (status == "RUR NOK"){
+        cout << "incorrect unregister attempt\n";
+    }
+    
+    else if (status == "RUR UNR"){
+        cout << "unknown user\n";
+    }
+
+    else cout << "INCORRECT RESPONSE\n";
+}
+
+void exit(){
+    //TODO Check if user is logged in. If it is -> logout
+    //If locally we have values for UID and passowrd, then the user is logged in.
+    if (logged_in == true)
+        cout << "Please logout before exiting the application\n";
+    
+    else {
+        cout << "Exiting the program.\n" << endl;
+        exit(0);
+    }
+}
+
+string myauctions(){
+    //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
+    return "LMA " + userID;
+}
+
+string mybids(){
+    //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
+    return "LMB " + userID;
+}
+
+string list(){
+    //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
+    return "LST";
+}
+
+string show_record(){
+    //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
+    return "SRC";
+}
+
+//TODO Não esquecer de dar check do reply do server para cada command
+void getCommand(string command){
+    string whichCommand, request, status, result;
+    //getline (command, whichCommand, " ");
+    whichCommand = command.substr(0, command.find(" "));
+
+    if (whichCommand == "login"){
+        request = login(command);
+
+        if (request != "INCORRECT LOGIN ATTEMPT"){
+            cout << request << "\n";
+            result = sendUDP(request);
+            status = result.substr(0, result.find('\n'));
+            //cout << "Status is->" << status <<"\nABC\n";
+            cout << "RESPONSE:";
+            loginStatus(status);
+
+        } else {
+            cout << "INCORRECT LOGIN\n";
+        }
+
+    } else if (whichCommand == "logout") {
+        request = logout();
+
+        if (request != "USER NOT LOGGED IN"){
+            cout << request << "\n";
+            result = sendUDP(request);
+            status = result.substr(0, result.find('\n'));
+            cout << "Status is->" << status <<"\n";
+            cout << "RESPONSE:";
+            logoutStatus(status);
+        } else {
+            cout << "INCORRECT LOGOUT\n";
+        }
+
+    } else if (whichCommand == "unregister") {
+        request = unregister();
+
+        if (request != "USER NOT KNOWN"){
+            cout << request << "\n";
+            result = sendUDP(request);
+            status = result.substr(0, result.find('\n'));
+            cout << "Status is->" << status <<"\n";
+            cout << "RESPONSE:";
+            unregisterStatus(status);
+
+        } else {
+            cout << "INCORRECT UNREGISTER\n";
+        }
+
+    } else if (whichCommand == "exit") {
+        exit();
+        //cout << "exit\n";
+
+    } else if (whichCommand == "open") {
+        // open(command);
+        cout << "open\n";
+
+    } else if (whichCommand == "close") {
+        // close(command);
+        cout << "close\n";
+
+    } else if (whichCommand == "myauctions" || whichCommand == "ma") {
+        request = myauctions();
+        cout << request << "\n";
+        //sendUDP(request);
+        cout << "myauctions\n";
+
+    } else if (whichCommand == "mybids" || whichCommand == "mb") {
+        request = mybids();
+        cout << request << "\n";
+        //sendUDP(request);
+        cout << "mybids\n";
+
+    } else if (whichCommand == "list" || whichCommand == "l") {
+        request = list();
+        cout << request << "\n";
+        //sendUDP(request);
+        cout << "list\n";
+
+    } else if (whichCommand == "show_asset" || whichCommand == "sa") {
+        // show_asset(command);
+        cout << "show_asset\n";
+
+    } else if (whichCommand == "bid" || whichCommand == "b") {
+        // bid(command);
+        cout << "bid\n";
+        
+    } else if (whichCommand == "show_record" || whichCommand == "sr") {
+        request = show_record();
+        cout << request << "\n";
+        //sendUDP(request);
+        cout << "show_record\n";
+
+    } else {
+        cout << "Unknown command\n";
+    }
+}
+
+
 int main(int argc, char *argv[])
 {
     string result, user_command;
 
     getArgs(argc, argv);
 
-    cout << port << ip << endl;
+    //cout << port << ip << endl;
 
     while (1){
 
         user_command = readCommands();
         getCommand(user_command);
     }
-
+    cout << port << "\n" << ip << "\n";
     cout << "done\n";
-
     result = sendUDP("hello");
     cout << "--------" << result << endl; // Debug
 }
