@@ -130,8 +130,7 @@ void createUserPasswordFile(string userId, string password) {
  * Este ﬁcheiro existe apenas durante a sess˜ao do utilizador
 */
 void createUserLoginFile(string userId) {
-    string filePath = "USERS/" + userId + "/" + userId + "_login.txt"; // FIXME: change to filestream::path type
-    createFile(filePath);
+    filesystem::path filePath = "USERS/" + userId + "/" + userId + "_login.txt";    createFile(filePath);
 }
 
 /**
@@ -139,10 +138,12 @@ void createUserLoginFile(string userId) {
  * Um ﬁcheiro (uid) login.txt indicando que o utilizador está em sessão.
  * Este ﬁcheiro existe apenas durante a sess˜ao do utilizador
 */
-// void deleteUserLoginFile(string userId) {
-//     string path = "USERS/" + userId + "/" + userId + "_login.txt";
-//     remove(path.c_str());
-// }
+bool deleteUserLoginFile(string userId) { // TODO: deal with the errors
+    filesystem::path filePath = "USERS/" + userId + "/" + userId + "_login.txt";
+    if (filesystem::remove(filePath) != -1)
+        return true;
+    else return false;
+}
 
 /**
  * Uma directoria designada HOSTED contendo informa¸c˜ao sobre todos os leil˜oes iniciados pelo utilizador.
@@ -185,12 +186,17 @@ int userAlreadyExists(string userId) {
     return filesystem::exists(directoryPath);
 }
 
-int isCorrectPassword(string userId, string passwordToTest) {
+bool isCorrectPassword(string userId, string passwordToTest) {
     filesystem::path filePath = "USERS/" + userId + "/" + userId + "_pass.txt";
     string corretPassword = readFromFile(filePath);
     // cout << "corretPassword " << corretPassword << endl; // Debug
     // cout << "passwordToTest " << passwordToTest << endl; // Debug
-    return corretPassword == passwordToTest ? 1 : 0;
+    return corretPassword == passwordToTest ? true : false;
+}
+
+bool isLoggedIn(string userId) {
+    filesystem::path filePath = "USERS/" + userId + "/" + userId + "_login.txt";
+    return filesystem::exists(filePath);
 }
 
 string login(string userId, string password) {
@@ -213,6 +219,19 @@ string login(string userId, string password) {
     return "RLN " + status;
 }
 
+string logout(string userId, string password) {
+    string status;
+    
+    if (isLoggedIn(userId)) {
+        if (!isCorrectPassword(userId, password)) status = "NOK";
+        else if (deleteUserLoginFile(userId)) status = "OK";
+    }
+    else if (!userAlreadyExists(userId)) status = "UNR";
+    else status = "NOK";
+
+    return "RLO " + status;
+}
+
 string getCommand(string command) {
     istringstream iss(command);
     string whichCommand;
@@ -223,16 +242,17 @@ string getCommand(string command) {
         iss >> user >> password;
         return login(user, password);
     }
+    else if (whichCommand == "LOU") {
+        string user, password, status;
+        iss >> user >> password;
+        return logout(user, password);
+    }
     return "";
 }
 
 int main(int argc, char *argv[])
 {
     getArgs(argc, argv);
-
-    // createUser("bbb", "bbb");
-    // cout << readFromFile("todo.md");
-    // cout << "login: " << login("aaa", "babb");
 
     char in_str[128];
     fd_set inputs, testfds; // fd_set -> mascara. Corresponde a descritores.
