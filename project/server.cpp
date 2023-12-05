@@ -81,7 +81,7 @@ string readFromFile(filesystem::path filePath) {
     // cout << filePath << endl; // Debug
     if (!filesystem::exists(filePath)) {
         cerr << "File don't exists" << endl;
-        // return -1; // FIXME: throw std::runtime_error("Error opening file: " + filePath);
+        return "-1"; // FIXME: throw std::runtime_error("Error opening file: " + filePath);
     }
     string content, line;
     ifstream file(filePath);
@@ -120,9 +120,19 @@ void createUserFolder(string userId) {
  * Um ﬁcheiro (uid) pass.txt que cont´em a password do utilizador.
  * Este ﬁcheiro existir´a enquanto o utilizador permanecer registado.
  */
-void createUserPasswordFile(string userId, string password) {
-    string filePath = "USERS/" + userId + "/" + userId + "_pass.txt";  // FIXME: change to filestream::path type
-    createFile(filePath, password);
+bool createUserPasswordFile(string userId, string password) {
+    filesystem::path filePath = "USERS/" + userId + "/" + userId + "_pass.txt";
+    if (createFile(filePath, password) != -1) return true;
+    return false;
+}
+
+/**
+ * Um ﬁcheiro (uid) pass.txt que cont´em a password do utilizador.
+ * Este ﬁcheiro existir´a enquanto o utilizador permanecer registado.
+ */
+bool deleteUserPasswordFile(string userId) { // TODO: deal with the errors
+    filesystem::path filePath = "USERS/" + userId + "/" + userId + "_pass.txt";
+    return filesystem::remove(filePath);
 }
 
 /**
@@ -181,9 +191,22 @@ void createUser(string userId, string password) {
     // cout << "User folder struct created" << endl; // Debug
 }
 
-int userAlreadyExists(string userId) {
+/**
+ * Checks if the userAlreadyExists
+ * aka if the folder structure from that user already was created
+*/
+bool userAlreadyExists(string userId) {
     string directoryPath = "USERS/" + userId;
     return filesystem::exists(directoryPath);
+}
+
+/**
+ * Checks if the user is registed
+ * aka if has a password
+*/
+bool isRegistedUser(string userId) {
+    filesystem::path filePath = "USERS/" + userId + "/" + userId + "_pass.txt";
+    return filesystem::exists(filePath);
 }
 
 bool isCorrectPassword(string userId, string passwordToTest) {
@@ -205,7 +228,7 @@ string login(string userId, string password) {
 
     // TODO: check if user and password are allowed (char number etc)
 
-    if (userAlreadyExists(userId)) {
+    if (isRegistedUser(userId)) {
         if (!isCorrectPassword(userId, password)) { status = "NOK"; }
         else {
             createUserLoginFile(userId);
@@ -223,13 +246,29 @@ string logout(string userId, string password) {
     string status;
     
     if (isLoggedIn(userId)) {
-        if (!isCorrectPassword(userId, password)) status = "NOK";
-        else if (deleteUserLoginFile(userId)) status = "OK";
+        if (!isCorrectPassword(userId, password)) status = "NOK"; // incorrect password
+        else if (deleteUserLoginFile(userId)) status = "OK"; // unregister user
+        else status = "NOK";// something gone wrong deleting the file
     }
-    else if (!userAlreadyExists(userId)) status = "UNR";
-    else status = "NOK";
+    else if (!isRegistedUser(userId)) status = "UNR"; // not registered
+    else status = "NOK"; // not loggedin
 
     return "RLO " + status;
+}
+
+string unregister(string userId, string password) {
+    string status;
+
+    if (!isRegistedUser(userId)) status = "UNR"; // not registered
+    else if (isLoggedIn(userId)) {
+        if (!isCorrectPassword(userId, password)) status = "NOK";   // incorrect password
+        else {
+            if (deleteUserLoginFile(userId) && deleteUserPasswordFile(userId)) status = "OK";    // unregister user
+            else status = "NOK"; // something gone wrong deleting the files
+        }
+    }
+    else status = "NOK"; // not loggedin
+    return "RUR " + status;
 }
 
 string getCommand(string command) {
@@ -246,6 +285,11 @@ string getCommand(string command) {
         string user, password, status;
         iss >> user >> password;
         return logout(user, password);
+    }
+    else if (whichCommand == "UNR") {
+        string user, password, status;
+        iss >> user >> password;
+        return unregister(user, password);
     }
     return "";
 }
