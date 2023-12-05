@@ -23,6 +23,7 @@ string port = "58000";
 string ip = "localhost";
 string userID, password;
 //#define PORT "58001"
+bool logged_in = false;
 
 
 string sendUDP(string message)
@@ -142,6 +143,7 @@ void loginStatus(string status){
     //cout << "IN LOGIN \n";
 
     if (status == "RLI OK"){
+        logged_in = true;
         cout << "successful login\n";
     }
 
@@ -154,6 +156,7 @@ void loginStatus(string status){
     else if (status == "RLI REG"){
         //userID = "";
         //password = "";
+        logged_in = true;
         cout << "new user registered\n";
     }
 
@@ -175,6 +178,7 @@ void logoutStatus(string status){
     if (status == "RLO OK"){
         //userID = "";
         //password = "";
+        logged_in = false;
         cout << "successful logout\n";
     }
 
@@ -197,6 +201,9 @@ string unregister(){
         } else return "USER NOT KNOWN";    
     }
 
+    /*if (logged_in = true)
+        return "UNR " + userID + " " + password;*/
+
     //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
     else return "USER NOT KNOWN";
 }
@@ -206,6 +213,7 @@ void unregisterStatus(string status){
     if (status == "RUR OK"){
         //userID = "";
         //password = "";
+        logged_in = false;
         cout << "successful unregister\n";
     }
 
@@ -223,7 +231,7 @@ void unregisterStatus(string status){
 void exit(){
     //TODO Check if user is logged in. If it is -> logout
     //If locally we have values for UID and passowrd, then the user is logged in.
-    if (userID != "" && password != "")
+    if (logged_in == true)
         cout << "Please logout before exiting the application\n";
     
     else {
@@ -304,7 +312,7 @@ void getCommand(string command){
 
     } else if (whichCommand == "exit") {
         exit();
-        cout << "exit\n";
+        //cout << "exit\n";
 
     } else if (whichCommand == "open") {
         // open(command);
