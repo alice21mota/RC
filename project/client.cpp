@@ -14,7 +14,8 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <cctype> 
+#include <cctype>
+#include <algorithm> 
 
 using namespace std;
 
@@ -126,6 +127,7 @@ string login(string command){
         }
 
         else {
+            //TODO -> Passar o userID e password a ""?
             return "INCORRECT LOGIN ATTEMPT";               // TODO DAR CHECK NESTES RETURNS. PASSAR SEND_UDP PARA AQUI??
         }
 
@@ -190,11 +192,13 @@ void logoutStatus(string status){
 string unregister(){
 
     if (userID != "" && password != ""){
-        return "UNR " + userID + " " + password;
+        if (isUID(userID) && isPassword(password)){
+            return "UNR " + userID + " " + password;
+        } else return "USER NOT KNOWN";    
     }
 
-    else return "USER NOT KNOWN";
     //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
+    else return "USER NOT KNOWN";
 }
 
 void unregisterStatus(string status){
