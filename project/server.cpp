@@ -15,6 +15,8 @@
 #include <sstream>
 #include <fstream>
 #include <filesystem>
+#include <vector>
+#include <algorithm>
 
 #include <iostream>
 using namespace std;
@@ -222,6 +224,64 @@ bool isLoggedIn(string userId) {
     return filesystem::exists(filePath);
 }
 
+vector<string> getSortedFilesFromDirectory(filesystem::path directoryPath) {
+// vector<filesystem::directory_entry> getSortedFilesFromDirectory(filesystem::path directoryPath) {
+    if (filesystem::is_directory(directoryPath)) {
+        vector<filesystem::directory_entry> files;
+        vector<string> filenames;
+
+        for (const auto& entry : filesystem::directory_iterator(directoryPath)) {
+            files.push_back(entry);
+        }
+
+        sort(files.begin(), files.end(), [](const filesystem::directory_entry& a, const filesystem::directory_entry& b) {
+            return a.path().filename() < b.path().filename();
+            });
+
+        for (const auto& entry : files) {
+            filenames.push_back(entry.path().filename());
+        }
+
+        // return files;
+        return filenames;
+    }
+    else { // FIXME deal with the errors
+        cerr << "O caminho especificado não é um diretório válido." << std::endl;
+        exit(-1);
+    }
+}
+
+
+
+// TODO :  se puder ser, é só checkar se a pasta HOSTED
+bool hasOngoingAudictions(string userId) {
+    // TODO
+    return false;
+}
+
+bool isAudictionActive(string audictionId) {
+    filesystem::path filePath = "AUCTIONS/" + audictionId + "/END_" + audictionId + ".txt";
+    return !(filesystem::exists(filePath));
+}
+
+
+string getMyAudictions(string userId) {
+    string status;
+    if (!hasOngoingAudictions(userId)) status = "NOK";
+    else if (!isLoggedIn(userId)) status = "NLG";
+    else {
+        status = "OK";
+        filesystem::path directoryPath("USERS/" + userId + "/HOSTED/");
+        vector<string> auctions = getSortedFilesFromDirectory(directoryPath);
+
+        int nAudictions = auctions.size();
+        for (int i = 0;i < nAudictions;i++) {
+            status += " " + auctions[i] + " " + (isAudictionActive(auctions[i]) ? "1" : "0");
+        }
+    }
+    return "RMA " + status;
+}
+
 string login(string userId, string password) {
     string status;
     // cout << "login do user " << userId << "com a password " << password << endl; // Debug
@@ -244,7 +304,7 @@ string login(string userId, string password) {
 
 string logout(string userId, string password) {
     string status;
-    
+
     if (isLoggedIn(userId)) {
         if (!isCorrectPassword(userId, password)) status = "NOK"; // incorrect password
         else if (deleteUserLoginFile(userId)) status = "OK"; // unregister user
@@ -291,7 +351,12 @@ string getCommand(string command) {
         iss >> user >> password;
         return unregister(user, password);
     }
-    return "";
+    else if (whichCommand == "LMA") {
+        string user, status;
+        iss >> user;
+        return getMyAudictions(user);
+    }
+    return "ERR";
 }
 
 int main(int argc, char *argv[])

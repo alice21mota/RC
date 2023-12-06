@@ -12,6 +12,10 @@
 - [ ] Mensagens de erro ao ler do UDP (ver mail `Servidor AS/UDP - esclarecimento importante` do dia 23/11)
 - [X] As funções de criar os ficheiros estão bué redundantes mas não sei como lidar com os erros
 
+### Ask
+
+- [ ] Posso só criar as pastas `HOSTED` e `BIDDED` só quando existir pelo menos uma
+
 ```
 Note: No guia do projeto tem funções uteis
 - dar print ao tempo
