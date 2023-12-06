@@ -109,7 +109,10 @@ void sendFileChunks(int fd, string fileName) {
 }
 
 string sendTCP(string message, string fileName){
-    message = message + "\n";
+    
+    if (fileName == ""){
+        message = message + "\n";
+    }
 
     int fd, errcode;
     ssize_t n;
@@ -150,6 +153,12 @@ string sendTCP(string message, string fileName){
     if (fileName != ""){
         
         sendFileChunks(fd, fileName);
+        
+        char newline = '\n';
+        ssize_t n = write(fd, &newline, 1);
+        if (n == -1) {
+            exit(1);
+        }
     }
 
     n = read(fd, buffer, 128);
@@ -163,7 +172,6 @@ string sendTCP(string message, string fileName){
 
     return buffer;
 }
-
 
 void getArgs(int argc, char *argv[])
 {
@@ -229,23 +237,9 @@ bool isDuration(string duration){
 
 // Does file exists?
 bool fileExists(string asset_fname){
+
     return filesystem::exists(asset_fname);
 }
-
-// Reads the contents of the selected file
-/*string getFileContents(string asset_fname) {
-    ifstream file(asset_fname, ios::binary);
-    if (!file) {
-        cerr << "Error opening file: " << asset_fname << endl;
-        exit(1);
-    }
-
-    ostringstream contents;
-    contents << file.rdbuf();
-    file.close();
-
-    return contents.str();
-}*/
 
 //Gets file size in bytes
 size_t getFileSize(string asset_fname) {
@@ -255,10 +249,19 @@ size_t getFileSize(string asset_fname) {
     return size;
 }
 
+bool isFileSizeValid(size_t fileSize){
+    size_t maxSize = 10 * 1024 * 1024; //10MB in bytes
+    return fileSize <= maxSize;
+}
+
 string fileSizeString(string asset_fname) {
     size_t size = getFileSize(asset_fname);
     ostringstream sizeStr;
     sizeStr << size;
+
+    if (sizeStr.str().size() > 8){
+        return "TOO MANY DIGITS";
+    }
 
     return sizeStr.str();
 }
@@ -411,42 +414,46 @@ string open(string command){
 
     if (userID != "" && password != ""){
         if (iss >> whichCommand >> name >> asset_fname >> start_value >> timeactive && iss.eof()) {
-            cout << "W>Rnadhf\n";
-            if (isDescription(name) && isStartValue(start_value) && isDuration(timeactive)){
-                cout << "asdadads\n";
+            
+            if (isDescription(name) && isFileName(asset_fname) && isStartValue(start_value) && isDuration(timeactive)){
+
                 
                 //Check if the file exists
                 if (fileExists(asset_fname)) {
-
+                    
                     fName = asset_fname;
-                    //fData = getFileContents(fName);
-                    fSize = fileSizeString(fName);
+                    size_t fileSize = getFileSize(fName);
+                    if (isFileSizeValid(fileSize)){
+                        
+                        //TODO MAYBE CHANGE THIS FUNC LATER
+                        fSize = fileSizeString(fName);
 
-                    toReturn = "OPA " + userID + " " + password + " " + name + " " + start_value + " " +
-                            timeactive + " " + fName + " " + fSize; // + " " + fData;
-                    return toReturn;
+                        if (fSize != "TOO MANY DIGITS"){
+
+                            toReturn = "OPA " + userID + " " + password + " " + name + " " + start_value + " " +
+                                    timeactive + " " + fName + " " + fSize + " ";
+
+                            return toReturn;
+                        }
+
+                        return "INCORRECT OPEN"; //TODO CHANGE THIS LATER
+
+
+                    }
+                    return "INCORRECT OPEN";
+
                 }
 
-                //TODO FILE SIZE (Fsize)
-                //TODO CONTENTS OF THE FILE (Fdata)
                 else {
                     return "FILE NOT FOUND";
                 }
             }
-
-            else {
-                //TODO -> Passar o userID e password a ""?
-                return "INCORRECT OPEN";               // TODO DAR CHECK NESTES RETURNS. PASSAR SEND_UDP PARA AQUI??
-            }
-
-        } else {
-            cout << "sdadadasasdadasd\n";
+            else 
+                return "INCORRECT OPEN";             
+        } else 
             return "INCORRECT OPEN";
-        }
-        
     }
     return "NOT LOGGED IN USER APPLICATION";
-
 }
 
 string myauctions(){
