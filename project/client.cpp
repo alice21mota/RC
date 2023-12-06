@@ -25,7 +25,7 @@ using namespace std;
 string port = "58000";
 string ip = "localhost";
 string userID, password;
-string fName, fData;
+string fName, fData, tempAID;
 //#define PORT "58001"
 bool logged_in = false;
 
@@ -109,7 +109,7 @@ void sendFileChunks(int fd, string fileName) {
 }
 
 string sendTCP(string message, string fileName){
-    
+    cout << "GOT in TCP\n";
     if (fileName == ""){
         message = message + "\n";
     }
@@ -125,8 +125,10 @@ string sendTCP(string message, string fileName){
     fd = socket(AF_INET, SOCK_STREAM, 0);
     if (fd == -1)
     {
+        cout << "GOT in socket\n";
         exit(1);
     }
+    
 
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_INET; // IPv4
@@ -135,18 +137,21 @@ string sendTCP(string message, string fileName){
     errcode = getaddrinfo(ip.c_str(), port.c_str(), &hints, &res);
     if (errcode != 0)
     {
+        cout << "GOT in addrinfo\n";
         exit(1);
     }
 
     n = connect(fd, res->ai_addr, res->ai_addrlen);
     if (n == -1)
     {
+        cout << "GOT in connect\n";
         exit(1);
     }
 
     n = write(fd, message.c_str(), message.length());
     if (n == -1)
     {
+        cout << "GOT in write\n";
         exit(1);
     }
 
@@ -157,6 +162,7 @@ string sendTCP(string message, string fileName){
         char newline = '\n';
         ssize_t n = write(fd, &newline, 1);
         if (n == -1) {
+            cout << "GOT in send chunks write\n";
             exit(1);
         }
     }
@@ -164,9 +170,11 @@ string sendTCP(string message, string fileName){
     n = read(fd, buffer, 128);
     if (n == -1)
     {
+        cout << "GOT in read\n";
         exit(1);
     }
     
+    cout << "ALMOST OUT\n";
     freeaddrinfo(res);
     close(fd);
 
@@ -282,19 +290,26 @@ string login(string command){
     string whichCommand;    //, userID, password;
     istringstream iss(command);
 
-    if (iss >> whichCommand >> userID >> password && iss.eof()) {
-        // Use userID and password as needed
-        if (isUID(userID) && isPassword(password)){
-            return "LIN " + userID + " " + password;
-        }
+    if (logged_in == false){
 
-        else {
-            //TODO -> Passar o userID e password a ""?
-            return "INCORRECT LOGIN ATTEMPT";               // TODO DAR CHECK NESTES RETURNS. PASSAR SEND_UDP PARA AQUI??
+        if (iss >> whichCommand >> userID >> password && iss.eof()) {
+            // Use userID and password as needed
+            if (isUID(userID) && isPassword(password)){
+                return "LIN " + userID + " " + password;
+            }
+
+            else {
+                //TODO -> Passar o userID e password a ""?
+                return "Incorrect login attempt";               // TODO DAR CHECK NESTES RETURNS. PASSAR SEND_UDP PARA AQUI??
+            }
+
+        } else {
+            return "Incorrect login attempt";
         }
 
     } else {
-        return "INCORRECT LOGIN ATTEMPT";
+        //cout << userID <<" "<< password << endl;
+        return "A user is already logged in";
     }
 
 }
@@ -329,7 +344,7 @@ string logout(){
         return "LOU " + userID + " " + password;
     }
 
-    else return "USER NOT LOGGED IN";
+    else return "User not logged in";
     //TODO CHECK IF LOGOUT IS CORRECT
     //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
 }
@@ -416,7 +431,6 @@ string open(string command){
         if (iss >> whichCommand >> name >> asset_fname >> start_value >> timeactive && iss.eof()) {
             
             if (isDescription(name) && isFileName(asset_fname) && isStartValue(start_value) && isDuration(timeactive)){
-
                 
                 //Check if the file exists
                 if (fileExists(asset_fname)) {
@@ -435,25 +449,114 @@ string open(string command){
 
                             return toReturn;
                         }
-
-                        return "INCORRECT OPEN"; //TODO CHANGE THIS LATER
-
-
+                        return "File Size is too big"; //TODO CHANGE THIS LATER
                     }
-                    return "INCORRECT OPEN";
-
-                }
-
-                else {
-                    return "FILE NOT FOUND";
-                }
-            }
-            else 
-                return "INCORRECT OPEN";             
+                    return "Invalid File Size";
+                } else
+                    return "File not found";
+            } else 
+                return "Invalid fields";             
         } else 
-            return "INCORRECT OPEN";
+            return "Command not as expected";
     }
-    return "NOT LOGGED IN USER APPLICATION";
+    return "Not logged in User Application";
+}
+
+void openStatus(string response){
+    istringstream iss(response);
+    string command, status, aid;
+
+    if (iss >> command >> status){// && iss.eof()){
+        
+        if (command == "ROA"){
+            
+            if (status == "NOK" && iss.eof()){
+                cout << "auction could not be started\n";
+            }
+
+            else if (status == "NLG" && iss.eof()){
+                cout << "user not logged in\n";
+            }
+
+            else if (status == "OK"){
+                if (iss >> aid && iss.eof()){
+                    if (aid.size() == 3 && isNumeric(aid)){
+                        cout << "successful request, AID = " << aid << "\n";
+                    }
+                    else cout << "incorrect AID\n";
+                    
+                } else cout << "incorrect response\n";
+
+            } else cout << "incorrect response\n";
+
+        } else cout << "incorrect response\n";
+
+    } else cout << "incorrect response\n";
+}
+
+string close(string command){
+    
+    string whichCommand, aid;    //, userID, password;
+    istringstream iss(command);
+
+    if ((userID != "" && password != "") || logged_in == true ){
+
+        if (iss >> whichCommand >> aid && iss.eof()) {
+            // TODO _ am i supposed to check if auser is logged in the user application?
+            if (isNumeric(aid) && aid.size() == 3){
+                tempAID = aid;
+                return "CLS " + userID + " " + password + " " + aid;
+            }
+
+            else {
+                return "Incorrect AID";               // TODO DAR CHECK NESTES RETURNS. PASSAR SEND_UDP PARA AQUI??
+            }
+
+        } else {
+            return "Incorrect command format";
+        }
+
+    } else {
+        return "User not logged in User Appplication";
+    }
+}
+
+void closeStatus(string response){
+    istringstream iss(response);
+    string command, status;
+
+    if (iss >> command >> status && iss.eof()){
+
+        if (command == "RCL"){
+            
+            if (status == "OK"){
+                cout << "auction closed successfully" << endl;
+            }
+
+            else if (status == "NOK"){
+                cout << "user or password incorrect" << endl;
+            }
+
+            else if (status == "NLG"){
+                cout << "user not logged in" << endl;
+            }
+
+            else if (status == "EAU"){
+                cout << "auction " << tempAID << " does not exist" << endl;
+            }
+
+            else if (status == "EOW"){
+                cout << "user " << userID << " does not own " << "auction " << tempAID << endl;
+            }
+
+            else if (status == "END"){
+                cout << "auction " << tempAID << " has already ended" << endl;
+            }
+
+        } else cout << "incorrect response\n";
+ 
+    } else cout << "incorrect response\n";
+ 
 }
 
 string myauctions(){
@@ -485,7 +588,7 @@ void getCommand(string command){
     if (whichCommand == "login"){
         request = login(command);
 
-        if (request != "INCORRECT LOGIN ATTEMPT"){
+        if ((request.substr(0, 3) == "LIN")){
             cout << request << "\n";
             result = sendUDP(request);
             status = result.substr(0, result.find('\n'));
@@ -494,13 +597,13 @@ void getCommand(string command){
             loginStatus(status);
 
         } else {
-            cout << "INCORRECT LOGIN\n";
+            cout << "Error: " << request << endl;
         }
 
     } else if (whichCommand == "logout") {
         request = logout();
 
-        if (request != "USER NOT LOGGED IN"){
+        if (request.substr(0, 3) == "LOU"){
             cout << request << "\n";
             result = sendUDP(request);
             status = result.substr(0, result.find('\n'));
@@ -508,13 +611,13 @@ void getCommand(string command){
             cout << "RESPONSE:";
             logoutStatus(status);
         } else {
-            cout << "INCORRECT LOGOUT\n";
+            cout << "Error: " << request << endl;
         }
 
     } else if (whichCommand == "unregister") {
         request = unregister();
 
-        if (request != "USER NOT KNOWN"){
+        if (request.substr(0, 3) == "UNR"){
             cout << request << "\n";
             result = sendUDP(request);
             status = result.substr(0, result.find('\n'));
@@ -523,7 +626,7 @@ void getCommand(string command){
             unregisterStatus(status);
 
         } else {
-            cout << "INCORRECT UNREGISTER\n";
+            cout << "Error: " << request << endl;
         }
 
     } else if (whichCommand == "exit") {
@@ -533,21 +636,33 @@ void getCommand(string command){
     } else if (whichCommand == "open") {
         request = open(command);
 
-        if (request != "INCORRECT OPEN" && request != "FILE NOT FOUND" && request != "NOT LOGGED IN USER APPLICATION"){
+        if (request.substr(0, 3) == "OPA"){
             cout << request << "\n";
             cout << fName << " <- FILE NAME\n";
             result = sendTCP(request, fName);
             status = result.substr(0, result.find('\n'));
             cout << "Status is->" << status <<"\n";
-            //cout << "RESPONSE:";
+            cout << "RESPONSE:";
+            openStatus(status);
 
         } else {
-            cout << "FAIL OPEN\n";
+            cout << "Error: " << request << endl;
         }
 
     } else if (whichCommand == "close") {
-        // close(command);
-        cout << "close\n";
+        request = close(command);
+
+        if (request.substr(0, 3) == "CLS"){
+            cout << request << "\n";
+            result = sendTCP(request, "");
+            status = result.substr(0, result.find('\n'));
+            cout << "Status is->" << status <<"\n";
+            cout << "RESPONSE:";
+            closeStatus(status);
+
+        }else {
+            cout << "Error: " << request << endl;
+        }
 
     } else if (whichCommand == "myauctions" || whichCommand == "ma") {
         request = myauctions();
@@ -593,8 +708,6 @@ int main(int argc, char *argv[])
 
     getArgs(argc, argv);
 
-    //cout << port << ip << endl;
-
     while (1){
 
         user_command = readCommands();
@@ -602,22 +715,5 @@ int main(int argc, char *argv[])
     }
     cout << port << "\n" << ip << "\n";
     cout << "done\n";
-    //result = sendTCP("CLS 102500 passpass 123");
-    /*bool Exists = fileExists("TESTE REDES.pdf");
-    string contents = getFileContents("TESTE REDES.pdf");
-    size_t size = getFileSize("TESTE REDES.pdf");
-    string sizesize = fileSizeString("TESTE REDES.pdf");
-    cout << Exists << " false is 0 ?\n";
-    cout << contents << " <- contents; size -> " << size << "\n" << sizesize;*/
-    /*bool name = isFileName("IST-1.png");
-    cout << "IST -> " << name << "\n";
-    bool name1 = isFileName("ABCD.tt");
-    cout << "ABCD -> " << name1 << "\n";
-    bool name2 = isFileName("monet_0-1121212121212.png");
-    cout << "Monet -> " << name2 << "\n";
-    bool name3 = isFileName("monet_01");
-    cout << "wrong1 -> " << name3 << "\n";
-    bool name4 = isFileName(".png");
-    cout << "wrong2 -> " << name4 << "\n";*/
     cout << "--------" << result << endl; // Debug
 }
