@@ -15,7 +15,8 @@
 
 ### Ask
 
-- [ ] Posso só criar as pastas `HOSTED` e `BIDDED` só quando existir pelo menos uma
+- [ ] Posso só criar as pastas `HOSTED`, `BIDDED` e `AUCTIONS` só quando existir pelo menos uma
+
 
 ```
 Note: No guia do projeto tem funções uteis

@@ -288,6 +288,12 @@ bool hasOngoingBids(string userId) {
     return false;
 }
 
+// TODO :  se puder ser, é só checkar se a pasta BIDDED
+bool existAuctions() {
+// TODO
+    return false;
+}
+
 string getMyBids(string userId) {
     string status;
     if (!hasOngoingBids(userId)) status = "NOK";    // FIXME check what sould return if is an *unlogged* user *without* bids
@@ -305,6 +311,21 @@ string getMyBids(string userId) {
     return "RMA " + status;
 }
 
+string listAuctions() {
+    string status;
+    if (!existAuctions()) status = "NOK";    // FIXME check what sould return if is an *unlogged* user *without* bids
+    else {
+        status = "OK";
+        filesystem::path directoryPath("AUCTIONS/");
+        vector<string> auctions = getSortedFilesFromDirectory(directoryPath);
+
+        int nAuctions = auctions.size();
+        for (int i = 0;i < nAuctions;i++) {
+            status += " " + auctions[i] + " " + (isAudictionActive(auctions[i]) ? "1" : "0");
+        }
+    }
+    return "RMA " + status;
+}
 
 string login(string userId, string password) {
     string status;
@@ -391,6 +412,12 @@ string getCommand(string command) {
 int main(int argc, char *argv[])
 {
     getArgs(argc, argv);
+
+    // vector<string> files = getSortedFilesFromDirectory("AUCTIONS/");
+    // for (int i = 0;i < files.size();i++) {
+    //     cout << "aaaa ";
+    //     cout << files[i] << endl;
+    // }
 
     char in_str[128];
     fd_set inputs, testfds; // fd_set -> mascara. Corresponde a descritores.
