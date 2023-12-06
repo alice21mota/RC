@@ -17,13 +17,15 @@
 #include <vector>
 #include <string>
 #include <cctype>
-#include <algorithm> 
+#include <algorithm>
+#include <regex>
 
 using namespace std;
 
 string port = "58000";
 string ip = "localhost";
 string userID, password;
+string fName, fData;
 //#define PORT "58001"
 bool logged_in = false;
 
@@ -78,7 +80,35 @@ string sendUDP(string message)
     return buffer;
 }
 
-string sendTCP(string message){
+void sendFileChunks(int fd, string fileName) {
+    size_t chunkSize = 1024;
+    char buffer[chunkSize];
+
+    // Open the file
+    ifstream file(fileName, ios::binary);
+    if (!file.is_open()) {
+        cerr << "Error opening file." << endl;
+        exit(1);
+    }
+
+    // Send the file in chunks
+    while (!file.eof()) {
+        file.read(buffer, chunkSize);
+
+        // Check if anything was read
+        if (file.gcount() > 0) {
+            ssize_t n = write(fd, buffer, file.gcount());
+            if (n == -1) {
+                exit(1);
+            }
+        }
+    }
+
+    // Close the file
+    file.close();
+}
+
+string sendTCP(string message, string fileName){
     message = message + "\n";
 
     int fd, errcode;
@@ -117,17 +147,23 @@ string sendTCP(string message){
         exit(1);
     }
 
+    if (fileName != ""){
+        
+        sendFileChunks(fd, fileName);
+    }
+
     n = read(fd, buffer, 128);
     if (n == -1)
     {
         exit(1);
     }
-
+    
     freeaddrinfo(res);
     close(fd);
 
     return buffer;
 }
+
 
 void getArgs(int argc, char *argv[])
 {
@@ -167,6 +203,12 @@ bool isDescription(string description){
     return false;
 }
 
+bool isFileName(string fileName){
+    const std::regex pattern("^([0-9]{1,21}\\.)?[a-zA-Z0-9_-]{1,21}\\.[a-zA-Z0-9_-]{3}$");
+
+    return regex_match(fileName, pattern);
+}
+
 bool isStartValue(string startValue){
     if (startValue.size() > 0 && startValue.size() <= 6){
         if (isNumeric(startValue))
@@ -191,7 +233,7 @@ bool fileExists(string asset_fname){
 }
 
 // Reads the contents of the selected file
-string getFileContents(string asset_fname) {
+/*string getFileContents(string asset_fname) {
     ifstream file(asset_fname, ios::binary);
     if (!file) {
         cerr << "Error opening file: " << asset_fname << endl;
@@ -203,7 +245,7 @@ string getFileContents(string asset_fname) {
     file.close();
 
     return contents.str();
-}
+}*/
 
 //Gets file size in bytes
 size_t getFileSize(string asset_fname) {
@@ -364,7 +406,7 @@ string open(string command){
     // timeactive = max 5 digits (seconds)
 
     string whichCommand, name, asset_fname, start_value, timeactive;
-    string toReturn, fName, fSize, fData;
+    string toReturn, fSize;// fName, fSize, fData;
     istringstream iss(command);
 
     if (userID != "" && password != ""){
@@ -377,11 +419,11 @@ string open(string command){
                 if (fileExists(asset_fname)) {
 
                     fName = asset_fname;
-                    fSize = getFileContents(fName);
-                    fData = fileSizeString(fName);
+                    //fData = getFileContents(fName);
+                    fSize = fileSizeString(fName);
 
                     toReturn = "OPA " + userID + " " + password + " " + name + " " + start_value + " " +
-                            timeactive + " " + asset_fname + " " + fSize + " " + fData;
+                            timeactive + " " + fName + " " + fSize; // + " " + fData;
                     return toReturn;
                 }
 
@@ -486,7 +528,8 @@ void getCommand(string command){
 
         if (request != "INCORRECT OPEN" && request != "FILE NOT FOUND" && request != "NOT LOGGED IN USER APPLICATION"){
             cout << request << "\n";
-            result = sendTCP(request);
+            cout << fName << " <- FILE NAME\n";
+            result = sendTCP(request, fName);
             status = result.substr(0, result.find('\n'));
             cout << "Status is->" << status <<"\n";
             //cout << "RESPONSE:";
@@ -559,5 +602,15 @@ int main(int argc, char *argv[])
     string sizesize = fileSizeString("TESTE REDES.pdf");
     cout << Exists << " false is 0 ?\n";
     cout << contents << " <- contents; size -> " << size << "\n" << sizesize;*/
+    /*bool name = isFileName("IST-1.png");
+    cout << "IST -> " << name << "\n";
+    bool name1 = isFileName("ABCD.tt");
+    cout << "ABCD -> " << name1 << "\n";
+    bool name2 = isFileName("monet_0-1121212121212.png");
+    cout << "Monet -> " << name2 << "\n";
+    bool name3 = isFileName("monet_01");
+    cout << "wrong1 -> " << name3 << "\n";
+    bool name4 = isFileName(".png");
+    cout << "wrong2 -> " << name4 << "\n";*/
     cout << "--------" << result << endl; // Debug
 }
