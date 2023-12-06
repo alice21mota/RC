@@ -11,12 +11,12 @@
 - [ ] Checkar que não há espaços entre as mensagens trocadas com o client (se houverem, tem de dar erro)
 - [ ] Mensagens de erro ao ler do UDP (ver mail `Servidor AS/UDP - esclarecimento importante` do dia 23/11)
 - [X] As funções de criar os ficheiros estão bué redundantes mas não sei como lidar com os erros
-- [ ] Check what sould return if is an *unlogged* user *without* bids
+- [ ] Check what sould return if is an **unlogged** user **without** bids
+- [ ] *maybe* pôr as path como `const` e `getPath... functions`
 
 ### Ask
 
 - [ ] Posso só criar as pastas `HOSTED`, `BIDDED` e `AUCTIONS` só quando existir pelo menos uma
-
 
 ```
 Note: No guia do projeto tem funções uteis

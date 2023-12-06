@@ -142,7 +142,8 @@ bool deleteUserPasswordFile(string userId) { // TODO: deal with the errors
  * Este ﬁcheiro existe apenas durante a sess˜ao do utilizador
 */
 void createUserLoginFile(string userId) {
-    filesystem::path filePath = "USERS/" + userId + "/" + userId + "_login.txt";    createFile(filePath);
+    filesystem::path filePath = "USERS/" + userId + "/" + userId + "_login.txt";
+    createFile(filePath);
 }
 
 /**
@@ -376,7 +377,8 @@ string unregister(string userId, string password) {
     return "RUR " + status;
 }
 
-string getCommand(string command) {
+string getUDPCommand(string command) {
+    string response;
     istringstream iss(command);
     string whichCommand;
     iss >> whichCommand;
@@ -384,29 +386,33 @@ string getCommand(string command) {
     if (whichCommand == "LIN") {
         string user, password, status;
         iss >> user >> password;
-        return login(user, password);
+        response = login(user, password);
     }
     else if (whichCommand == "LOU") {
         string user, password, status;
         iss >> user >> password;
-        return logout(user, password);
+        response = logout(user, password);
     }
     else if (whichCommand == "UNR") {
         string user, password, status;
         iss >> user >> password;
-        return unregister(user, password);
+        response = unregister(user, password);
     }
     else if (whichCommand == "LMA") {
         string user, status;
         iss >> user;
-        return getMyAudictions(user);
+        response = getMyAudictions(user);
     }
     else if (whichCommand == "LMB") {
         string user, status;
         iss >> user;
-        return getMyBids(user);
+        response = getMyBids(user);
     }
-    return "ERR";
+    else if (whichCommand == "LST") {
+        response = listAuctions();
+    }
+    response = "ERR";
+    return response + "\n";
 }
 
 int main(int argc, char *argv[])
@@ -537,7 +543,7 @@ int main(int argc, char *argv[])
                         prt_str[ret - 1] = 0;
                     cout << "---UDP socket: " << prt_str << endl;
 
-                    string returnString = getCommand(prt_str);
+                    string returnString = getUDPCommand(prt_str);
 
                     errcode = getnameinfo((struct sockaddr *)&udp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
                     if (errcode == 0 && verbose)
