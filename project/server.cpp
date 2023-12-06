@@ -267,7 +267,7 @@ bool isAudictionActive(string audictionId) {
 
 string getMyAudictions(string userId) {
     string status;
-    if (!hasOngoingAudictions(userId)) status = "NOK";
+    if (!hasOngoingAudictions(userId)) status = "NOK"; // FIXME check what sould return if is an *unlogged* user *without* bids
     else if (!isLoggedIn(userId)) status = "NLG";
     else {
         status = "OK";
@@ -281,6 +281,30 @@ string getMyAudictions(string userId) {
     }
     return "RMA " + status;
 }
+
+// TODO :  se puder ser, é só checkar se a pasta BIDDED
+bool hasOngoingBids(string userId) {
+    // TODO
+    return false;
+}
+
+string getMyBids(string userId) {
+    string status;
+    if (!hasOngoingBids(userId)) status = "NOK";    // FIXME check what sould return if is an *unlogged* user *without* bids
+    else if (!isLoggedIn(userId)) status = "NLG";
+    else {
+        status = "OK";
+        filesystem::path directoryPath("USERS/" + userId + "/BIDDED/");
+        vector<string> bids = getSortedFilesFromDirectory(directoryPath);
+
+        int nBids = bids.size();
+        for (int i = 0;i < nBids;i++) {
+            status += " " + bids[i] + " " + (isAudictionActive(bids[i]) ? "1" : "0");
+        }
+    }
+    return "RMA " + status;
+}
+
 
 string login(string userId, string password) {
     string status;
@@ -355,6 +379,11 @@ string getCommand(string command) {
         string user, status;
         iss >> user;
         return getMyAudictions(user);
+    }
+    else if (whichCommand == "LMB") {
+        string user, status;
+        iss >> user;
+        return getMyBids(user);
     }
     return "ERR";
 }

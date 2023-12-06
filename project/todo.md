@@ -11,6 +11,7 @@
 - [ ] Checkar que não há espaços entre as mensagens trocadas com o client (se houverem, tem de dar erro)
 - [ ] Mensagens de erro ao ler do UDP (ver mail `Servidor AS/UDP - esclarecimento importante` do dia 23/11)
 - [X] As funções de criar os ficheiros estão bué redundantes mas não sei como lidar com os erros
+- [ ] Check what sould return if is an *unlogged* user *without* bids
 
 ### Ask
 
