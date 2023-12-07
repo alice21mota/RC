@@ -618,7 +618,7 @@ void myauctionsStatus(string response){
             } else cout << "incorrect response" << endl;
         } 
 
-        else if (status == "OK"){
+        else if (command == "RMA" && status == "OK"){
                     
                 while (iss >> aid >> state) {
                     /*if (iss.eof()){             //TODO KINDA POINTLESS BUT CHECK
@@ -721,7 +721,7 @@ void mybidsStatus(string response){
             } else cout << "incorrect response" << endl;
         } 
 
-        else if (status == "OK"){
+        else if (command == "RMB" && status == "OK"){
                     
                 while (iss >> aid >> state) {
                     /*if (iss.eof()){             //TODO KINDA POINTLESS BUT CHECK
@@ -735,9 +735,42 @@ void mybidsStatus(string response){
     } else cout << "incorrect response!!!" << endl;
 
 }
-string list(){
+
+string list(string command){
     //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
-    return "LST";
+    string whichCommand;    //, userID, password;
+    istringstream iss(command);
+    if (iss >> whichCommand && iss.eof()) {
+        return "LST";      
+    } else return "Incorrect command format";
+}
+
+void listStatus(string response){
+    istringstream iss(response);
+    string command, status, aid, state;
+
+    if (iss >> command >> status){
+       
+        if (iss.eof()){
+
+            if (command == "RLS" && status == "NOK"){
+                cout << "No auction has been started" << endl;
+
+            } else cout << "incorrect response" << endl;
+        } 
+
+        else if (command == "RLS" && status == "OK"){
+                    
+                while (iss >> aid >> state) {
+                    /*if (iss.eof()){             //TODO KINDA POINTLESS BUT CHECK
+                        cout << "Auction ID: "  << aid << ", State: " << state << endl;
+                    }*/
+                    cout << "Auction ID: "  << aid << ", State: " << state << endl;
+                }
+
+        } else cout << "incorrect response" << endl; 
+        
+    } else cout << "incorrect response" << endl;
 }
 
 string show_record(){
@@ -857,10 +890,17 @@ void getCommand(string command){
         } else cout << "Error: " << request << endl;
 
     } else if (whichCommand == "list" || whichCommand == "l") {
-        request = list();
-        cout << request << "\n";
-        //sendUDP(request);
-        cout << "list\n";
+        request = list(command);
+
+        if (request.substr(0, 3) == "LST"){
+            cout << request << "\n";
+            result = sendUDP(request);
+            status = result.substr(0, result.find('\n'));
+            cout << "Status is->" << status <<"\n";
+            cout << "RESPONSE: ";
+            listStatus(status);
+
+        } else cout << "Error: " << request << endl;
 
     } else if (whichCommand == "show_asset" || whichCommand == "sa") {
         // show_asset(command);
