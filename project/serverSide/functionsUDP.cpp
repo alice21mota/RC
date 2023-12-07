@@ -19,7 +19,7 @@ string login(string userId, string password) {
 
     // TODO: check if user and password are allowed (char number etc)
 
-    if (isRegistedUser(userId)) {
+    if (isRegisteredUser(userId)) {
         if (!isCorrectPassword(userId, password)) { status = "NOK"; }
         else {
             createUserLoginFile(userId);
@@ -41,7 +41,7 @@ string logout(string userId, string password) {
         else if (deleteUserLoginFile(userId)) status = "OK"; // unregister user
         else status = "NOK";// something gone wrong deleting the file
     }
-    else if (!isRegistedUser(userId)) status = "UNR"; // not registered
+    else if (!isRegisteredUser(userId)) status = "UNR"; // not registered
     else status = "NOK"; // not loggedin
 
     return "RLO " + status;
@@ -50,7 +50,7 @@ string logout(string userId, string password) {
 string unregister(string userId, string password) {
     string status;
 
-    if (!isRegistedUser(userId)) status = "UNR"; // not registered
+    if (!isRegisteredUser(userId)) status = "UNR"; // not registered
     else if (isLoggedIn(userId)) {
         if (!isCorrectPassword(userId, password)) status = "NOK";   // incorrect password
         else {
@@ -63,18 +63,18 @@ string unregister(string userId, string password) {
 }
 
 
-string getMyAudictions(string userId) {
+string getMyAuctions(string userId) {
     string status;
-    if (!hasOngoingAudictions(userId)) status = "NOK"; // FIXME check what sould return if is an *unlogged* user *without* bids
+    if (!hasOngoingAuctions(userId)) status = "NOK"; // FIXME check what sould return if is an *unlogged* user *without* bids
     else if (!isLoggedIn(userId)) status = "NLG";
     else {
         status = "OK";
         filesystem::path directoryPath("USERS/" + userId + "/HOSTED/");
         vector<string> auctions = getSortedFilesFromDirectory(directoryPath);
 
-        int nAudictions = auctions.size();
-        for (int i = 0;i < nAudictions;i++) {
-            status += " " + auctions[i] + " " + (isAudictionActive(auctions[i]) ? "1" : "0");
+        int nAuctions = auctions.size();
+        for (int i = 0;i < nAuctions;i++) {
+            status += " " + auctions[i] + " " + (isAuctionActive(auctions[i]) ? "1" : "0");
         }
     }
     return "RMA " + status;
@@ -92,7 +92,7 @@ string getMyBids(string userId) {
 
         int nBids = bids.size();
         for (int i = 0;i < nBids;i++) {
-            status += " " + bids[i] + " " + (isAudictionActive(bids[i]) ? "1" : "0");
+            status += " " + bids[i] + " " + (isAuctionActive(bids[i]) ? "1" : "0");
         }
     }
     return "RMA " + status;
@@ -108,7 +108,7 @@ string listAuctions() {
 
         int nAuctions = auctions.size();
         for (int i = 0;i < nAuctions;i++) {
-            status += " " + auctions[i] + " " + (isAudictionActive(auctions[i]) ? "1" : "0");
+            status += " " + auctions[i] + " " + (isAuctionActive(auctions[i]) ? "1" : "0");
         }
     }
     return "RMA " + status;

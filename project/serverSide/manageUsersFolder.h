@@ -1,5 +1,5 @@
-#ifndef MANAGEDIRECTORIES
-#define MANAGEDIRECTORIES
+#ifndef MANAGERUSERSFOLDER
+#define MANAGERUSERSFOLDER
 
 #include <filesystem>
 #include <sstream>
@@ -11,51 +11,50 @@
 using namespace std;
 
 /**
- * Diretoria USERS contém toda a informação de cada utilizador
-*/
+ * A diretoria USERS contém toda a informação de cada utilizador.
+ */
 void createUsersFolder();
 
 /**
- * O servidor AS criar´a dentro da directoria USERS uma directoria por cada utilizador que se regista.
- * A designa¸c˜ao da directoria de utilizador coincide com o UID do utilizador em causa.
-*/
+ * O servidor AS criará dentro da diretoria USERS uma diretoria para cada utilizador que se registar.
+ * A designação da diretoria de utilizador coincide com o UID do utilizador em causa.
+ */
 void createUserFolder(string userId);
 
 /**
- * Um ﬁcheiro (uid) pass.txt que cont´em a password do utilizador.
- * Este ﬁcheiro existir´a enquanto o utilizador permanecer registado.
+ * Um ficheiro (uid) pass.txt que contém a password do utilizador.
+ * Este ficheiro existirá enquanto o utilizador permanecer registado.
  */
 bool createUserPasswordFile(string userId, string password);
 
 /**
- * Um ﬁcheiro (uid) pass.txt que cont´em a password do utilizador.
- * Este ﬁcheiro existir´a enquanto o utilizador permanecer registado.
+ * Um ficheiro (uid) pass.txt que contém a password do utilizador.
+ * Este ficheiro existirá enquanto o utilizador permanecer registado.
  */
 bool deleteUserPasswordFile(string userId);
 
 /**
- * Um ﬁcheiro (uid) login.txt indicando que o utilizador está em sessão.
- * Este ﬁcheiro existe apenas durante a sess˜ao do utilizador
-*/
+ * Um ficheiro (uid) login.txt indicando que o utilizador está em sessão.
+ * Este ficheiro existe apenas durante a sessão do utilizador.
+ */
 void createUserLoginFile(string userId);
 
 /**
- *
- * Um ﬁcheiro (uid) login.txt indicando que o utilizador está em sessão.
- * Este ﬁcheiro existe apenas durante a sess˜ao do utilizador
-*/
+ * Um ficheiro (uid) login.txt indicando que o utilizador está em sessão.
+ * Este ficheiro existe apenas durante a sessão do utilizador.
+ */
 bool deleteUserLoginFile(string userId);
 
 /**
- * Uma directoria designada HOSTED contendo informa¸c˜ao sobre todos os leil˜oes iniciados pelo utilizador.
- * A cada leil˜ao iniciado pelo utilizador corresponde um ficheiro dentro da directoria HOSTED.
-*/
+ * Uma diretoria designada HOSTED contendo informação sobre todos os leilões iniciados pelo utilizador.
+ * Para cada leilão iniciado pelo utilizador, corresponde um ficheiro dentro da diretoria HOSTED.
+ */
 void createHostedFolder(string userId);
 
 /**
- * Uma directoria designada BIDDED contendo informa¸c˜ao sobre todos os leil˜oes nos quais o utilizador licitou. A cada leil˜ao no qual o
- * utilizador licitou, corresponde um ﬁcheiro dentro da directoria BIDDED
-*/
+ * Uma diretoria designada BIDDED contendo informação sobre todos os leilões nos quais o utilizador licitou.
+ * Para cada leilão no qual o utilizador licitou, corresponde um ficheiro dentro da diretoria BIDDED.
+ */
 void createBiddedFolder(string userId);
 
 #endif

@@ -54,7 +54,7 @@ string getUDPCommand(string command) {
     else if (whichCommand == "LMA") {
         string user, status;
         iss >> user;
-        response = getMyAudictions(user);
+        response = getMyAuctions(user);
     }
     else if (whichCommand == "LMB") {
         string user, status;

@@ -13,12 +13,12 @@ string logout(string userId, string password);
 
 string unregister(string userId, string password);
 
-string getMyAudictions(string userId);
+string getMyAuctions(string userId);
 
 string getMyBids(string userId);
 
 string listAuctions();
 
-
+// string showRecord(string auctionId);
 
 #endif

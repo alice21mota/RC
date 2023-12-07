@@ -6,7 +6,7 @@ bool userAlreadyExists(string userId) {
     return filesystem::exists(directoryPath);
 }
 
-bool isRegistedUser(string userId) {
+bool isRegisteredUser(string userId) {
     filesystem::path filePath = "USERS/" + userId + "/" + userId + "_pass.txt";
     return filesystem::exists(filePath);
 }
@@ -25,13 +25,13 @@ bool isLoggedIn(string userId) {
 }
 
 // TODO :  se puder ser, é só checkar se a pasta HOSTED
-bool hasOngoingAudictions(string userId) {
+bool hasOngoingAuctions(string userId) {
     // TODO
     return false;
 }
 
-bool isAudictionActive(string audictionId) {
-    filesystem::path filePath = "AUCTIONS/" + audictionId + "/END_" + audictionId + ".txt";
+bool isAuctionActive(string auctionId) {
+    filesystem::path filePath = "AUCTIONS/" + auctionId + "/END_" + auctionId + ".txt";
     return !(filesystem::exists(filePath));
 }
 
