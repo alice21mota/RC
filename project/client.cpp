@@ -29,19 +29,18 @@ string fName, fData, tempAID;
 //#define PORT "58001"
 bool logged_in = false;
 
-
-string sendUDP(string message)
-{
+string sendUDP(string message) {
     message = message + "\n";
 
     // maybe global variables
     int fd, errcode;
-    ssize_t n;
+    ssize_t n, recSize;
     socklen_t addrlen;
     char buffer[128];
 
     struct addrinfo hints, *res;
     struct sockaddr_in addr;
+   
 
     fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (fd == -1)
@@ -65,19 +64,43 @@ string sendUDP(string message)
         exit(1);
     }
 
-    addrlen = sizeof(addr);
-    n = recvfrom(fd, buffer, sizeof(buffer), 0, (struct sockaddr *)&addr, &addrlen);
+    /*n = recvfrom(fd, buffer, sizeof(buffer), 0, (struct sockaddr *)&addr, &addrlen);
     if (n == -1)
     {
         exit(1);
+    }*/
+
+    addrlen = sizeof(addr);
+    char headerBuffer[sizeof(int)]; //Storing message size
+
+    ssize_t headerBytes = recvfrom(fd, headerBuffer, sizeof(headerBuffer), MSG_PEEK, (struct sockaddr *)&addr, &addrlen);
+    //cout << "headerBytes = " << headerBytes << endl;
+    if (headerBytes == -1) {
+        cerr << "Error receiving message size." << endl;
+        close(fd);
+        exit(1);
     }
 
-    //cout << "UDP returned: " << buffer << endl; // Debug
+    int messageSize;
+    memcpy(&messageSize, headerBuffer, sizeof(int));
+
+    char* fullMessage = new char[messageSize];
+    ssize_t messageBytes = recvfrom(fd, fullMessage, messageSize, 0, (struct sockaddr *)&addr, &addrlen);
+    if (messageBytes == -1) {
+        cerr << "Error receiving message." << endl;
+        //delete[] buffer;
+        close(fd);
+        exit(1);
+    }
+
+    //cout << "Data received from the server: " << fullMessage << endl;
+
+    //cout << "Complete Response: " << fullResponse; // Print the complete response*/
 
     freeaddrinfo(res);
     close(fd);
 
-    return buffer;
+    return fullMessage;
 }
 
 void sendFileChunks(int fd, string fileName) {
@@ -372,16 +395,17 @@ void logoutStatus(string status){
 string unregister(){
 
     if (userID != "" && password != ""){
+
         if (isUID(userID) && isPassword(password)){
             return "UNR " + userID + " " + password;
-        } else return "USER NOT KNOWN";    
-    }
+        } else return "user not known";    
+
+    } else return "user not known";
 
     /*if (logged_in = true)
         return "UNR " + userID + " " + password;*/
 
     //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
-    else return "USER NOT KNOWN";
 }
 
 void unregisterStatus(string status){
@@ -561,7 +585,50 @@ void closeStatus(string response){
 
 string myauctions(){
     //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
-    return "LMA " + userID;
+    if ((userID != "" && password != "") || logged_in == true ){
+        if (isUID(userID) && isPassword(password)){
+            return "LMA " + userID;
+        } else return "user not known"; 
+
+    } else return "user not known";
+}
+
+void myauctionsStatus(string response){
+    istringstream iss(response);
+    string command, status, aid, state;
+
+    if (iss >> command >> status){
+       
+        if (iss.eof()){
+
+            if (command == "RMA"){
+
+                if (status == "NOK"){
+                    cout << "user " << userID << " does not have ongoing auctions" << endl;
+                }
+
+                else if (status == "NLG"){
+                    cout << "user not logged in" << endl;
+                }
+
+                else cout << "!incorrect response" << endl;
+
+            } else cout << "incorrect response" << endl;
+        } 
+
+        else if (status == "OK"){
+                    
+                while (iss >> aid >> state) {
+                    /*if (iss.eof()){             //TODO KINDA POINTLESS BUT CHECK
+                        cout << "Auction ID: "  << aid << ", State: " << state << endl;
+                    }*/
+                    cout << "Auction ID: "  << aid << ", State: " << state << endl;
+                }
+
+        } else cout << "incorrect response!" << endl; 
+        
+    } else cout << "incorrect response!!!" << endl;
+
 }
 
 string mybids(){
@@ -666,9 +733,18 @@ void getCommand(string command){
 
     } else if (whichCommand == "myauctions" || whichCommand == "ma") {
         request = myauctions();
-        cout << request << "\n";
-        //sendUDP(request);
-        cout << "myauctions\n";
+
+        if (request.substr(0, 3) == "LMA"){
+            cout << request << "\n";
+            result = sendUDP(request);
+            status = result.substr(0, result.find('\n'));
+            cout << "Status is->" << status <<"\n";
+            cout << "RESPONSE:";
+            myauctionsStatus(status);
+
+        }else {
+            cout << "Error: " << request << endl;
+        }
 
     } else if (whichCommand == "mybids" || whichCommand == "mb") {
         request = mybids();
