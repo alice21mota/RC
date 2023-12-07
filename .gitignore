@@ -3,5 +3,3 @@ project/client
 .vscode/settings.json
 project/USERS/
 project/AUCTIONS/
-project/USERS/**
-project/AUCTIONS/**
