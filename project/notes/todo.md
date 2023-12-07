@@ -1,4 +1,6 @@
-# Server side:
+# TODO
+
+### Server side:
 - [X] Acho que a parte de TCP do select não está a 100%
   - Não sei se apenas está a faltar fechar a ligação ou se falta algo mais 
   - Testar: abrir o server e fazer **dois** ou mais pedidos TCP seguidos
@@ -11,26 +13,12 @@
 - [ ] Checkar que não há espaços entre as mensagens trocadas com o client (se houverem, tem de dar erro)
 - [ ] Mensagens de erro ao ler do UDP (ver mail `Servidor AS/UDP - esclarecimento importante` do dia 23/11)
 - [X] As funções de criar os ficheiros estão bué redundantes mas não sei como lidar com os erros
+- [ ] Check what sould return if is an **unlogged** user **without** bids
+- [ ] *maybe* pôr as path como `const` e `getPath... functions`
 
-```
-Note: No guia do projeto tem funções uteis
-- dar print ao tempo
-- carregar todos os lances para o leil˜ao AID por ordem decrescente do nome (valor) do lance
 
-```
-
-</br>
-
-# Client side:
+### Client side:
 - [ ] Imprimir mensagens de erro antes de sair
 - [ ] Função de exit
 - [X] Fechar sempre o socket do UDP ou deixar aberto?  --> tanto faz mas o stor prefere que esteja sempre fechado
 - [ ] Checkar que não há espaços entre as mensagens trocadas com o server (se houverem, tem de dar erro)
-
-
-
-### Test Strings
-
-```
-Era uma vez, em uma pequena vila à beira-mar, um pescador chamado João. Todas as manhãs, ele saía com seu barco para pescar nas águas calmas do oceano. Um dia, enquanto lançava sua rede, João descobriu algo extraordinário. Uma mensagem em uma garrafa flutuava na água, contando a história de um tesouro perdido. Animado, João embarcou em uma aventura que o levaria por mares desconhecidos, enfrentando desafios e fazendo novos amigos. No final, ele descobriu que o verdadeiro tesouro estava na jornada e nas memórias que criou ao longo do caminho.
-```
