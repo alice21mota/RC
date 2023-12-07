@@ -1,0 +1,83 @@
+#include "filesystem.h"
+
+int createFolder(filesystem::path directoryPath) {
+    if (!filesystem::exists(directoryPath)) {
+        if (filesystem::create_directories(directoryPath)) {
+            cout << "Directory " << directoryPath << " created successfully." << endl; // Debug
+        }
+        else {
+            cerr << "Error creating directory." << endl; // Debug
+            return -1;
+        }
+    }
+    else {
+        cout << "The directory " << directoryPath << " already exists." << endl; // Debug
+    }
+    return 0;
+}
+
+
+int createFile(string path, string content) {
+    ofstream file(path);
+    if (file.is_open()) {
+        if (!content.empty()) {
+            file << content;
+        }
+        file.close();
+        cout << "file created in " << path << endl; // Debug
+        return 0;
+    }
+    else {
+        cerr << "Erro ao criar o ficheiro: " << path << endl; // Debug
+        return -1;
+    }
+}
+
+string readFromFile(filesystem::path filePath) {
+    // cout << filePath << endl; // Debug
+    if (!filesystem::exists(filePath)) {
+        cerr << "File don't exists" << endl;
+        return "-1"; // FIXME: throw std::runtime_error("Error opening file: " + filePath);
+    }
+    string content, line;
+    ifstream file(filePath);
+    if (file.is_open()) {
+        while (getline(file, line)) {
+            content += line;
+        }
+        file.close();
+        return content;
+    }
+    else {
+        cerr << "Error reading the file: " << filePath << endl; // Debug
+        // return -1; // FIXME: throw std::runtime_error("Error opening file: " + filePath);
+        return "-1";
+    }
+}
+
+vector<string> getSortedFilesFromDirectory(filesystem::path directoryPath) {
+// vector<filesystem::directory_entry> getSortedFilesFromDirectory(filesystem::path directoryPath) {
+    if (filesystem::is_directory(directoryPath)) {
+        vector<filesystem::directory_entry> files;
+        vector<string> filenames;
+
+        for (const auto& entry : filesystem::directory_iterator(directoryPath)) {
+            files.push_back(entry);
+        }
+
+        sort(files.begin(), files.end(), [](const filesystem::directory_entry& a, const filesystem::directory_entry& b) {
+            return a.path().filename() < b.path().filename();
+            });
+
+        for (const auto& entry : files) {
+            filenames.push_back(entry.path().filename());
+        }
+
+        // return files;
+        return filenames;
+    }
+    else { // FIXME deal with the errors
+        cerr << "O caminho especificado não é um diretório válido." << std::endl;
+        exit(-1);
+    }
+}

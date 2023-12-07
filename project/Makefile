@@ -1,12 +1,15 @@
 TARGETS = server client
 
+SERVER_SRC = serverSide/server.cpp serverSide/filesystem.cpp serverSide/functionsUDP.cpp serverSide/manageUsersFolder.cpp serverSide/utils.cpp
+CLIENT_SRC = client.cpp
+
 all: $(TARGETS)
 
-server: server.cpp
-	g++ -std=c++17 server.cpp -o server
+server: $(SERVER_SRC)
+	g++ -std=c++17 $(SERVER_SRC) -o server
 
-client: client.cpp
-	g++ -std=c++17 client.cpp -o client
+client: $(CLIENT_SRC)
+	g++ -std=c++17 $(CLIENT_SRC) -o client
 
 clean:
 	rm -f $(TARGETS)
