@@ -409,7 +409,7 @@ string unregister(){
 }
 
 void unregisterStatus(string status){
-    
+    //TODO ALTER THIS TO BE THE SAMEAS THE OTHERS
     if (status == "RUR OK"){
         //userID = "";
         //password = "";
@@ -528,7 +528,7 @@ string close(string command){
         if (iss >> whichCommand >> aid && iss.eof()) {
             // TODO _ am i supposed to check if auser is logged in the user application?
             if (isNumeric(aid) && aid.size() == 3){
-                tempAID = aid;
+                tempAID = aid; //Used to return error to user if needed
                 return "CLS " + userID + " " + password + " " + aid;
             }
 
@@ -576,6 +576,8 @@ void closeStatus(string response){
             else if (status == "END"){
                 cout << "auction " << tempAID << " has already ended" << endl;
             }
+
+            else cout << "incorrect response\n";
 
         } else cout << "incorrect response\n";
  
@@ -629,6 +631,62 @@ void myauctionsStatus(string response){
         
     } else cout << "incorrect response!!!" << endl;
 
+}
+
+string bid(string command){
+    string whichCommand, aid, value;    //, userID, password;
+    istringstream iss(command);
+
+    if ((userID != "" && password != "") || logged_in == true ){
+
+        if (iss >> whichCommand >> aid >> value && iss.eof()) {
+            // TODO _ am i supposed to check if auser is logged in the user application?
+            if (isNumeric(aid) && aid.size() == 3){
+                tempAID = aid;
+
+                if (isNumeric(value)){
+                    return "BID " + userID + " " + password + " " + aid + " " + value;
+                } else return "Invalid value";
+
+            } else return "Invalid aid";
+
+        } else return "Incorrect command format";
+
+    } else return "User not logged in User Appplication";
+}
+
+void bidStatus(string response){
+    istringstream iss(response);
+    string command, status;
+    if (iss >> command >> status && iss.eof()){
+
+        if (command == "RBD"){
+            
+            if (status == "ACC"){
+                cout << "Bid accepted" << endl;
+            }
+
+            else if (status == "NOK"){
+                cout << "Auction " << tempAID << " is not active" << endl;
+            }
+
+            else if (status == "NLG"){
+                cout << "User not logged in" << endl;
+            }
+
+            else if (status == "REF"){
+                cout << "Bid refused. Larger bid placed previously" << endl;
+            }
+
+            else if (status == "ILG"){
+                cout << "Cannot bid on auction hosted by yourself" << endl;
+            }
+
+            else cout << "incorrect response\n";
+
+        } else cout << "incorrect response\n";
+ 
+    } else cout << "incorrect response\n";
 }
 
 string mybids(){
@@ -763,8 +821,19 @@ void getCommand(string command){
         cout << "show_asset\n";
 
     } else if (whichCommand == "bid" || whichCommand == "b") {
-        // bid(command);
-        cout << "bid\n";
+        request = bid(command);
+
+        if (request.substr(0, 3) == "BID"){
+            cout << request << "\n";
+            result = sendTCP(request, "");
+            status = result.substr(0, result.find('\n'));
+            cout << "Status is->" << status <<"\n";
+            cout << "RESPONSE:";
+            bidStatus(status);
+
+        }else {
+            cout << "Error: " << request << endl;
+        }
         
     } else if (whichCommand == "show_record" || whichCommand == "sr") {
         request = show_record();
