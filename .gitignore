@@ -2,4 +2,6 @@ project/server
 project/client
 .vscode/settings.json
 project/USERS/
+project/USERS/**
 project/AUCTIONS/
+project/AUCTIONS/**
