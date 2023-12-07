@@ -691,9 +691,50 @@ void bidStatus(string response){
 
 string mybids(){
     //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
-    return "LMB " + userID;
+    if ((userID != "" && password != "") || logged_in == true ){
+        if (isUID(userID) && isPassword(password)){
+            return "LMB " + userID;
+        } else return "user not known"; 
+    } else return "user not known";
 }
 
+void mybidsStatus(string response){
+    istringstream iss(response);
+    string command, status, aid, state;
+
+    if (iss >> command >> status){
+       
+        if (iss.eof()){
+
+            if (command == "RMB"){
+
+                if (status == "NOK"){
+                    cout << "user " << userID << " does not have ongoing bids" << endl;
+                }
+
+                else if (status == "NLG"){
+                    cout << "user not logged in" << endl;
+                }
+
+                else cout << "!incorrect response" << endl;
+
+            } else cout << "incorrect response" << endl;
+        } 
+
+        else if (status == "OK"){
+                    
+                while (iss >> aid >> state) {
+                    /*if (iss.eof()){             //TODO KINDA POINTLESS BUT CHECK
+                        cout << "Auction ID: "  << aid << ", State: " << state << endl;
+                    }*/
+                    cout << "Auction ID: "  << aid << ", State: " << state << endl;
+                }
+
+        } else cout << "incorrect response!" << endl; 
+        
+    } else cout << "incorrect response!!!" << endl;
+
+}
 string list(){
     //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
     return "LST";
@@ -800,15 +841,20 @@ void getCommand(string command){
             cout << "RESPONSE:";
             myauctionsStatus(status);
 
-        }else {
-            cout << "Error: " << request << endl;
-        }
+        } else cout << "Error: " << request << endl;
 
     } else if (whichCommand == "mybids" || whichCommand == "mb") {
         request = mybids();
-        cout << request << "\n";
-        //sendUDP(request);
-        cout << "mybids\n";
+
+        if (request.substr(0, 3) == "LMB"){
+            cout << request << "\n";
+            result = sendUDP(request);
+            status = result.substr(0, result.find('\n'));
+            cout << "Status is->" << status <<"\n";
+            cout << "RESPONSE:";
+            mybidsStatus(status);
+
+        } else cout << "Error: " << request << endl;
 
     } else if (whichCommand == "list" || whichCommand == "l") {
         request = list();
