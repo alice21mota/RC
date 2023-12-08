@@ -24,10 +24,10 @@ bool isLoggedIn(string userId) {
     return filesystem::exists(filePath);
 }
 
-// TODO :  se puder ser, é só checkar se a pasta HOSTED
+// FIXME :  not sure se pode ser só checkar se a pasta HOSTED
 bool hasOngoingAuctions(string userId) {
-    // TODO
-    return false;
+    filesystem::path directoryPath = "USERS/" + userId + "/" + "HOSTED";
+    return filesystem::exists(directoryPath);
 }
 
 bool isAuctionActive(string auctionId) {
@@ -36,14 +36,14 @@ bool isAuctionActive(string auctionId) {
 }
 
 
-// TODO :  se puder ser, é só checkar se a pasta BIDDED
+// FIXME :  not sure se pode ser só checkar se a pasta BIDDED
 bool hasOngoingBids(string userId) {
-    // TODO
-    return false;
+    filesystem::path directoryPath = "USERS/" + userId + "/" + "BIDDED";
+    return filesystem::exists(directoryPath);
 }
 
-// TODO :  se puder ser, é só checkar se a pasta BIDDED
+// FIXME :  not sure se pode ser só checkar se a pasta AUCTIONS
 bool existAuctions() {
-// TODO
-    return false;
+    filesystem::path directoryPath = "AUCTIONS/";
+    return filesystem::exists(directoryPath);
 }
