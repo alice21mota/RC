@@ -28,7 +28,7 @@ void createUserLoginFile(string userId) {
 
 bool deleteUserLoginFile(string userId) { // TODO: deal with the errors
     filesystem::path filePath = "USERS/" + userId + "/" + userId + "_login.txt";
-    if (filesystem::remove(filePath) != -1)
+    if (filesystem::remove(filePath))
         return true;
     else return false;
 }
