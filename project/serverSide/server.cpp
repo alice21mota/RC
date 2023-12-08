@@ -1,19 +1,15 @@
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <time.h>
-#include <fcntl.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <signal.h>
+// #include <sys/types.h>
+// #include <netinet/in.h>
+// #include <arpa/inet.h>
+// #include <time.h>
+// #include <fcntl.h>
+// #include <sys/socket.h>
+// #include <sys/ioctl.h>
+// #include <stdlib.h>
+// #include <errno.h>
+// #include <signal.h>
 
-#include <iostream>
-using namespace std;
+#include "server.h"
 
 string myPort = "58000";
 bool verbose = false;
@@ -29,9 +25,58 @@ void getArgs(int argc, char *argv[])
     }
 }
 
+// void createAuctionsFolder() {
+//     filesystem::path directoryPath("AUCTIONS");
+//     createFolder(directoryPath);
+// }
+
+string getUDPCommand(string command) {
+    string response;
+    istringstream iss(command);
+    string whichCommand;
+    iss >> whichCommand;
+
+    if (whichCommand == "LIN") {
+        string user, password, status;
+        iss >> user >> password;
+        response = login(user, password);
+    }
+    else if (whichCommand == "LOU") {
+        string user, password, status;
+        iss >> user >> password;
+        response = logout(user, password);
+    }
+    else if (whichCommand == "UNR") {
+        string user, password, status;
+        iss >> user >> password;
+        response = unregister(user, password);
+    }
+    else if (whichCommand == "LMA") {
+        string user, status;
+        iss >> user;
+        response = getMyAuctions(user);
+    }
+    else if (whichCommand == "LMB") {
+        string user, status;
+        iss >> user;
+        response = getMyBids(user);
+    }
+    else if (whichCommand == "LST") {
+        response = listAuctions();
+    }
+    else response = "ERR";
+    return response + "\n";
+}
+
 int main(int argc, char *argv[])
 {
     getArgs(argc, argv);
+
+    // vector<string> files = getSortedFilesFromDirectory("AUCTIONS/");
+    // for (int i = 0;i < files.size();i++) {
+    //     cout << "aaaa ";
+    //     cout << files[i] << endl;
+    // }
 
     char in_str[128];
     fd_set inputs, testfds; // fd_set -> mascara. Corresponde a descritores.
@@ -151,11 +196,13 @@ int main(int argc, char *argv[])
                         prt_str[ret - 1] = 0;
                     cout << "---UDP socket: " << prt_str << endl;
 
+                    string returnString = getUDPCommand(prt_str);
+
                     errcode = getnameinfo((struct sockaddr *)&udp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
                     if (errcode == 0 && verbose)
                         cout << "       Sent by [" << host << ":" << service << "]" << endl;
 
-                    n = sendto(ufd, prt_str, ret, 0, (struct sockaddr *)&udp_useraddr, addrlen); // Send message to client
+                    n = sendto(ufd, returnString.c_str(), returnString.length(), 0, (struct sockaddr *)&udp_useraddr, addrlen); // Send message to client
                     if (n == -1) /*error*/
                         exit(1);
                 }
@@ -188,12 +235,12 @@ int main(int argc, char *argv[])
                 cout << "---TCP socket: " << finalBuffer << endl; // Debug
 
                 nWritten = write(new_tfd, finalBuffer.c_str(), finalBuffer.length()); // Send message to client
-if (nWritten == -1) // Will always get an error when using 'nc'
+                if (nWritten == -1) // Will always get an error when using 'nc'
                 {
                     exit(1);
                 }
 
-                
+
                 close(new_tfd); // Close socket
                 FD_CLR(new_tfd, &inputs); // Set TCP read channel off
                 cout << "TCP socket closed" << endl; // Debug
