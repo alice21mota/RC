@@ -18,7 +18,7 @@
 #include <string>
 #include <cctype>
 #include <algorithm>
-#include "validationFunc/validations.h"
+#include "../validationFunc/validations.h"
 
 using namespace std;
 
