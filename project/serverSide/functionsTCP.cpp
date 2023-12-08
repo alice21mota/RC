@@ -1,9 +1,15 @@
 #include "functionsTCP.h"
 
-int getAID() {
+string getAID() {
     filesystem::path directoryPath = "AUCTIONS/";
+    vector<string> filenames = getSortedFilesFromDirectory(directoryPath);
+    if (filenames.size() == 0) return "001";
     string lastAID = getSortedFilesFromDirectory(directoryPath).back();
-    return stoi(lastAID) + 1;
+    int newId = stoi(lastAID) + 1;
+    ostringstream oss;
+    oss << setw(3) << std::setfill('0') << newId;
+
+    return oss.str();
 }
 
 string open(string userId, string password, string name, string start_value, string timeactive, string Fname, string Fsize, string Fdata) {
@@ -12,7 +18,7 @@ string open(string userId, string password, string name, string start_value, str
     if (!isLoggedIn(userId)) status = "NLG";    // FIXME what should return first
     else if (!isCorrectPassword(userId, password)) status = "NOK"; // FIXME what should return first
     else {
-        string aid = to_string(getAID());
+        string aid = getAID();
 
         filesystem::path assetFilePath = "AUCTIONS/" + aid + "/ASSET/" + Fname;
 
