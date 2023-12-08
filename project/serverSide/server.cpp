@@ -68,6 +68,21 @@ string getUDPCommand(string command) {
     return response + "\n";
 }
 
+string getTCPCommand(string command) {
+    string response;
+    istringstream iss(command);
+    string whichCommand;
+    iss >> whichCommand;
+
+    if (whichCommand == "OPA") {
+        string user, password, name, start_value, timeactive, Fname, Fsize, Fdata;
+        iss >> user >> password >> name >> start_value >> timeactive >> Fname >> Fsize >> Fdata;
+        response = open(user, password, name, start_value, timeactive, Fname, Fsize, Fdata);
+    }
+    else response = "ERR";
+    return response + "\n";
+}
+
 int main(int argc, char *argv[])
 {
     getArgs(argc, argv);
@@ -235,7 +250,11 @@ int main(int argc, char *argv[])
                 }
                 cout << "---TCP socket: " << finalBuffer << endl; // Debug
 
-                nWritten = write(new_tfd, finalBuffer.c_str(), finalBuffer.length()); // Send message to client
+                string returnString = getTCPCommand(finalBuffer);
+
+                cout << "vou devolver por TCP: " << returnString << endl;
+
+                nWritten = write(new_tfd, returnString.c_str(), returnString.length()); // Send message to client
                 if (nWritten == -1) // Will always get an error when using 'nc'
                 {
                     exit(1);

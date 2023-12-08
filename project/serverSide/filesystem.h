@@ -32,9 +32,12 @@ int createFile(string path, string content = "");
  * Lê o conteúdo de um ficheiro no caminho especificado.
  *
  * @param filePath O caminho para o ficheiro a ser lido.
- * @return Retorna uma string contendo o conteúdo do ficheiro.
+ * @return Retorna uma s\tring contendo o conteúdo do ficheiro.
  */
 string readFromFile(filesystem::path filePath);
+
+// bool writeFile(string filename, size_t fileSize, vector<char>fileData);
+bool writeFile(filesystem::path filePath, string fileSize, string fileData);
 
 /**
  * Obtém uma lista ordenada dos nomes dos ficheiros dentro de uma pasta.

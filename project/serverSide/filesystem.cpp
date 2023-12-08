@@ -81,3 +81,26 @@ vector<string> getSortedFilesFromDirectory(filesystem::path directoryPath) {
         exit(-1);
     }
 }
+
+bool writeFile(filesystem::path filePath, string fileSize, string fileData) {
+
+    stringstream sstream(fileSize);
+    size_t size;
+    sstream >> size;
+
+    ofstream outputFile(filePath, ios::binary);
+    if (outputFile.is_open()) {
+        // Write the file data to the file
+        outputFile.write(fileData.data(), static_cast<std::streamsize>(size));
+
+        // Close the file stream
+        outputFile.close();
+
+        std::cout << "File \"" << filePath << "\" successfully written to disk." << std::endl;
+        return true;
+    }
+    else {
+        std::cerr << "Error opening file: " << filePath << std::endl;
+        return false;
+    }
+}
