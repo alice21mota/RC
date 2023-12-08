@@ -30,7 +30,7 @@ string login(string userId, string password) {
         createUser(userId, password);
         status = "REG";
     }
-    return "RLN " + status;
+    return "RLI " + status;
 }
 
 string logout(string userId, string password) {
