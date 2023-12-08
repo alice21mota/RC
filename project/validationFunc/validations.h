@@ -2,35 +2,39 @@
 #define VALIDATIONS_H
 
 #include <string>
+#include <regex>
+#include <filesystem> 
+
+using namespace std;
 
 //Checks if the string is composed only of numbers
-bool isNumeric(std::string str);
+bool isNumeric(string str);
 
 //Checks if the string is composed only of numbers and chars
-bool isAlphanumeric(std::string str);
+bool isAlphanumeric(string str);
 
 //Checks if UID is in correct format
-bool isUID(std::string uid);
+bool isUID(string uid);
 
 //Checks if password is in correct format
-bool isPassword(std::string password);
+bool isPassword(string password);
 
 //Checks if description is in correct format
-bool isDescription(std::string description);
+bool isDescription(string description);
 
 //Checks if string is a valid filename
-bool isFileName(std::string fileName);
+bool isFileName(string fileName);
 
 //Checks if it is a valid startValue
-bool isStartValue(std::string startValue);
+bool isStartValue(string startValue);
 
 //Checks if it is a valid duration time
-bool isDuration(std::string duration);
+bool isDuration(string duration);
 
 //Checks if file exists
-bool fileExists(std::string asset_fname);
+bool fileExists(string asset_fname);
 
 //Checks if file is of valid size
-bool isFileSizeValid(std::size_t fileSize);
+bool isFileSizeValid(size_t fileSize);
 
 #endif // VALIDATIONS_H
