@@ -19,6 +19,7 @@
 #include <cctype>
 #include <algorithm>
 #include <regex>
+#include "validation_functions/validations.h"
 
 using namespace std;
 
@@ -215,74 +216,12 @@ void getArgs(int argc, char *argv[])
     }
 }
 
-// Checks if the string is composed only of numbers
-bool isNumeric(string str) {
-    return (all_of(str.begin(), str.end(), ::isdigit));
-}
-
-bool isAlphanumeric(string str) {
-    return (all_of(str.begin(), str.end(), ::isalnum));
-}
-
-// Check if UID is in correct format
-bool isUID(string uid){
-    return (uid.size()==6 && isNumeric(uid));
-}
-
-bool isPassword(string password){
-    return (password.size()== 8 && isAlphanumeric(password));
-}
-
-bool isDescription(string description){
-    if (description.size() > 0 && description.size() <= 10){
-        if (isAlphanumeric(description))
-            return true;
-        return false;
-    }
-    return false;
-}
-
-bool isFileName(string fileName){
-    const std::regex pattern("^([0-9]{1,21}\\.)?[a-zA-Z0-9_-]{1,21}\\.[a-zA-Z0-9_-]{3}$");
-
-    return regex_match(fileName, pattern);
-}
-
-bool isStartValue(string startValue){
-    if (startValue.size() > 0 && startValue.size() <= 6){
-        if (isNumeric(startValue))
-            return true;
-        return false;
-    }
-    return false;
-}
-
-bool isDuration(string duration){
-    if (duration.size() > 0 && duration.size() <= 5){
-        if (isNumeric(duration))
-            return true;
-        return false;
-    }
-    return false;
-}
-
-// Does file exists?
-bool fileExists(string asset_fname){
-
-    return filesystem::exists(asset_fname);
-}
-
 //Gets file size in bytes
 size_t getFileSize(string asset_fname) {
     ifstream file(asset_fname, ios::binary | ios::ate);
     size_t size = file.tellg();
     file.close();
     return size;
-}
-
-bool isFileSizeValid(size_t fileSize){
-    size_t maxSize = 10 * 1024 * 1024; //10MB in bytes
-    return fileSize <= maxSize;
 }
 
 string fileSizeString(string asset_fname) {
