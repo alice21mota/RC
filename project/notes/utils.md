@@ -51,7 +51,7 @@ Era uma vez, em uma pequena vila à beira-mar, um pescador chamado João. Todas 
   2. Download server
 
   ```
-  git clone https://ana-mc-almeida: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@https://github.com/alice21mota/RC.git
+  git clone https://ana-mc-almeida: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@github.com/alice21mota/RC.git
   ```
 
   3. Compile and run server
@@ -73,6 +73,9 @@ Era uma vez, em uma pequena vila à beira-mar, um pescador chamado João. Todas 
   echo "ip_do_sigma 58000 n_do_script
     " | nc tejo.tecnico.ulisboa.pt 59000 > report.html
   ```
+
+echo "193.136.128.109 58000 4
+" | nc tejo.tecnico.ulisboa.pt 59000 > report_04.html
 
 ### Tests
 

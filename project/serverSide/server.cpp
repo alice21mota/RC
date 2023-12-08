@@ -202,6 +202,7 @@ int main(int argc, char *argv[])
                     if (errcode == 0 && verbose)
                         cout << "       Sent by [" << host << ":" << service << "]" << endl;
 
+                    cout << "vou devolver: " << returnString << endl;
                     n = sendto(ufd, returnString.c_str(), returnString.length(), 0, (struct sockaddr *)&udp_useraddr, addrlen); // Send message to client
                     if (n == -1) /*error*/
                         exit(1);

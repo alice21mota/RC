@@ -6,8 +6,8 @@
 void createUser(string userId, string password) {
     // cout << "creating the folder struct" << endl; // Debug
     createUserFolder(userId);
-    createHostedFolder(userId);
-    createBiddedFolder(userId);
+    // createHostedFolder(userId);
+    // createBiddedFolder(userId);
     createUserPasswordFile(userId, password);
     createUserLoginFile(userId);
     // cout << "User folder struct created" << endl; // Debug
