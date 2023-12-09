@@ -239,16 +239,34 @@ int main(int argc, char *argv[])
 
                 FD_SET(new_tfd, &inputs); // Set TCP read channel on
             }
-            if (FD_ISSET(new_tfd, &testfds)) // Depois do accept tem de voltar a entrar no select
+            else if (FD_ISSET(new_tfd, &testfds)) // Depois do accept tem de voltar a entrar no select
             {
                 cout << "Entrei no read TCP" << endl; // Debug
 
                 int nWritten, nRead;
                 string finalBuffer;
-                while ((nRead = read(new_tfd, buffer, 128)) != 0)
-                {
+                nRead = read(new_tfd, buffer, 3);
+                if (nRead < 0)
+                    exit(1);
+                cout << buffer << endl;// Debug
+                if (strcmp(buffer, "OPA")) {
+                    nRead = read(new_tfd, buffer, 6);
                     if (nRead < 0)
                         exit(1);
+                    string userId = "";
+                    userId.append(buffer, 6);
+                    cout << "USER " << buffer << endl; // Debug
+
+                    nRead = read(new_tfd, buffer, 8);
+                    if (nRead < 0)
+                        exit(1);
+                    string password = "";
+                    password.append(buffer, 8);
+                    cout << "PASSWORD " << buffer << endl; // Debug
+
+                }
+                while ((nRead = read(new_tfd, buffer, 128)) != 0)
+                {
                     finalBuffer.append(buffer, nRead);
                 }
                 cout << "---TCP socket: " << finalBuffer << endl; // Debug
