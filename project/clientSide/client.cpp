@@ -18,9 +18,13 @@
 #include <string>
 #include <cctype>
 #include <algorithm>
+
 #include "../common/validations.h"
+#include "../common/auxFuncs.h"
 #include "status/processStatus.h"
 #include "globalsClient/globals.h"
+#include "commands/commandsUDP.h"
+#include "commands/commandsTCP.h"
 
 using namespace std;
 
@@ -217,91 +221,11 @@ void getArgs(int argc, char *argv[])
     }
 }
 
-//Gets file size in bytes
-size_t getFileSize(string asset_fname) {
-    ifstream file(asset_fname, ios::binary | ios::ate);
-    size_t size = file.tellg();
-    file.close();
-    cout << "Size is " << size << endl;
-    return size;
-}
-
-string fileSizeString(string asset_fname) {
-    size_t size = getFileSize(asset_fname);
-    ostringstream sizeStr;
-    sizeStr << size;
-
-    if (sizeStr.str().size() > 8){
-        return "TOO MANY DIGITS";
-    }
-
-    return sizeStr.str();
-}
-
 string readCommands(){
     string command;
     getline(cin, command);
     cout << "Command is: " << command << "\n";
     return command;
-}
-
-string login(string command){
-
-    // login UID password
-    // UID = 6 numeros
-    // password = 8 alphabumeric numbers
-
-    string whichCommand;    //, userID, password;
-    istringstream iss(command);
-
-    if (logged_in == false){
-
-        if (iss >> whichCommand >> userID >> password && iss.eof()) {
-            // Use userID and password as needed
-            if (isUID(userID) && isPassword(password)){
-                return "LIN " + userID + " " + password;
-            }
-
-            else {
-                //TODO -> Passar o userID e password a ""?
-                return "Incorrect login attempt";               // TODO DAR CHECK NESTES RETURNS. PASSAR SEND_UDP PARA AQUI??
-            }
-
-        } else {
-            return "Incorrect login attempt";
-        }
-
-    } else {
-        //cout << userID <<" "<< password << endl;
-        return "A user is already logged in";
-    }
-
-}
-
-string logout(){
-    if (userID != "" && password != ""){
-        return "LOU " + userID + " " + password;
-    }
-
-    else return "User not logged in";
-    //TODO CHECK IF LOGOUT IS CORRECT
-    //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
-}
-
-string unregister(){
-
-    if (userID != "" && password != ""){
-
-        if (isUID(userID) && isPassword(password)){
-            return "UNR " + userID + " " + password;
-        } else return "user not known";    
-
-    } else return "user not known";
-
-    /*if (logged_in = true)
-        return "UNR " + userID + " " + password;*/
-
-    //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
 }
 
 void exit(){
@@ -314,130 +238,6 @@ void exit(){
         cout << "Exiting the program.\n" << endl;
         exit(0);
     }
-}
-
-string open(string command){
-    // name asset_fname start_value timeactive
-    // name = max 10 alphanumeric
-    // asset_fname = name of image or document file
-    // start_value = max 6 digits
-    // timeactive = max 5 digits (seconds)
-
-    string whichCommand, name, asset_fname, start_value, timeactive;
-    string toReturn, fSize;// fName, fSize, fData;
-    istringstream iss(command);
-
-    if (userID != "" && password != ""){
-        if (iss >> whichCommand >> name >> asset_fname >> start_value >> timeactive && iss.eof()) {
-            
-            if (isDescription(name) && isFileName(asset_fname) && isStartValue(start_value) && isDuration(timeactive)){
-                
-                filePath = "ASSETS/" + asset_fname;
-                //Check if the file exists
-                if (fileExists(filePath)) {
-                    
-                    fName = asset_fname;
-                    size_t fileSize = getFileSize(filePath);
-                    if (isFileSizeValid(fileSize)){
-                        
-                        //TODO MAYBE CHANGE THIS FUNC LATER
-                        fSize = fileSizeString(filePath);
-
-                        if (fSize != "TOO MANY DIGITS"){
-
-                            toReturn = "OPA " + userID + " " + password + " " + name + " " + start_value + " " +
-                                    timeactive + " " + fName + " " + fSize + " ";
-
-                            return toReturn;
-                        }
-                        return "File Size is too big"; //TODO CHANGE THIS LATER
-                    }
-                    return "Invalid File Size";
-                } else
-                    return "File not found";
-            } else 
-                return "Invalid fields";             
-        } else 
-            return "Command not as expected";
-    }
-    return "Not logged in User Application";
-}
-
-string close(string command){
-    
-    string whichCommand, aid;    //, userID, password;
-    istringstream iss(command);
-
-    if ((userID != "" && password != "") || logged_in == true ){
-
-        if (iss >> whichCommand >> aid && iss.eof()) {
-            // TODO _ am i supposed to check if auser is logged in the user application?
-            if (isNumeric(aid) && aid.size() == 3){
-                tempAID = aid; //Used to return error to user if needed
-                return "CLS " + userID + " " + password + " " + aid;
-            }
-
-            else {
-                return "Incorrect AID";               // TODO DAR CHECK NESTES RETURNS. PASSAR SEND_UDP PARA AQUI??
-            }
-
-        } else {
-            return "Incorrect command format";
-        }
-
-    } else {
-        return "User not logged in User Appplication";
-    }
-}
-
-string myauctions(){
-    //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
-    if ((userID != "" && password != "") || logged_in == true ){
-        if (isUID(userID) && isPassword(password)){
-            return "LMA " + userID;
-        } else return "user not known"; 
-
-    } else return "user not known";
-}
-
-string bid(string command){
-    string whichCommand, aid, value;    //, userID, password;
-    istringstream iss(command);
-
-    if ((userID != "" && password != "") || logged_in == true ){
-
-        if (iss >> whichCommand >> aid >> value && iss.eof()) {
-            // TODO _ am i supposed to check if auser is logged in the user application?
-            if (isNumeric(aid) && aid.size() == 3){
-                tempAID = aid;
-
-                if (isNumeric(value)){
-                    return "BID " + userID + " " + password + " " + aid + " " + value;
-                } else return "Invalid value";
-
-            } else return "Invalid aid";
-
-        } else return "Incorrect command format";
-
-    } else return "User not logged in User Appplication";
-}
-
-string mybids(){
-    //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
-    if ((userID != "" && password != "") || logged_in == true ){
-        if (isUID(userID) && isPassword(password)){
-            return "LMB " + userID;
-        } else return "user not known"; 
-    } else return "user not known";
-}
-
-string list(string command){
-    //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
-    string whichCommand;    //, userID, password;
-    istringstream iss(command);
-    if (iss >> whichCommand && iss.eof()) {
-        return "LST";      
-    } else return "Incorrect command format";
 }
 
 string show_record(){

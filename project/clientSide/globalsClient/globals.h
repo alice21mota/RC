@@ -11,6 +11,7 @@ extern string password;
 extern string fName;
 extern string fData;
 extern string tempAID;
+extern string filePath;
 extern bool logged_in;
 
 
