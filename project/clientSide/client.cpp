@@ -18,14 +18,16 @@
 #include <string>
 #include <cctype>
 #include <algorithm>
-#include "../validationFunc/validations.h"
+#include "../common/validations.h"
+#include "status/processStatus.h"
+#include "globalsClient/globals.h"
 
 using namespace std;
 
 string port = "58000";
 string ip = "localhost";
 string userID, password;
-string fName, fData, tempAID;
+string fName, fData, tempAID, filePath;
 //#define PORT "58001"
 bool logged_in = false;
 
@@ -220,6 +222,7 @@ size_t getFileSize(string asset_fname) {
     ifstream file(asset_fname, ios::binary | ios::ate);
     size_t size = file.tellg();
     file.close();
+    cout << "Size is " << size << endl;
     return size;
 }
 
@@ -275,31 +278,6 @@ string login(string command){
 
 }
 
-void loginStatus(string status){
-    
-    //cout << "IN LOGIN \n";
-
-    if (status == "RLI OK"){
-        logged_in = true;
-        cout << "successful login\n";
-    }
-
-    //TODO check if userId and password can be saved like this, when login is not performed
-    else if (status == "RLI NOK"){
-        cout << "incorrect login attempt\n";
-    }
-    
-    //TODO check passing userID to ""
-    else if (status == "RLI REG"){
-        //userID = "";
-        //password = "";
-        logged_in = true;
-        cout << "new user registered\n";
-    }
-
-    else cout << "INCORRECT RESPONSE\n";
-}
-
 string logout(){
     if (userID != "" && password != ""){
         return "LOU " + userID + " " + password;
@@ -308,26 +286,6 @@ string logout(){
     else return "User not logged in";
     //TODO CHECK IF LOGOUT IS CORRECT
     //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
-}
-
-void logoutStatus(string status){
-    
-    if (status == "RLO OK"){
-        //userID = "";
-        //password = "";
-        logged_in = false;
-        cout << "successful logout\n";
-    }
-
-    else if (status == "RLO NOK"){
-        cout << "user not logged in\n";
-    }
-    
-    else if (status == "RLO UNR"){
-        cout << "unknown user\n";
-    }
-
-    else cout << "INCORRECT RESPONSE\n";
 }
 
 string unregister(){
@@ -344,26 +302,6 @@ string unregister(){
         return "UNR " + userID + " " + password;*/
 
     //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
-}
-
-void unregisterStatus(string status){
-    //TODO ALTER THIS TO BE THE SAMEAS THE OTHERS
-    if (status == "RUR OK"){
-        //userID = "";
-        //password = "";
-        logged_in = false;
-        cout << "successful unregister\n";
-    }
-
-    else if (status == "RUR NOK"){
-        cout << "incorrect unregister attempt\n";
-    }
-    
-    else if (status == "RUR UNR"){
-        cout << "unknown user\n";
-    }
-
-    else cout << "INCORRECT RESPONSE\n";
 }
 
 void exit(){
@@ -394,15 +332,16 @@ string open(string command){
             
             if (isDescription(name) && isFileName(asset_fname) && isStartValue(start_value) && isDuration(timeactive)){
                 
+                filePath = "ASSETS/" + asset_fname;
                 //Check if the file exists
-                if (fileExists(asset_fname)) {
+                if (fileExists(filePath)) {
                     
                     fName = asset_fname;
-                    size_t fileSize = getFileSize(fName);
+                    size_t fileSize = getFileSize(filePath);
                     if (isFileSizeValid(fileSize)){
                         
                         //TODO MAYBE CHANGE THIS FUNC LATER
-                        fSize = fileSizeString(fName);
+                        fSize = fileSizeString(filePath);
 
                         if (fSize != "TOO MANY DIGITS"){
 
@@ -422,38 +361,6 @@ string open(string command){
             return "Command not as expected";
     }
     return "Not logged in User Application";
-}
-
-void openStatus(string response){
-    istringstream iss(response);
-    string command, status, aid;
-
-    if (iss >> command >> status){// && iss.eof()){
-        
-        if (command == "ROA"){
-            
-            if (status == "NOK" && iss.eof()){
-                cout << "auction could not be started\n";
-            }
-
-            else if (status == "NLG" && iss.eof()){
-                cout << "user not logged in\n";
-            }
-
-            else if (status == "OK"){
-                if (iss >> aid && iss.eof()){
-                    if (aid.size() == 3 && isNumeric(aid)){
-                        cout << "successful request, AID = " << aid << "\n";
-                    }
-                    else cout << "incorrect AID\n";
-                    
-                } else cout << "incorrect response\n";
-
-            } else cout << "incorrect response\n";
-
-        } else cout << "incorrect response\n";
-
-    } else cout << "incorrect response\n";
 }
 
 string close(string command){
@@ -483,46 +390,6 @@ string close(string command){
     }
 }
 
-void closeStatus(string response){
-    istringstream iss(response);
-    string command, status;
-
-    if (iss >> command >> status && iss.eof()){
-
-        if (command == "RCL"){
-            
-            if (status == "OK"){
-                cout << "auction closed successfully" << endl;
-            }
-
-            else if (status == "NOK"){
-                cout << "user or password incorrect" << endl;
-            }
-
-            else if (status == "NLG"){
-                cout << "user not logged in" << endl;
-            }
-
-            else if (status == "EAU"){
-                cout << "auction " << tempAID << " does not exist" << endl;
-            }
-
-            else if (status == "EOW"){
-                cout << "user " << userID << " does not own " << "auction " << tempAID << endl;
-            }
-
-            else if (status == "END"){
-                cout << "auction " << tempAID << " has already ended" << endl;
-            }
-
-            else cout << "incorrect response\n";
-
-        } else cout << "incorrect response\n";
- 
-    } else cout << "incorrect response\n";
- 
-}
-
 string myauctions(){
     //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
     if ((userID != "" && password != "") || logged_in == true ){
@@ -531,44 +398,6 @@ string myauctions(){
         } else return "user not known"; 
 
     } else return "user not known";
-}
-
-void myauctionsStatus(string response){
-    istringstream iss(response);
-    string command, status, aid, state;
-
-    if (iss >> command >> status){
-       
-        if (iss.eof()){
-
-            if (command == "RMA"){
-
-                if (status == "NOK"){
-                    cout << "user " << userID << " does not have ongoing auctions" << endl;
-                }
-
-                else if (status == "NLG"){
-                    cout << "user not logged in" << endl;
-                }
-
-                else cout << "!incorrect response" << endl;
-
-            } else cout << "incorrect response" << endl;
-        } 
-
-        else if (command == "RMA" && status == "OK"){
-                    
-                while (iss >> aid >> state) {
-                    /*if (iss.eof()){             //TODO KINDA POINTLESS BUT CHECK
-                        cout << "Auction ID: "  << aid << ", State: " << state << endl;
-                    }*/
-                    cout << "Auction ID: "  << aid << ", State: " << state << endl;
-                }
-
-        } else cout << "incorrect response!" << endl; 
-        
-    } else cout << "incorrect response!!!" << endl;
-
 }
 
 string bid(string command){
@@ -593,40 +422,6 @@ string bid(string command){
     } else return "User not logged in User Appplication";
 }
 
-void bidStatus(string response){
-    istringstream iss(response);
-    string command, status;
-    if (iss >> command >> status && iss.eof()){
-
-        if (command == "RBD"){
-            
-            if (status == "ACC"){
-                cout << "Bid accepted" << endl;
-            }
-
-            else if (status == "NOK"){
-                cout << "Auction " << tempAID << " is not active" << endl;
-            }
-
-            else if (status == "NLG"){
-                cout << "User not logged in" << endl;
-            }
-
-            else if (status == "REF"){
-                cout << "Bid refused. Larger bid placed previously" << endl;
-            }
-
-            else if (status == "ILG"){
-                cout << "Cannot bid on auction hosted by yourself" << endl;
-            }
-
-            else cout << "incorrect response\n";
-
-        } else cout << "incorrect response\n";
- 
-    } else cout << "incorrect response\n";
-}
-
 string mybids(){
     //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
     if ((userID != "" && password != "") || logged_in == true ){
@@ -636,44 +431,6 @@ string mybids(){
     } else return "user not known";
 }
 
-void mybidsStatus(string response){
-    istringstream iss(response);
-    string command, status, aid, state;
-
-    if (iss >> command >> status){
-       
-        if (iss.eof()){
-
-            if (command == "RMB"){
-
-                if (status == "NOK"){
-                    cout << "user " << userID << " does not have ongoing bids" << endl;
-                }
-
-                else if (status == "NLG"){
-                    cout << "user not logged in" << endl;
-                }
-
-                else cout << "!incorrect response" << endl;
-
-            } else cout << "incorrect response" << endl;
-        } 
-
-        else if (command == "RMB" && status == "OK"){
-                    
-                while (iss >> aid >> state) {
-                    /*if (iss.eof()){             //TODO KINDA POINTLESS BUT CHECK
-                        cout << "Auction ID: "  << aid << ", State: " << state << endl;
-                    }*/
-                    cout << "Auction ID: "  << aid << ", State: " << state << endl;
-                }
-
-        } else cout << "incorrect response!" << endl; 
-        
-    } else cout << "incorrect response!!!" << endl;
-
-}
-
 string list(string command){
     //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
     string whichCommand;    //, userID, password;
@@ -681,34 +438,6 @@ string list(string command){
     if (iss >> whichCommand && iss.eof()) {
         return "LST";      
     } else return "Incorrect command format";
-}
-
-void listStatus(string response){
-    istringstream iss(response);
-    string command, status, aid, state;
-
-    if (iss >> command >> status){
-       
-        if (iss.eof()){
-
-            if (command == "RLS" && status == "NOK"){
-                cout << "No auction has been started" << endl;
-
-            } else cout << "incorrect response" << endl;
-        } 
-
-        else if (command == "RLS" && status == "OK"){
-                    
-                while (iss >> aid >> state) {
-                    /*if (iss.eof()){             //TODO KINDA POINTLESS BUT CHECK
-                        cout << "Auction ID: "  << aid << ", State: " << state << endl;
-                    }*/
-                    cout << "Auction ID: "  << aid << ", State: " << state << endl;
-                }
-
-        } else cout << "incorrect response" << endl; 
-        
-    } else cout << "incorrect response" << endl;
 }
 
 string show_record(){
@@ -776,7 +505,8 @@ void getCommand(string command){
         if (request.substr(0, 3) == "OPA"){
             cout << request << "\n";
             cout << fName << " <- FILE NAME\n";
-            result = sendTCP(request, fName);
+            cout << filePath << " <- FILE PATH\n";
+            result = sendTCP(request, filePath);
             status = result.substr(0, result.find('\n'));
             cout << "Status is->" << status <<"\n";
             cout << "RESPONSE:";

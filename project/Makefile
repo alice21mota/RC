@@ -1,8 +1,7 @@
 TARGETS = server client
 
 SERVER_SRC = serverSide/server.cpp serverSide/filesystem.cpp serverSide/functionsUDP.cpp serverSide/manageUsersFolder.cpp serverSide/utils.cpp
-CLIENT_SRC = clientSide/client.cpp validationFunc/validations.cpp
-
+CLIENT_SRC = clientSide/client.cpp clientSide/status/processStatus.cpp common/validations.cpp
 all: $(TARGETS)
 
 server: $(SERVER_SRC)
