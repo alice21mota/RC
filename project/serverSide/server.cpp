@@ -75,6 +75,11 @@ string getTCPCommand(string command) {
         Fdata = command.substr(command.size() - stoi(Fsize) - 1, stoi(Fsize));
         response = open(user, password, name, start_value, timeactive, Fname, Fsize, Fdata);
     }
+    if (whichCommand == "SAS") {
+        string auctionId;
+        iss >> auctionId;
+        response = showAsset(auctionId);
+    }
     else response = "ERR";
     return response + "\n";
 }

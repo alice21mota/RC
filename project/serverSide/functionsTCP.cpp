@@ -43,3 +43,25 @@ string open(string userId, string password, string name, string start_value, str
     }
     return "ROA " + status;
 }
+
+string showAsset(string auctionId) {
+    string status;
+    if (!isExistingAuction(auctionId)) status = "NOK";
+    else
+    {
+        filesystem::path directoryPath = "AUCTIONS/" + auctionId + "/ASSET/";
+        vector<string> files = getSortedFilesFromDirectory(directoryPath);
+        if (files.size() != 1) status = "NOK";
+        else {
+            string Fname = files[0];
+            filesystem::path filePath = directoryPath / Fname;
+            string Fdata = readFromFile(filePath);
+            if (Fdata == "-1") status = "NOK";
+            else {
+                int Fsize = Fdata.length();
+                status = "OK " + Fname + " " + to_string(Fsize) + " " + Fdata;
+            }
+        }
+    }
+    return "RSA " + status;
+}

@@ -55,6 +55,12 @@ bool isAuctionActive(string auctionId);
  */
 bool existAuctions();
 
+/**
+ * Checks if the provided auction exists
+ * by verifying if the AUCTIONS/auctionId folder exists.
+ */
+bool isExistingAuction(string auctionId);
+
 // string getDate();
 
 /**
