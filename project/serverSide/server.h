@@ -8,6 +8,7 @@
 #include "filesystem.h"
 #include "manageUsersFolder.h"
 #include "functionsUDP.h"
+#include "functionsTCP.h"
 
 #include <iostream>
 using namespace std;

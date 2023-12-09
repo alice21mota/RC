@@ -47,3 +47,44 @@ bool existAuctions() {
     filesystem::path directoryPath = "AUCTIONS/";
     return filesystem::exists(directoryPath);
 }
+
+// string getDate() {
+//     time_t  fulltime;
+//     struct tm *current_time;
+//     char time_str[20];
+
+//     time(&fulltime); // Get current time in seconds starting at 1970−...
+//     current_time = gmtime(&fulltime); // Convert time to YYYY−MM−DD  HH:MM: SS .    current time points to a struct of type tm 
+//     sprintf(time_str, "%4d-%02d-%02d %02d:%02d:%02d",
+//         current_time->tm_year + 1900,
+//         current_time->tm_mon + 1,
+//         current_time->tm_mday,
+//         current_time->tm_hour,
+//         current_time->tm_min,
+//         current_time->tm_sec
+//     );
+//     return time_str;
+// }
+
+time_t getSeconds() {
+    time_t  fulltime;
+    time(&fulltime); // Get current time in seconds starting at 1970−...
+    return fulltime;
+}
+
+string secondsToDate(time_t  fulltime) {
+    struct tm *current_time;
+    char time_str[20];
+
+    time(&fulltime); // Get current time in seconds starting at 1970−...
+    current_time = gmtime(&fulltime); // Convert time to YYYY−MM−DD  HH:MM: SS .    current time points to a struct of type tm 
+    sprintf(time_str, "%4d-%02d-%02d %02d:%02d:%02d",
+        current_time->tm_year + 1900,
+        current_time->tm_mon + 1,
+        current_time->tm_mday,
+        current_time->tm_hour,
+        current_time->tm_min,
+        current_time->tm_sec
+    );
+    return time_str;
+}

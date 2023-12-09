@@ -25,11 +25,6 @@ void getArgs(int argc, char *argv[])
     }
 }
 
-// void createAuctionsFolder() {
-//     filesystem::path directoryPath("AUCTIONS");
-//     createFolder(directoryPath);
-// }
-
 string getUDPCommand(string command) {
     string response;
     istringstream iss(command);
@@ -63,6 +58,22 @@ string getUDPCommand(string command) {
     }
     else if (whichCommand == "LST") {
         response = listAuctions();
+    }
+    else response = "ERR";
+    return response + "\n";
+}
+
+string getTCPCommand(string command) {
+    string response;
+    istringstream iss(command);
+    string whichCommand;
+    iss >> whichCommand;
+
+    if (whichCommand == "OPA") {
+        string user, password, name, start_value, timeactive, Fname, Fsize, Fdata;
+        iss >> user >> password >> name >> start_value >> timeactive >> Fname >> Fsize;
+        Fdata = command.substr(command.size() - stoi(Fsize), stoi(Fsize));
+        response = open(user, password, name, start_value, timeactive, Fname, Fsize, Fdata);
     }
     else response = "ERR";
     return response + "\n";
@@ -223,19 +234,26 @@ int main(int argc, char *argv[])
 
                 FD_SET(new_tfd, &inputs); // Set TCP read channel on
             }
-            if (FD_ISSET(new_tfd, &testfds)) // Depois do accept tem de voltar a entrar no select
+            else if (FD_ISSET(new_tfd, &testfds)) // Depois do accept tem de voltar a entrar no select
             {
+                cout << "Entrei no read TCP" << endl; // Debug
+
                 int nWritten, nRead;
                 string finalBuffer;
-                while ((nRead = read(new_tfd, buffer, 128)) != 0)
+                while ((nRead = read(new_tfd, buffer, 127)) != 0)
                 {
                     if (nRead < 0)
                         exit(1);
                     finalBuffer.append(buffer, nRead);
+                    if (nRead < 127) break; // FIXME acho que não pode ser assim mas por enquanto está a funcionar :))
                 }
                 cout << "---TCP socket: " << finalBuffer << endl; // Debug
 
-                nWritten = write(new_tfd, finalBuffer.c_str(), finalBuffer.length()); // Send message to client
+                string returnString = getTCPCommand(finalBuffer);
+
+                cout << "vou devolver por TCP: " << returnString << endl;
+
+                nWritten = write(new_tfd, returnString.c_str(), returnString.length()); // Send message to client
                 if (nWritten == -1) // Will always get an error when using 'nc'
                 {
                     exit(1);
@@ -248,5 +266,9 @@ int main(int argc, char *argv[])
             }
         }
     }
-exit_loop:;
+exit_loop:
+    close(new_tfd);
+    close(tfd);
+    close(ufd);
+    ;
 }

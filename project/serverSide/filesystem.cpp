@@ -1,6 +1,6 @@
 #include "filesystem.h"
 
-int createFolder(filesystem::path directoryPath) {
+bool createFolder(filesystem::path directoryPath) {
     if (!filesystem::exists(directoryPath)) {
         if (filesystem::create_directories(directoryPath)) {
             cout << "Directory " << directoryPath << " created successfully." << endl; // Debug
@@ -17,7 +17,7 @@ int createFolder(filesystem::path directoryPath) {
 }
 
 
-int createFile(string path, string content) {
+bool createFile(string path, string content) {
     ofstream file(path);
     if (file.is_open()) {
         if (!content.empty()) {
@@ -25,11 +25,11 @@ int createFile(string path, string content) {
         }
         file.close();
         cout << "file created in " << path << endl; // Debug
-        return 0;
+        return true;
     }
     else {
         cerr << "Erro ao criar o ficheiro: " << path << endl; // Debug
-        return -1;
+        return false;
     }
 }
 
@@ -79,5 +79,28 @@ vector<string> getSortedFilesFromDirectory(filesystem::path directoryPath) {
     else { // FIXME deal with the errors
         cerr << "O caminho especificado não é um diretório válido." << std::endl;
         exit(-1);
+    }
+}
+
+bool writeFile(filesystem::path filePath, string fileSize, string fileData) {
+
+    stringstream sstream(fileSize);
+    size_t size;
+    sstream >> size;
+
+    ofstream outputFile(filePath, ios::binary);
+    if (outputFile.is_open()) {
+        // Write the file data to the file
+        outputFile.write(fileData.data(), static_cast<std::streamsize>(size));
+
+        // Close the file stream
+        outputFile.close();
+
+        std::cout << "File \"" << filePath << "\" successfully written to disk." << std::endl;
+        return true;
+    }
+    else {
+        std::cerr << "Error opening file: " << filePath << std::endl;
+        return false;
     }
 }

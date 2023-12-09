@@ -17,7 +17,7 @@ using namespace std;
  * @param directoryPath O caminho para a pasta a ser criada.
  * @return Retorna 0 se a pasta for criada com sucesso, -1 em caso de erro.
  */
-int createFolder(filesystem::path directoryPath);
+bool createFolder(filesystem::path directoryPath);
 
 /**
  * Cria um novo ficheiro no caminho especificado e opcionalmente escreve conteúdo nele.
@@ -26,15 +26,18 @@ int createFolder(filesystem::path directoryPath);
  * @param content O conteúdo a ser escrito no ficheiro (opcional).
  * @return Retorna 0 se o ficheiro for criado com sucesso, -1 em caso de erro.
  */
-int createFile(string path, string content = "");
+bool createFile(string path, string content = "");
 
 /**
  * Lê o conteúdo de um ficheiro no caminho especificado.
  *
  * @param filePath O caminho para o ficheiro a ser lido.
- * @return Retorna uma string contendo o conteúdo do ficheiro.
+ * @return Retorna uma s\tring contendo o conteúdo do ficheiro.
  */
 string readFromFile(filesystem::path filePath);
+
+// bool writeFile(string filename, size_t fileSize, vector<char>fileData);
+bool writeFile(filesystem::path filePath, string fileSize, string fileData);
 
 /**
  * Obtém uma lista ordenada dos nomes dos ficheiros dentro de uma pasta.

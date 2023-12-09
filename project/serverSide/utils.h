@@ -55,4 +55,16 @@ bool isAuctionActive(string auctionId);
  */
 bool existAuctions();
 
+// string getDate();
+
+/**
+ * Get current time in seconds starting at 1970−...
+ */
+time_t getSeconds();
+
+/**
+ * Convert time to YYYY−MM−DD  HH:MM:SS
+ */
+string secondsToDate(time_t  fulltime);
+
 #endif

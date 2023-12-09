@@ -6,6 +6,7 @@
 #include "filesystem.h"
 
 #include <iostream>
+using namespace std;
 
 string login(string userId, string password);
 
