@@ -72,7 +72,7 @@ string getTCPCommand(string command) {
     if (whichCommand == "OPA") {
         string user, password, name, start_value, timeactive, Fname, Fsize, Fdata;
         iss >> user >> password >> name >> start_value >> timeactive >> Fname >> Fsize;
-        Fdata = command.substr(command.size() - stoi(Fsize));
+        Fdata = command.substr(command.size() - stoi(Fsize), stoi(Fsize));
         response = open(user, password, name, start_value, timeactive, Fname, Fsize, Fdata);
     }
     else response = "ERR";
