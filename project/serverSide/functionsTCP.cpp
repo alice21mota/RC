@@ -13,7 +13,7 @@ string getAID() {
 }
 
 string open(string userId, string password, string name, string start_value, string timeactive, string Fname, string Fsize, string Fdata) {
-    cout << "entrei no OPEN" << endl; // Debug
+    // cout << "entrei no OPEN" << endl; // Debug
     string status;
 
     if (!isLoggedIn(userId)) status = "NLG";    // FIXME what should return first
@@ -38,7 +38,7 @@ string open(string userId, string password, string name, string start_value, str
 
             string contentStartFile = userId + ", " + name + ", " + Fname + ", " + start_value + ", " + timeactive + ", " + start_datetime + ", " + to_string(start_fulltime) + "\n";
             if (!createFile(startFilePath, contentStartFile)) status = "NOK";
-            else status = "OK";
+            else status = "OK " + aid;
         }
     }
     return "ROA " + status;
