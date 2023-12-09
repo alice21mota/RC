@@ -72,10 +72,7 @@ string getTCPCommand(string command) {
     if (whichCommand == "OPA") {
         string user, password, name, start_value, timeactive, Fname, Fsize, Fdata;
         iss >> user >> password >> name >> start_value >> timeactive >> Fname >> Fsize;
-        cout << "value = " << command.size() - stoi(Fsize) - 1 << endl;
         Fdata = command.substr(command.size() - stoi(Fsize) - 1, stoi(Fsize));
-        cout << "Fsize = " << Fsize << endl;
-        cout << "FData = " << Fdata << endl;
         response = open(user, password, name, start_value, timeactive, Fname, Fsize, Fdata);
     }
     else response = "ERR";
@@ -270,9 +267,5 @@ int main(int argc, char *argv[])
             }
         }
     }
-exit_loop:
-    close(new_tfd);
-    close(tfd);
-    close(ufd);
-    ;
+exit_loop:; // FIXME: should i force to close all the sockets here?
 }
