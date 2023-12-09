@@ -241,6 +241,8 @@ int main(int argc, char *argv[])
             }
             if (FD_ISSET(new_tfd, &testfds)) // Depois do accept tem de voltar a entrar no select
             {
+                cout << "Entrei no read TCP" << endl; // Debug
+
                 int nWritten, nRead;
                 string finalBuffer;
                 while ((nRead = read(new_tfd, buffer, 128)) != 0)
@@ -268,5 +270,9 @@ int main(int argc, char *argv[])
             }
         }
     }
-exit_loop:;
+exit_loop:
+    close(new_tfd);
+    close(tfd);
+    close(ufd);
+    ;
 }

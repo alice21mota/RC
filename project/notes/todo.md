@@ -16,6 +16,7 @@
 - [x] As funções de criar os ficheiros estão bué redundantes mas não sei como lidar com os erros
 - [ ] Check what sould return if is an **unlogged** user **without** bids
 - [ ] _maybe_ pôr as path como `const` e `getPath... functions`
+- [ ] Não permitir mais do 999 auctions
 
 - Testar
 - [ ] correr o `isCorrectPassword()` com um user que não existe

@@ -13,17 +13,19 @@ string getAID() {
 }
 
 string open(string userId, string password, string name, string start_value, string timeactive, string Fname, string Fsize, string Fdata) {
+    cout << "entrei no OPEN" << endl; // Debug
     string status;
 
     if (!isLoggedIn(userId)) status = "NLG";    // FIXME what should return first
     else if (!isCorrectPassword(userId, password)) status = "NOK"; // FIXME what should return first
     else {
         string aid = getAID();
-
+        cout << "aid  = " << aid << endl; // Debug
         filesystem::path assetFilePath = "AUCTIONS/" + aid + "/ASSET/" + Fname;
 
         if (!writeFile(assetFilePath, Fsize, Fdata)) status = "NOK";
         else {
+            cout << "escreveu o file" << endl; // Debug
             filesystem::path startFilePath = "AUCTIONS/" + aid + "START_" + aid + ".txt";
 
             time_t start_fulltime = getSeconds();
