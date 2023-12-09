@@ -24,6 +24,7 @@ string open(string userId, string password, string name, string start_value, str
         string aid = getAID();
         cout << "aid  = " << aid << endl; // Debug
         createAuctionFolder(aid);
+        createAuctionAssetFolder(aid);
 
         filesystem::path assetFilePath = "AUCTIONS/" + aid + "/ASSET/" + Fname;
 
