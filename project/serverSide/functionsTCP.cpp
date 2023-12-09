@@ -19,8 +19,12 @@ string open(string userId, string password, string name, string start_value, str
     if (!isLoggedIn(userId)) status = "NLG";    // FIXME what should return first
     else if (!isCorrectPassword(userId, password)) status = "NOK"; // FIXME what should return first
     else {
+        if (!existAuctions()) createAuctionsFolder();
+
         string aid = getAID();
         cout << "aid  = " << aid << endl; // Debug
+        createAuctionFolder(aid);
+
         filesystem::path assetFilePath = "AUCTIONS/" + aid + "/ASSET/" + Fname;
 
         if (!writeFile(assetFilePath, Fsize, Fdata)) status = "NOK";

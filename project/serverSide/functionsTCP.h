@@ -3,6 +3,7 @@
 
 #include "utils.h"
 #include "filesystem.h"
+#include "manageAuctionsFolder.h"
 
 // #include <string>
 

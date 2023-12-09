@@ -25,11 +25,6 @@ void getArgs(int argc, char *argv[])
     }
 }
 
-// void createAuctionsFolder() {
-//     filesystem::path directoryPath("AUCTIONS");
-//     createFolder(directoryPath);
-// }
-
 string getUDPCommand(string command) {
     string response;
     istringstream iss(command);
@@ -245,33 +240,12 @@ int main(int argc, char *argv[])
 
                 int nWritten, nRead;
                 string finalBuffer;
-                // nRead = read(new_tfd, buffer, 3);
-                // if (nRead < 0)
-                //     exit(1);
-                // cout << buffer << endl;// Debug
-                // if (strcmp(buffer, "OPA")) {
-                //     cout << "entrei no if" << endl;
-                //     nRead = read(new_tfd, buffer, 6);
-                //     if (nRead < 0)
-                //         exit(1);
-                //     string userId = "";
-                //     userId.append(buffer, 6);
-                //     cout << "USER " << userId << endl; // Debug
-
-                //     nRead = read(new_tfd, buffer, 8);
-                //     if (nRead < 0)
-                //         exit(1);
-                //     string password = "";
-                //     password.append(buffer, 8);
-                //     cout << "PASSWORD " << password << endl; // Debug
-                // }
-                cout << "vou para o while" << endl;
                 while ((nRead = read(new_tfd, buffer, 127)) != 0)
                 {
                     if (nRead < 0)
                         exit(1);
                     finalBuffer.append(buffer, nRead);
-                    if (nRead < 127) break;
+                    if (nRead < 127) break; // FIXME acho que não pode ser assim mas por enquanto está a funcionar :))
                 }
                 cout << "---TCP socket: " << finalBuffer << endl; // Debug
 
