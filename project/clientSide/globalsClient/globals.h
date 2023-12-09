@@ -12,6 +12,8 @@ extern string fName;
 extern string fData;
 extern string tempAID;
 extern string filePath;
+extern string port;
+extern string ip;
 extern bool logged_in;
 
 

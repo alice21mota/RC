@@ -48,7 +48,6 @@ string open(string command){
     } else return "Not logged in User Application";
 }
 
-
 string close(string command){
     
     string whichCommand, aid;    
