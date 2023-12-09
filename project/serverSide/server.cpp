@@ -72,12 +72,16 @@ string getTCPCommand(string command) {
     if (whichCommand == "OPA") {
         string user, password, name, start_value, timeactive, Fname, Fsize, Fdata;
         iss >> user >> password >> name >> start_value >> timeactive >> Fname >> Fsize;
-        Fdata = command.substr(command.size() - stoi(Fsize), stoi(Fsize));
+        cout << "value = " << command.size() - stoi(Fsize) - 1 << endl;
+        Fdata = command.substr(command.size() - stoi(Fsize) - 1, stoi(Fsize));
+        cout << "Fsize = " << Fsize << endl;
+        cout << "FData = " << Fdata << endl;
         response = open(user, password, name, start_value, timeactive, Fname, Fsize, Fdata);
     }
     else response = "ERR";
     return response + "\n";
 }
+
 
 int main(int argc, char *argv[])
 {
@@ -245,7 +249,7 @@ int main(int argc, char *argv[])
                     if (nRead < 0)
                         exit(1);
                     finalBuffer.append(buffer, nRead);
-                    if (nRead < 127) break; // FIXME acho que não pode ser assim mas por enquanto está a funcionar :))
+                    if (nRead < 127 && buffer[nRead - 1] == '\n') break; // FIXME acho que não pode ser assim mas por enquanto está a funcionar :))
                 }
                 cout << "---TCP socket: " << finalBuffer << endl; // Debug
 

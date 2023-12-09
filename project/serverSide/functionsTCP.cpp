@@ -38,7 +38,7 @@ string open(string userId, string password, string name, string start_value, str
 
             string contentStartFile = userId + ", " + name + ", " + Fname + ", " + start_value + ", " + timeactive + ", " + start_datetime + ", " + to_string(start_fulltime) + "\n";
             if (!createFile(startFilePath, contentStartFile)) status = "NOK";
-            else status = "OK";
+            else status = "OK " + aid;
         }
     }
     return "ROA " + status;
