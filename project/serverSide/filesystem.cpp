@@ -1,6 +1,6 @@
 #include "filesystem.h"
 
-int createFolder(filesystem::path directoryPath) {
+bool createFolder(filesystem::path directoryPath) {
     if (!filesystem::exists(directoryPath)) {
         if (filesystem::create_directories(directoryPath)) {
             cout << "Directory " << directoryPath << " created successfully." << endl; // Debug
@@ -17,7 +17,7 @@ int createFolder(filesystem::path directoryPath) {
 }
 
 
-int createFile(string path, string content) {
+bool createFile(string path, string content) {
     ofstream file(path);
     if (file.is_open()) {
         if (!content.empty()) {
@@ -25,11 +25,11 @@ int createFile(string path, string content) {
         }
         file.close();
         cout << "file created in " << path << endl; // Debug
-        return 0;
+        return true;
     }
     else {
         cerr << "Erro ao criar o ficheiro: " << path << endl; // Debug
-        return -1;
+        return false;
     }
 }
 

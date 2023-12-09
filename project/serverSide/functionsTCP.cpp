@@ -8,7 +8,7 @@ string getAID() {
     int newId = stoi(lastAID) + 1;
     ostringstream oss;
     oss << setw(3) << std::setfill('0') << newId;
-
+    // FIXME what if aid > 999 ?
     return oss.str();
 }
 
@@ -31,12 +31,12 @@ string open(string userId, string password, string name, string start_value, str
         if (!writeFile(assetFilePath, Fsize, Fdata)) status = "NOK";
         else {
             cout << "escreveu o file" << endl; // Debug
-            filesystem::path startFilePath = "AUCTIONS/" + aid + "START_" + aid + ".txt";
+            filesystem::path startFilePath = "AUCTIONS/" + aid + "/START_" + aid + ".txt";
 
             time_t start_fulltime = getSeconds();
             string start_datetime = secondsToDate(start_fulltime);
 
-            string contentStartFile = userId + ", " + name + ", " + Fname + ", " + start_value + ", " + timeactive + ", " + start_datetime + ", " + to_string(start_fulltime);
+            string contentStartFile = userId + ", " + name + ", " + Fname + ", " + start_value + ", " + timeactive + ", " + start_datetime + ", " + to_string(start_fulltime) + "\n";
             if (!createFile(startFilePath, contentStartFile)) status = "NOK";
             else status = "OK";
         }
