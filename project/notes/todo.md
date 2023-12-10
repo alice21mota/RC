@@ -19,6 +19,8 @@
 - [ ] Não permitir mais do 999 auctions
 - [ ] Ver a diferença entre o writeFile e o createFile
 - [ ] Quando temos de retornar um `status` é suposto este ser `ERR` se os parametros forem errados
+- [ ] Quando estou a enviar um ficheiro tenho de garantir que acaba com `\n`
+- [ ] Garantir que não há mais do que 50 bids -> not sure, [estava no slack](https://rc-2324.slack.com/archives/C0614L96BUN/p1701964605129539)
 
 - Testar
 - [ ] correr o `isCorrectPassword()` com um user que não existe
@@ -29,3 +31,5 @@
 - [ ] Função de exit
 - [x] Fechar sempre o socket do UDP ou deixar aberto? --> tanto faz mas o stor prefere que esteja sempre fechado
 - [ ] Checkar que não há espaços entre as mensagens trocadas com o server (se houverem, tem de dar erro)
+- [ ] https://rc-2324.slack.com/archives/C0614L96BUN/p1701789339515289?thread_ts=1701783007.463039&cid=C0614L96BUN
+- [ ] https://rc-2324.slack.com/archives/C0614L96BUN/p1701853995009919?thread_ts=1701799419.818599&cid=C0614L96BUN

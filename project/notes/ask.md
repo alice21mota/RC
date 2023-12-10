@@ -6,7 +6,8 @@
 
 ### Server Side
 
-- [ ] Posso só criar as pastas `HOSTED`, `BIDDED` e `AUCTIONS` só quando existir pelo menos uma
+- [x] Posso só criar as pastas `HOSTED`, `BIDDED` e `AUCTIONS` só quando existir pelo menos uma
+  - Answer is in [slack](https://rc-2324.slack.com/archives/C0614L96BUN/p1701728614949099?thread_ts=1701720539.828539&cid=C0614L96BUN)
 - [ ] Quando colocamos o tempo em que o leilao esteve ativo é tendo em conta quando o encerramos ou quando ele devia terminar --> depende de quando é que corremos a função para o encerrar
 - [ ] Podemos devolver 'NOK' quando dá algum tipo de erro ao criar ficheiros e tal?
 - [ ] Ordem pela qual temos de dar prioridade aos states.
