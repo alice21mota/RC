@@ -93,3 +93,7 @@ string secondsToDate(time_t  fulltime) {
     );
     return time_str;
 }
+
+bool isOwner(string userId, string auctionId) {
+    return userId == getAuctionOwner(auctionId);
+}

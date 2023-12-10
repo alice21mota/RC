@@ -11,6 +11,9 @@
 #include <iostream>
 using namespace std;
 
+const int FULLTIME_NCHARS = 10;
+const int USERID_NCHARS = 6;
+
 string getAID();
 
 bool createAuctionsFolder();
@@ -31,6 +34,8 @@ bool createAuctionEndFile(string auctionId);
 int getAuctionStartFullTime(string auctionId);
 
 int getAuctionTimeactive(string auctionId);
+
+string getAuctionOwner(string auctionId);
 
 int checkExpiredAuctions();
 

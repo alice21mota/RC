@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include "filesystem.h"
+#include "manageAuctionsFolder.h"
 
 #include <iostream>
 using namespace std;
@@ -72,6 +73,8 @@ time_t getSeconds();
  * Convert time to YYYY−MM−DD  HH:MM:SS
  */
 string secondsToDate(time_t  fulltime);
+
+bool isOwner(string userId, string auctionId);
 
 
 #endif

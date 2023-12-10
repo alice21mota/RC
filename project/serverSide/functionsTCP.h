@@ -14,4 +14,6 @@ string open(string userId, string password, string name, string start_value, str
 
 string showAsset(string auctionId);
 
+string closeAuction(string userId, string password, string auctionId);
+
 #endif

@@ -8,5 +8,6 @@
 
 - [ ] Posso só criar as pastas `HOSTED`, `BIDDED` e `AUCTIONS` só quando existir pelo menos uma
 - [ ] Quando colocamos o tempo em que o leilao esteve ativo é tendo em conta quando o encerramos ou quando ele devia terminar --> depende de quando é que corremos a função para o encerrar
+- [ ] Podemos devolver 'NOK' quando dá algum tipo de erro ao criar ficheiros e tal?
 
 ### Client Side

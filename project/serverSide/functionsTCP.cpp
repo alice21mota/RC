@@ -49,3 +49,13 @@ string showAsset(string auctionId) {
     }
     return "RSA " + status;
 }
+
+string closeAuction(string userId, string password, string auctionId) {
+    string command = "RCL ";
+    if (!isLoggedIn(userId)) return command + "NLG";
+    if (!isExistingAuction(auctionId)) return command + "EAU";
+    if (!isOwner(userId, auctionId)) return command + "EOW";
+    if (!isAuctionActive(auctionId)) return command + "END";
+    if (!createAuctionEndFile(auctionId)) return command + "NOK";
+    return command + "OK";
+}

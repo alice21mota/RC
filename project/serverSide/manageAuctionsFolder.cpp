@@ -69,8 +69,7 @@ int getAuctionStartFullTime(string auctionId) {
     filesystem::path startFilePath("AUCTIONS/" + auctionId + "/START_" + auctionId + ".txt");
     string infos = readFromFile(startFilePath);
     int infosLen = infos.length();
-    int nCharsFullTime = 10;
-    string start_fulltime = infos.substr(infosLen - 1 - nCharsFullTime, nCharsFullTime);
+    string start_fulltime = infos.substr(infosLen - 1 - FULLTIME_NCHARS, FULLTIME_NCHARS);
     return stoi(start_fulltime);
 }
 
@@ -86,6 +85,12 @@ int getAuctionTimeactive(string auctionId) {
     string timeactive = infos.substr(startPosition, endPosition - startPosition);
 
     return stoi(timeactive);
+}
+
+string getAuctionOwner(string auctionId) {
+    filesystem::path startFilePath("AUCTIONS/" + auctionId + "/START_" + auctionId + ".txt");
+    string infos = readFromFile(startFilePath);
+    return infos.substr(USERID_NCHARS);
 }
 
 int checkExpiredAuctions() {
