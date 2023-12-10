@@ -73,4 +73,5 @@ time_t getSeconds();
  */
 string secondsToDate(time_t  fulltime);
 
+
 #endif

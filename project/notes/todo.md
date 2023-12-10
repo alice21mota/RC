@@ -17,6 +17,7 @@
 - [ ] Check what sould return if is an **unlogged** user **without** bids
 - [ ] _maybe_ pôr as path como `const` e `getPath... functions`
 - [ ] Não permitir mais do 999 auctions
+- [ ] O wirteFile não devia pedir o argumento size
 
 - Testar
 - [ ] correr o `isCorrectPassword()` com um user que não existe

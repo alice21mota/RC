@@ -69,6 +69,8 @@ string getTCPCommand(string command) {
     string whichCommand;
     iss >> whichCommand;
 
+    checkExpiredAuctions();
+
     if (whichCommand == "OPA") {
         string user, password, name, start_value, timeactive, Fname, Fsize, Fdata;
         iss >> user >> password >> name >> start_value >> timeactive >> Fname >> Fsize;
