@@ -62,7 +62,18 @@ bool createAuctionEndFile(string auctionId) {
     int end_sec_time = end_fulltime - getAuctionStartFullTime(auctionId);
 
     string contentEndFile = end_datetime + " " + to_string(end_sec_time);
-    return writeFile(endFilePath, to_string(contentEndFile.length()), contentEndFile);
+    return createFile(endFilePath, contentEndFile);
+}
+
+bool createBidsFolder(string auctionId) {
+    filesystem::path directoryPath("AUCTIONS/" + auctionId + "/BIDS/");
+    return createFolder(directoryPath);
+}
+
+bool createBidFile(string auctionId, int bid_value) {
+    if (!hasAnyBid(auctionId)) createBidsFolder(auctionId);
+    filesystem::path bidFilePath = "AUCTIONS/" + auctionId + "/BIDS/" + to_string(bid_value) + ".txt";
+    return createFile(bidFilePath);
 }
 
 int getAuctionStartFullTime(string auctionId) {

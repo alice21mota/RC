@@ -62,6 +62,8 @@ bool existAuctions();
  */
 bool isExistingAuction(string auctionId);
 
+bool hasAnyBid(string auctionId);
+
 // string getDate();
 
 /**

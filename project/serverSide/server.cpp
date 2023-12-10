@@ -87,6 +87,11 @@ string getTCPCommand(string command) {
         iss >> userId >> password >> auctionId;
         response = closeAuction(userId, password, auctionId);
     }
+    else if (whichCommand == "BID") {
+        string userId, password, auctionId, value;
+        iss >> userId >> password >> auctionId >> value;
+        response = addBid(userId, password, auctionId, stoi(value));
+    }
     else response = "ERR";
     return response + "\n";
 }

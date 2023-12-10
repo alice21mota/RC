@@ -53,6 +53,11 @@ bool isExistingAuction(string auctionId) {
     return filesystem::exists(directoryPath);
 }
 
+bool hasAnyBid(string auctionId) {
+    filesystem::path directoryPath("AUCTIONS/" + auctionId + "/BIDS/");
+    return filesystem::exists(directoryPath);
+}
+
 // string getDate() {
 //     time_t  fulltime;
 //     struct tm *current_time;

@@ -56,6 +56,25 @@ string closeAuction(string userId, string password, string auctionId) {
     if (!isExistingAuction(auctionId)) return command + "EAU";
     if (!isOwner(userId, auctionId)) return command + "EOW";
     if (!isAuctionActive(auctionId)) return command + "END";
+    if (!isCorrectPassword(userId, password)) return command + "NOK"; //FIXME: não está no enunciado
     if (!createAuctionEndFile(auctionId)) return command + "NOK";
+    return command + "OK";
+}
+
+int getLastBid(string auctionId) {
+    filesystem::path directoryPath("AUCTIONS/" + auctionId + "/BIDS/");
+    if (!hasAnyBid(auctionId)) return 0;
+    vector<string> bids = getSortedFilesFromDirectory(directoryPath);
+    return stoi(bids.back());
+}
+
+string addBid(string userId, string password, string auctionId, int bid) {
+    string command = "RBD ";
+    if (!isAuctionActive(auctionId)) return command + "NOK";
+    if (!isLoggedIn(userId)) return command + "NLG";
+    if (isOwner(userId, auctionId)) return command + "ILG";
+    if (!isCorrectPassword(userId, password)) return command + "NOK";
+    if (bid < getLastBid(auctionId)) return command + "REF";
+    if (!createBidFile(auctionId, bid)) return command + "NOK";
     return command + "OK";
 }

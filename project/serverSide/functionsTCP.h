@@ -16,4 +16,6 @@ string showAsset(string auctionId);
 
 string closeAuction(string userId, string password, string auctionId);
 
+string addBid(string userId, string password, string auctionId, int big);
+
 #endif
