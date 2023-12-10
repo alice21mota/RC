@@ -70,10 +70,16 @@ bool createBidsFolder(string auctionId) {
     return createFolder(directoryPath);
 }
 
-bool createBidFile(string auctionId, int bid_value) {
+bool createBidFile(string auctionId, int bid_value, string userId) {
     if (!hasAnyBid(auctionId)) createBidsFolder(auctionId);
     filesystem::path bidFilePath = "AUCTIONS/" + auctionId + "/BIDS/" + to_string(bid_value) + ".txt";
-    return createFile(bidFilePath);
+
+    time_t bid_fulltime = getSeconds();
+    string bid_datetime = secondsToDate(bid_fulltime);
+    int bid_sec_time = bid_fulltime - getAuctionStartFullTime(auctionId);
+
+    string content = userId + " " + to_string(bid_value) + " " + bid_datetime + " " + to_string(bid_sec_time);
+    return createFile(bidFilePath, content);
 }
 
 int getAuctionStartFullTime(string auctionId) {

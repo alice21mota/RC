@@ -33,7 +33,7 @@ bool createAuctionEndFile(string auctionId);
 
 bool createBidsFolder(string auctionId);
 
-bool createBidFile(string auctionId, int bid_value);
+bool createBidFile(string auctionId, int bid_value, string userId);
 
 int getAuctionStartFullTime(string auctionId);
 

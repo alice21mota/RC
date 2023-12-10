@@ -59,6 +59,11 @@ string getUDPCommand(string command) {
     else if (whichCommand == "LST") {
         response = listAuctions();
     }
+    else if (whichCommand == "SRC") {
+        string auctionId;
+        iss >> auctionId;
+        response = showRecord(auctionId);
+    }
     else response = "ERR";
     return response + "\n";
 }
