@@ -60,7 +60,6 @@ string sendUDP(string message) {
     if (messageBytes == -1) {
 
         cerr << "Error receiving message." << endl;
-        //delete[] fullMessage;
         close(fd);
         return "ERROR";
 
