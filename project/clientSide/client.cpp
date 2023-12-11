@@ -202,8 +202,6 @@ void getCommand(string command){
         if (request.substr(0, 3) == "SAS"){
             cout << request << "\n";
             result = sendTCP(request, "");
-            //status = result.substr(0, result.find('\n'));
-            cout << "Status is->" << result <<"\n";
             cout << "RESPONSE: ";
             show_assetStatus(result, "RECEIVED_FILES");
 

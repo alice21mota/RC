@@ -80,6 +80,7 @@ void sendFileChunks(int fd, string fileName) {
 
     // Open the file
     ifstream file(fileName, ios::binary);
+    
     if (!file.is_open()) {
         cerr << "Error opening file." << endl;
         exit(1);
@@ -88,8 +89,6 @@ void sendFileChunks(int fd, string fileName) {
     // Send the file in chunks
     while (!file.eof()) {
         file.read(buffer, chunkSize);
-
-        //cout << "Chunks " << buffer << endl;
 
         // Check if anything was read
         if (file.gcount() > 0) {
@@ -104,14 +103,8 @@ void sendFileChunks(int fd, string fileName) {
     file.close();
 }
 
-// Function to receive the server response as a string
-/*string receiveResponse(int fd) {
-    
-    return receivedData.str();
-}*/
-
 string sendTCP(string message, string fileName){
-    cout << "GOT in TCP\n";
+    
     if (fileName == ""){
         message = message + "\n";
     }
@@ -126,10 +119,9 @@ string sendTCP(string message, string fileName){
     struct sockaddr_in addr;
 
     fd = socket(AF_INET, SOCK_STREAM, 0);
-    cout << fd << "FDDDDDD\n";
+    
     if (fd == -1)
     {
-        cout << "GOT in socket\n";
         exit(1);
     }
 
@@ -138,39 +130,32 @@ string sendTCP(string message, string fileName){
     hints.ai_socktype = SOCK_STREAM;
 
     errcode = getaddrinfo(ip.c_str(), port.c_str(), &hints, &res);
-    cout << errcode << "errcode\n";
+    
     if (errcode != 0)
-    {
-        cout << "GOT in addrinfo\n";
+    {   
         exit(1);
     }
 
     n = connect(fd, res->ai_addr, res->ai_addrlen);
-    cout << n << "connect\n";
+    
     if (n == -1)
     {
-        cout << "GOT in connect\n";
         exit(1);
     }
 
     n = write(fd, message.c_str(), message.length());
-    cout << n << "write\n";
+
     if (n == -1)
     {
-        cout << "GOT in write\n";
         exit(1);
     }
 
     if (fileName != ""){
-        cout << fileName << "fileName\n";
         sendFileChunks(fd, fileName);
         
-        //char newline = '\n';
         ssize_t n = write(fd, &newline, 1);
-        cout << n << "n write\n";
-
+        
         if (n == -1) {
-            cout << "GOT in send chunks write\n";
             exit(1);
         }
     }
@@ -178,30 +163,15 @@ string sendTCP(string message, string fileName){
     string finalBuffer;
 
     while ((n = read(fd, buffer, sizeof(buffer) - 1)) > 0) {
-        cout << n << "read\n";
         //buffer[n] = '\0';  // Null-terminate buffer
         finalBuffer.append(buffer, n);
     }
-    cout << n << "read\n";
+    
     if (n == -1) {
-        cout << "GOT in read\n";
+        
         exit(1);
     }
 
-    //finalBuffer.erase(finalBuffer.size() - 1);
-    //cout << fd << "FDDDDDD\n";
-    //cout << "finalBuffer " << finalBuffer << endl;
-
-
-    /*n = read(fd, buffer, 128);
-    if (n == -1)
-    {
-        cout << "GOT in read\n";
-        exit(1);
-    }*/
-    
-    //cout << "finalBuffer " << finalBuffer << endl;
-    cout << "ALMOST OUT\n";
     freeaddrinfo(res);
     close(fd);
 

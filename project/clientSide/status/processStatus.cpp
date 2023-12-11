@@ -287,11 +287,8 @@ void show_assetStatus(string response, string destinationDirectory) {
                     vector<char> fData((istreambuf_iterator<char>(iss)), {});
                     
                     istringstream dataStream;
-
-                    //dataStream << iss.rdbuf();  // Read until the end of the stream
                     
                     dataStream >> command >> status >> fName >> fSize;
-                    //fData = dataStream.str();
 
                      // Read until the end of the stream
                     dataStream.seekg(response.find(fSize) + fSize.size());
@@ -299,6 +296,7 @@ void show_assetStatus(string response, string destinationDirectory) {
 
                     // If a destination directory is specified, store the file there
                     if (!destinationDirectory.empty()) {
+
                         // Construct the full path for the file in the destination directory
                         string fullPath = destinationDirectory + "/" + fName;
 
@@ -306,23 +304,18 @@ void show_assetStatus(string response, string destinationDirectory) {
                         ofstream file(fullPath, ios::binary);
 
                         if (file.is_open()) {
+                            
                             // Write the received data to the file
-                            //cout << "CONTENT " << fData << endl;
-
-                            file.write(fData.data() + 1, fData.size() - 1);
+                            file.write(fData.data() + 1, fData.size() - 2);
 
                             // Close the file after writing
                             file.close();
 
-                            cout << "File stored at: " << fullPath << endl;
+                            cout << "File " << fName << " of " << fSize << " bytes stored at: " << fullPath << endl;
 
-                        } else cerr << "Error opening file for writing." << endl;
+                        } else cout << "Error opening file for writing." << endl;
 
                     } else cout << "Destination directory not specified" << endl;
-
-
-                    cout << "File " << fName << " of " << fSize << " bytes stored locally" << endl;
-
 
                 } else cout << "Unknown response" << endl;
 
