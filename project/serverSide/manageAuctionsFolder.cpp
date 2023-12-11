@@ -83,6 +83,7 @@ bool createBidFile(string auctionId, int bid_value, string userId) {
 }
 
 int getAuctionStartFullTime(string auctionId) {
+    cout << "getAuctionStartFullTime " << auctionId << endl; // Debug
     filesystem::path startFilePath("AUCTIONS/" + auctionId + "/START_" + auctionId + ".txt");
     string infos = readFromFile(startFilePath);
     int infosLen = infos.length();
@@ -91,6 +92,7 @@ int getAuctionStartFullTime(string auctionId) {
 }
 
 int getAuctionTimeactive(string auctionId) {
+    cout << "getAuctionTimeactive " << auctionId << endl; // Debug
     filesystem::path startFilePath("AUCTIONS/" + auctionId + "/START_" + auctionId + ".txt");
     string infos = readFromFile(startFilePath);
 
@@ -105,6 +107,7 @@ int getAuctionTimeactive(string auctionId) {
 }
 
 string getAuctionOwner(string auctionId) {
+    cout << "getAuctionOwner " << auctionId << endl; // Debug
     filesystem::path startFilePath("AUCTIONS/" + auctionId + "/START_" + auctionId + ".txt");
     string infos = readFromFile(startFilePath);
     return infos.substr(USERID_NCHARS);
