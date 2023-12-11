@@ -21,6 +21,7 @@
 - [ ] Quando temos de retornar um `status` é suposto este ser `ERR` se os parametros forem errados
 - [ ] Quando estou a enviar um ficheiro tenho de garantir que acaba com `\n`
 - [ ] Garantir que não há mais do que 50 bids -> not sure, [estava no slack](https://rc-2324.slack.com/archives/C0614L96BUN/p1701964605129539)
+- [ ] Alterar a data de quando os leilões expiram -> ver mail Encerramento de leilões - servidor AS
 
 - Testar
 - [ ] correr o `isCorrectPassword()` com um user que não existe

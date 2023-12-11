@@ -4,16 +4,18 @@ bool createFolder(filesystem::path directoryPath) {
     if (!filesystem::exists(directoryPath)) {
         if (filesystem::create_directories(directoryPath)) {
             cout << "Directory " << directoryPath << " created successfully." << endl; // Debug
+            return true;
         }
         else {
             cerr << "Error creating directory." << endl; // Debug
-            return -1;
+            return false;
         }
     }
     else {
         cout << "The directory " << directoryPath << " already exists." << endl; // Debug
+        return false;
     }
-    return 0;
+    return true;
 }
 
 
