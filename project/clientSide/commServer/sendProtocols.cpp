@@ -3,7 +3,6 @@
 string sendUDP(string message) {
     message = message + "\n";
 
-    // maybe global variables
     int fd, errcode;
     ssize_t n, recSize;
     socklen_t addrlen;
@@ -16,7 +15,8 @@ string sendUDP(string message) {
     fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (fd == -1)
     {
-        exit(1);
+        cerr << "Error creating socket." << endl;
+        return "ERROR";
     }
 
     memset(&hints, 0, sizeof hints);
@@ -26,13 +26,17 @@ string sendUDP(string message) {
     errcode = getaddrinfo(ip.c_str(), port.c_str(), &hints, &res);
     if (errcode != 0)
     {
-        exit(1);
+        cerr << "Error getting address information." << endl;
+        close(fd);
+        return "ERROR";
     }
 
     n = sendto(fd, message.c_str(), message.length(), 0, res->ai_addr, res->ai_addrlen);
     if (n == -1)
     {
-        exit(1);
+        cerr << "Error sending message." << endl;
+        close(fd);
+        return "ERROR";
     }
 
     addrlen = sizeof(addr);
@@ -41,9 +45,10 @@ string sendUDP(string message) {
     ssize_t headerBytes = recvfrom(fd, headerBuffer, sizeof(headerBuffer), MSG_PEEK, (struct sockaddr *)&addr, &addrlen);
     
     if (headerBytes == -1) {
+
         cerr << "Error receiving message size." << endl;
         close(fd);
-        exit(1);
+        return "ERROR";
     }
 
     int messageSize;
@@ -51,11 +56,14 @@ string sendUDP(string message) {
 
     char* fullMessage = new char[messageSize];
     ssize_t messageBytes = recvfrom(fd, fullMessage, messageSize, 0, (struct sockaddr *)&addr, &addrlen);
+    
     if (messageBytes == -1) {
+
         cerr << "Error receiving message." << endl;
-        //delete[] buffer;
+        delete[] fullMessage;
         close(fd);
-        exit(1);
+        return "ERROR";
+
     }
 
     freeaddrinfo(res);
@@ -73,18 +81,23 @@ void sendFileChunks(int fd, string fileName) {
     
     if (!file.is_open()) {
         cerr << "Error opening file." << endl;
-        exit(1);
+        return;
     }
 
     // Send the file in chunks
     while (!file.eof()) {
+
         file.read(buffer, chunkSize);
 
         // Check if anything was read
         if (file.gcount() > 0) {
             ssize_t n = write(fd, buffer, file.gcount());
+            
             if (n == -1) {
-                exit(1);
+
+                cerr << "Error writing file chunk." << endl;
+                return;
+
             }
         }
     }
@@ -112,7 +125,8 @@ string sendTCP(string message, string fileName){
     
     if (fd == -1)
     {
-        exit(1);
+        cerr << "Error creating socket." << endl;
+        return "ERROR";
     }
 
     memset(&hints, 0, sizeof hints);
@@ -123,21 +137,27 @@ string sendTCP(string message, string fileName){
     
     if (errcode != 0)
     {   
-        exit(1);
+        cerr << "Error getting address information." << endl;
+        close(fd);
+        return "ERROR";
     }
 
     n = connect(fd, res->ai_addr, res->ai_addrlen);
     
     if (n == -1)
     {
-        exit(1);
+        cerr << "Error connecting to the server." << endl;
+        close(fd);
+        return "ERROR";
     }
 
     n = write(fd, message.c_str(), message.length());
 
     if (n == -1)
     {
-        exit(1);
+        cerr << "Error writing message." << endl;
+        close(fd);
+        return "ERROR";
     }
 
     if (fileName != ""){
@@ -146,7 +166,11 @@ string sendTCP(string message, string fileName){
         ssize_t n = write(fd, &newline, 1);
         
         if (n == -1) {
-            exit(1);
+
+            cerr << "Error sending file." << endl;
+            close(fd);
+            return "ERROR";
+
         }
     }
 
@@ -159,7 +183,10 @@ string sendTCP(string message, string fileName){
     
     if (n == -1) {
         
-        exit(1);
+        cerr << "Error reading response." << endl;
+        close(fd);
+        return "ERROR";
+        
     }
 
     freeaddrinfo(res);
