@@ -126,6 +126,7 @@ string sendTCP(string message, string fileName){
     struct sockaddr_in addr;
 
     fd = socket(AF_INET, SOCK_STREAM, 0);
+    cout << fd << "FDDDDDD\n";
     if (fd == -1)
     {
         cout << "GOT in socket\n";
@@ -137,6 +138,7 @@ string sendTCP(string message, string fileName){
     hints.ai_socktype = SOCK_STREAM;
 
     errcode = getaddrinfo(ip.c_str(), port.c_str(), &hints, &res);
+    cout << errcode << "errcode\n";
     if (errcode != 0)
     {
         cout << "GOT in addrinfo\n";
@@ -144,6 +146,7 @@ string sendTCP(string message, string fileName){
     }
 
     n = connect(fd, res->ai_addr, res->ai_addrlen);
+    cout << n << "connect\n";
     if (n == -1)
     {
         cout << "GOT in connect\n";
@@ -151,6 +154,7 @@ string sendTCP(string message, string fileName){
     }
 
     n = write(fd, message.c_str(), message.length());
+    cout << n << "write\n";
     if (n == -1)
     {
         cout << "GOT in write\n";
@@ -158,11 +162,12 @@ string sendTCP(string message, string fileName){
     }
 
     if (fileName != ""){
-        
+        cout << fileName << "fileName\n";
         sendFileChunks(fd, fileName);
         
         //char newline = '\n';
         ssize_t n = write(fd, &newline, 1);
+        cout << n << "n write\n";
 
         if (n == -1) {
             cout << "GOT in send chunks write\n";
@@ -171,17 +176,20 @@ string sendTCP(string message, string fileName){
     }
 
     string finalBuffer;
+
     while ((n = read(fd, buffer, sizeof(buffer) - 1)) > 0) {
+        cout << n << "read\n";
         //buffer[n] = '\0';  // Null-terminate buffer
         finalBuffer.append(buffer, n);
     }
-
+    cout << n << "read\n";
     if (n == -1) {
         cout << "GOT in read\n";
         exit(1);
     }
 
-    finalBuffer.erase(finalBuffer.size() - 1);
+    //finalBuffer.erase(finalBuffer.size() - 1);
+    //cout << fd << "FDDDDDD\n";
     //cout << "finalBuffer " << finalBuffer << endl;
 
 
