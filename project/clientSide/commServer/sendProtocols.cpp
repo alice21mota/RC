@@ -89,6 +89,8 @@ void sendFileChunks(int fd, string fileName) {
     while (!file.eof()) {
         file.read(buffer, chunkSize);
 
+        cout << "Chunks " << buffer << endl;
+
         // Check if anything was read
         if (file.gcount() > 0) {
             ssize_t n = write(fd, buffer, file.gcount());
@@ -102,6 +104,12 @@ void sendFileChunks(int fd, string fileName) {
     file.close();
 }
 
+// Function to receive the server response as a string
+/*string receiveResponse(int fd) {
+    
+    return receivedData.str();
+}*/
+
 string sendTCP(string message, string fileName){
     cout << "GOT in TCP\n";
     if (fileName == ""){
@@ -112,6 +120,7 @@ string sendTCP(string message, string fileName){
     ssize_t n;
     socklen_t addrlen;
     char buffer[128];
+    char newline = '\n';
 
     struct addrinfo hints, *res;
     struct sockaddr_in addr;
@@ -122,7 +131,6 @@ string sendTCP(string message, string fileName){
         cout << "GOT in socket\n";
         exit(1);
     }
-    
 
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_INET; // IPv4
@@ -153,24 +161,39 @@ string sendTCP(string message, string fileName){
         
         sendFileChunks(fd, fileName);
         
-        char newline = '\n';
+        //char newline = '\n';
         ssize_t n = write(fd, &newline, 1);
+
         if (n == -1) {
             cout << "GOT in send chunks write\n";
             exit(1);
         }
     }
 
-    n = read(fd, buffer, 128);
+    string finalBuffer;
+    while ((n = read(fd, buffer, sizeof(buffer) - 1)) > 0) {
+        buffer[n] = '\0';  // Null-terminate buffer
+        finalBuffer.append(buffer, n);
+    }
+
+    if (n == -1) {
+        cout << "GOT in read\n";
+        exit(1);
+    }
+    //cout << "finalBuffer " << finalBuffer << endl;
+
+
+    /*n = read(fd, buffer, 128);
     if (n == -1)
     {
         cout << "GOT in read\n";
         exit(1);
-    }
+    }*/
     
+    //cout << "finalBuffer " << finalBuffer << endl;
     cout << "ALMOST OUT\n";
     freeaddrinfo(res);
     close(fd);
 
-    return buffer;
+    return finalBuffer;
 }

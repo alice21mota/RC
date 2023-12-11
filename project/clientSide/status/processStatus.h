@@ -4,8 +4,10 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <regex>
 #include <filesystem> 
+
 #include "../globalsClient/globals.h"
 #include "../../common/validations.h"
 
@@ -29,5 +31,7 @@ void bidStatus(string response);
 void mybidsStatus(string response);
 
 void listStatus(string response);
+
+void show_assetStatus(string response, string destinationDirectory);
 
 #endif // STATUS_H

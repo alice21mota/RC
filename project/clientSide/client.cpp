@@ -197,8 +197,17 @@ void getCommand(string command){
         } else cout << "Error: " << request << endl;
 
     } else if (whichCommand == "show_asset" || whichCommand == "sa") {
-        // show_asset(command);
-        cout << "show_asset\n";
+        request = show_asset(command);
+
+        if (request.substr(0, 3) == "SAS"){
+            cout << request << "\n";
+            result = sendTCP(request, "");
+            //status = result.substr(0, result.find('\n'));
+            cout << "Status is->" << result <<"\n";
+            cout << "RESPONSE: ";
+            show_assetStatus(result, "RECEIVED_FILES");
+
+        } else cout << "Error: " << request << endl;
 
     } else if (whichCommand == "bid" || whichCommand == "b") {
         request = bid(command);

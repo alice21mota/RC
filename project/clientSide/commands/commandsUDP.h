@@ -12,13 +12,18 @@
 using namespace std;
 
 string login(string command);
-string logout();
-string unregister();
-string open(string command);
-string myauctions();
-string mybids();
-string list(string command);
 
+string logout();
+
+string unregister();
+
+string open(string command);
+
+string myauctions();
+
+string mybids();
+
+string list(string command);
 
 
 #endif // COMMANDSUDP_H 

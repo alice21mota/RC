@@ -93,3 +93,24 @@ string bid(string command){
 
     } else return "User not logged in User Appplication";
 }
+
+string show_asset(string command){
+
+    string whichCommand, aid;
+    istringstream iss(command);
+
+    if (userID != "" && password != ""){
+
+        if (iss >> whichCommand >> aid && iss.eof()) {
+            
+            if (isNumeric(aid) && aid.size() == 3){
+                tempAID = aid;
+
+                return "SAS " + aid;
+
+            } else return "Invalid AID";
+
+        } else return "Incorrect command format";
+
+    } else return "User not logged in User Appplication";
+}

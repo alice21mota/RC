@@ -13,8 +13,12 @@
 using namespace std;
 
 string open(string command);
+
 string close(string command);
+
 string bid(string command);
+
+string show_asset(string command);
 
 
 

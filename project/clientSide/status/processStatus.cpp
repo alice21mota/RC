@@ -262,3 +262,64 @@ void listStatus(string response){
     } else cout << "Unknown response" << endl;
 
 }
+
+void show_assetStatus(string response, string destinationDirectory) {
+    
+    istringstream iss(response);
+    string command, status, fName, fSize, fData;
+
+    if (iss >> command >> status) {
+
+        if (command == "RSA") {
+
+            if (iss.eof()) {
+
+                if (status == "NOK") {
+
+                    cout << "Problems receiving file" << endl;
+
+                } else cout << "Unknown response" << endl;
+
+            } else if (status == "OK") {
+
+                if (iss >> fName >> fSize) {
+
+                    stringstream dataStream;
+                    dataStream << iss.rdbuf();  // Read until the end of the stream
+                    fData = dataStream.str();
+
+                    // If a destination directory is specified, store the file there
+                    if (!destinationDirectory.empty()) {
+                        // Construct the full path for the file in the destination directory
+                        string fullPath = destinationDirectory + "/" + fName;
+
+                        // Open a file for writing in binary mode
+                        ofstream file(fullPath, ios::binary);
+
+                        if (file.is_open()) {
+                            // Write the received data to the file
+                            //cout << "CONTENT " << fData << endl;
+
+                            file.write(fData.c_str(), fData.size());
+
+                            // Close the file after writing
+                            file.close();
+
+                            cout << "File stored at: " << fullPath << endl;
+
+                        } else cerr << "Error opening file for writing." << endl;
+
+                    } else cout << "Destination directory not specified" << endl;
+
+
+                    cout << "File " << fName << " of " << fSize << " bytes stored locally" << endl;
+
+
+                } else cout << "Unknown response" << endl;
+
+            } else cout << "Unknown response" << endl;
+
+        } else cout << "Unknown response" << endl;
+
+    } else cout << "Unknown response" << endl;
+}
