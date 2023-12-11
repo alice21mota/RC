@@ -35,4 +35,6 @@ void listStatus(string response);
 
 void show_assetStatus(string response, string destinationDirectory);
 
+void show_recordStatus(string response);
+
 #endif // STATUS_H

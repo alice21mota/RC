@@ -51,8 +51,6 @@ bool isDuration(string duration){
 }
 
 bool fileExists(string filePath) {
-    //string filePath = "ASSETS/" + asset_fname;
-    cout << "Checking for file: " << filePath << endl;
     return filesystem::exists(filePath);
 }
 

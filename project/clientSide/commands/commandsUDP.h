@@ -25,5 +25,7 @@ string mybids();
 
 string list(string command);
 
+string show_record(string command);
+
 
 #endif // COMMANDSUDP_H 

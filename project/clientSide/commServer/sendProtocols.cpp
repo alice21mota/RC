@@ -35,17 +35,11 @@ string sendUDP(string message) {
         exit(1);
     }
 
-    /*n = recvfrom(fd, buffer, sizeof(buffer), 0, (struct sockaddr *)&addr, &addrlen);
-    if (n == -1)
-    {
-        exit(1);
-    }*/
-
     addrlen = sizeof(addr);
     char headerBuffer[sizeof(int)]; //Storing message size
 
     ssize_t headerBytes = recvfrom(fd, headerBuffer, sizeof(headerBuffer), MSG_PEEK, (struct sockaddr *)&addr, &addrlen);
-    //cout << "headerBytes = " << headerBytes << endl;
+    
     if (headerBytes == -1) {
         cerr << "Error receiving message size." << endl;
         close(fd);
@@ -63,10 +57,6 @@ string sendUDP(string message) {
         close(fd);
         exit(1);
     }
-
-    //cout << "Data received from the server: " << fullMessage << endl;
-
-    //cout << "Complete Response: " << fullResponse; // Print the complete response*/
 
     freeaddrinfo(res);
     close(fd);
