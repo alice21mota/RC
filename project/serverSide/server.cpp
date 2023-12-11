@@ -264,12 +264,12 @@ int main(int argc, char *argv[])
 
                 int nWritten, nRead;
                 string finalBuffer;
-                while ((nRead = read(new_tfd, buffer, 127)) != 0)
+                while ((nRead = read(new_tfd, buffer, 75)) != 0)
                 {
                     if (nRead < 0)
                         exit(1);
                     finalBuffer.append(buffer, nRead);
-                    if (nRead < 127 && buffer[nRead - 1] == '\n') break; // FIXME acho que não pode ser assim mas por enquanto está a funcionar :))
+                    if (nRead < 75 && buffer[nRead - 1] == '\n') break; // FIXME acho que não pode ser assim mas por enquanto está a funcionar :))
                 }
                 cout << "---TCP socket: " << finalBuffer << endl; // Debug
 
