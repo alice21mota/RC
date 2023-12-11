@@ -7,6 +7,7 @@
 #include <fstream>
 #include <regex>
 #include <filesystem> 
+#include <vector>
 
 #include "../globalsClient/globals.h"
 #include "../../common/validations.h"

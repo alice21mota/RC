@@ -283,10 +283,19 @@ void show_assetStatus(string response, string destinationDirectory) {
             } else if (status == "OK") {
 
                 if (iss >> fName >> fSize) {
+                    
+                    vector<char> fData((istreambuf_iterator<char>(iss)), {});
+                    
+                    istringstream dataStream;
 
-                    stringstream dataStream;
-                    dataStream << iss.rdbuf();  // Read until the end of the stream
-                    fData = dataStream.str();
+                    //dataStream << iss.rdbuf();  // Read until the end of the stream
+                    
+                    dataStream >> command >> status >> fName >> fSize;
+                    //fData = dataStream.str();
+
+                     // Read until the end of the stream
+                    dataStream.seekg(response.find(fSize) + fSize.size());
+                    string remainingContent((istreambuf_iterator<char>(dataStream)), {});
 
                     // If a destination directory is specified, store the file there
                     if (!destinationDirectory.empty()) {
@@ -300,7 +309,7 @@ void show_assetStatus(string response, string destinationDirectory) {
                             // Write the received data to the file
                             //cout << "CONTENT " << fData << endl;
 
-                            file.write(fData.c_str(), fData.size());
+                            file.write(fData.data() + 1, fData.size() - 1);
 
                             // Close the file after writing
                             file.close();

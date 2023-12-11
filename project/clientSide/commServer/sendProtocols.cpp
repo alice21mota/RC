@@ -89,7 +89,7 @@ void sendFileChunks(int fd, string fileName) {
     while (!file.eof()) {
         file.read(buffer, chunkSize);
 
-        cout << "Chunks " << buffer << endl;
+        //cout << "Chunks " << buffer << endl;
 
         // Check if anything was read
         if (file.gcount() > 0) {
@@ -172,7 +172,7 @@ string sendTCP(string message, string fileName){
 
     string finalBuffer;
     while ((n = read(fd, buffer, sizeof(buffer) - 1)) > 0) {
-        buffer[n] = '\0';  // Null-terminate buffer
+        //buffer[n] = '\0';  // Null-terminate buffer
         finalBuffer.append(buffer, n);
     }
 
@@ -180,6 +180,8 @@ string sendTCP(string message, string fileName){
         cout << "GOT in read\n";
         exit(1);
     }
+
+    finalBuffer.erase(finalBuffer.size() - 1);
     //cout << "finalBuffer " << finalBuffer << endl;
 
 
