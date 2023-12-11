@@ -384,13 +384,11 @@ void show_recordStatus(string response){
                                         << ", " << end_sec_time << " seconds after it started" << endl;
 
                                     //cout << end_date << " " << end_time << " " << end_sec_time << endl;
-                                }
+                                } else cout << "Unknown response" << endl;
 
                             } else cout << "Unknown response" << endl;
-                        }
 
-                        else if (iss.eof()) cout << endl << "Auction has not ended yet" << endl;
-
+                        } else if (iss.eof()) cout << endl << "Auction has not ended yet" << endl;
 
                     } else cout << "Auction has not ended yet, and no bids have been made" << endl;
                     
