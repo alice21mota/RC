@@ -77,7 +77,7 @@ void openStatus(string response){
             else if (status == "OK"){
                 if (iss >> aid && iss.eof()){
 
-                    if (aid.size() == 3 && isNumeric(aid))
+                    if (isValidAID(aid))
                         cout << "Successful request, AID = " << aid << "" << endl;
                     
                     else cout << "Did not receive a valid AID" << endl;
@@ -149,7 +149,7 @@ void myauctionsStatus(string response){
                         
                 while (iss >> aid >> state) {
 
-                    if (aid.size() == 3 && isNumeric(aid) && isValidState(state))
+                    if (isValidAID(aid) && isValidState(state))
 
                         cout << "Auction ID: "  << aid << ", State: " << state << endl;
 
@@ -221,7 +221,7 @@ void mybidsStatus(string response){
             else if (status == "OK"){
                         
                 while (iss >> aid >> state) {
-                    if (aid.size() == 3 && isNumeric(aid) && isValidState(state))
+                    if (isValidAID(aid) && isValidState(state))
                         cout << "Auction ID: "  << aid << ", State: " << state << endl;
                     if (iss.eof()) break;
                 }
@@ -254,7 +254,7 @@ void listStatus(string response){
             else if (status == "OK"){
                         
                 while (iss >> aid >> state) {
-                    if (aid.size() == 3 && isNumeric(aid) && isValidState(state))
+                    if (isValidAID(aid) && isValidState(state))
                         cout << "Auction ID: "  << aid << ", State: " << state << endl;
                     if (iss.eof()) break;
                 }
@@ -352,46 +352,58 @@ void show_recordStatus(string response){
                         
                 if (iss >> host_UID >> auction_name >> asset_fName >> start_value >> start_date >> start_time >> timeactive) {
 
-                    
-                    cout << "Auction \"" << auction_name << "\" with file \"" << asset_fName << "\" started by user " << host_UID 
-                        << " in " << start_date << " at " << start_time << ". Start Value was " << start_value << " and it was/has been active for " 
-                        << timeactive << " seconds" << endl;
+                    if (isUID(host_UID) && isDescription(auction_name) && isFileName(asset_fName) && isStartValue(start_value) && 
+                        isValidDate(start_date) && isValidTime(start_time) && isValidSecTime(timeactive)){
 
-                    if (!iss.eof()){
-
-                        cout << "Bids Information:" << endl;
-
-                        if (iss >> identifier && identifier == "B"){
-
-                            while (identifier == "B"){
-                                if (iss >> bidder_UID >> bid_value >> bid_date >> bid_time >> bid_sec_time){
-
-                                    cout << "Bidder UID: " << bidder_UID << ", Bid Value: " << bid_value << ", Bid Date and Time: " 
-                                        << bid_date << " at " << bid_time << ", Time since the auction started: " << bid_sec_time << " seconds" << endl;
-                                    
-                                }
-                                if (iss >> identifier && !iss.eof()) continue;
-                            }
-
-                        } else cout << "No bids were/have been made" << endl;
+                        cout << "Auction \"" << auction_name << "\" with file \"" << asset_fName << "\" started by user " << host_UID 
+                            << " in " << start_date << " at " << start_time << ". Start Value was " << start_value << " and it was/has been active for " 
+                            << timeactive << " seconds" << endl;
 
                         if (!iss.eof()){
 
-                            if (identifier == "E"){
+                            cout << "Bids Information:" << endl;
 
-                                if (iss >> end_date >> end_time >> end_sec_time && iss.eof()){
+                            if (iss >> identifier && identifier == "B"){
 
-                                    cout << "Auction ended in " << end_date << " at " << end_time 
-                                        << ", " << end_sec_time << " seconds after it started" << endl;
+                                while (identifier == "B"){
+                                    if (iss >> bidder_UID >> bid_value >> bid_date >> bid_time >> bid_sec_time){
+
+                                        if (isUID(bidder_UID) && isBidValue(bid_value) && isValidDate(bid_date) && isValidTime(bid_time) && isValidSecTime(timeactive)){
+
+                                            cout << "Bidder UID: " << bidder_UID << ", Bid Value: " << bid_value << ", Bid Date and Time: " 
+                                                << bid_date << " at " << bid_time << ", Time since the auction started: " << bid_sec_time << " seconds" << endl;
+
+                                        } else cout << "Invalid Bid information received" << endl;
+
+                                    }
+                                    if (iss >> identifier && !iss.eof()) continue;
+                                }
+
+                            } else cout << "No bids were/have been made" << endl;
+
+                            if (!iss.eof()){
+
+                                if (identifier == "E"){
+
+                                    if (iss >> end_date >> end_time >> end_sec_time && iss.eof()){
+
+                                        if (isValidDate(end_date) && isValidTime(end_time) && isValidSecTime(end_sec_time)){
+
+                                            cout << "Auction ended in " << end_date << " at " << end_time 
+                                                << ", " << end_sec_time << " seconds after it started" << endl;
+
+                                        } else cout << "Invalid End information received" << endl;
+
+                                    } else cout << "Unknown response" << endl;
 
                                 } else cout << "Unknown response" << endl;
 
-                            } else cout << "Unknown response" << endl;
+                            } else if (iss.eof()) 
+                                cout << endl << "Auction has not ended yet" << endl;
 
-                        } else if (iss.eof()) 
-                            cout << endl << "Auction has not ended yet" << endl;
+                        } else cout << "Auction has not ended yet, and no bids have been made" << endl;
 
-                    } else cout << "Auction has not ended yet, and no bids have been made" << endl;
+                    } else cout << "Invalid Auction information received";
                     
                 } else cout << "Unknown response" << endl; 
 
