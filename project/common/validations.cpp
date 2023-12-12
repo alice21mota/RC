@@ -50,6 +50,12 @@ bool isDuration(string duration){
     return false;
 }
 
+bool isValidState(string state){
+    if (state == "0" || state == "1")
+        return true;
+    return false;
+}
+
 bool fileExists(string filePath) {
     return filesystem::exists(filePath);
 }
@@ -57,4 +63,25 @@ bool fileExists(string filePath) {
 bool isFileSizeValid(size_t fileSize){
     size_t maxSize = 10 * 1024 * 1024; //10MB in bytes
     return fileSize <= maxSize;
+}
+
+bool isValidFileSize(string fileSizeStr) {
+    try {
+        // Convert the string to an integer
+        int fileSize = stoi(fileSizeStr);
+
+        // Check if the file size is non-negative and within the allowed range
+        int maxSize = 10 * 1024 * 1024; // 10MB in bytes
+        return fileSize >= 0 && fileSize <= maxSize;
+
+    } catch (const invalid_argument& e) {
+        // Handle the case where the conversion fails
+        cerr << "Error converting file " << endl;
+        return false;
+
+    } catch (const out_of_range& e) {
+        // Handle the case where the converted value is out of the range of int
+        cerr << "Value out of range for int" << endl;
+        return false;
+    }
 }

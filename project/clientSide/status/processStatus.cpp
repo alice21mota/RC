@@ -4,61 +4,59 @@ void loginStatus(string status){
 
     if (status == "RLI OK"){
         logged_in = true;
-        cout << "Successful login\n";
+        cout << "Successful login" << endl;
     }
 
     else if (status == "RLI NOK"){
-        cout << "Incorrect login attempt\n";
+        cout << "Incorrect login attempt" << endl;
     }
     
     else if (status == "RLI REG"){
         logged_in = true;
-        cout << "New user registered\n";
+        cout << "New user registered" << endl;
     }
 
-    else cout << "Unknown response\n";
+    else cout << "Unknown response" << endl;
 }
 
 void logoutStatus(string status){
     
     if (status == "RLO OK"){
-        //TODO CHECK THIS
-        //userID = "";
-        //password = "";
+        
         logged_in = false;
-        cout << "Successful logout\n";
+        cout << "Successful logout" << endl;
     }
 
     else if (status == "RLO NOK"){
-        cout << "User not logged in\n";
+        cout << "User not logged in" << endl;
     }
     
     else if (status == "RLO UNR"){
-        cout << "Unknown user\n";
+        cout << "Unknown user" << endl;
     }
 
-    else cout << "Unknown response\n";
+    else cout << "Unknown response" << endl;
 }
 
 void unregisterStatus(string status){
 
     //TODO ALTER THIS TO BE THE SAME AS THE OTHERS
     if (status == "RUR OK"){
-        //userID = "";
-        //password = "";
+    
         logged_in = false;
-        cout << "Successful unregister\n";
+        cout << "Successful unregister" << endl;
+
     }
 
     else if (status == "RUR NOK"){
-        cout << "Incorrect unregister attempt\n";
+        cout << "Incorrect unregister attempt" << endl;
     }
     
     else if (status == "RUR UNR"){
-        cout << "Unknown user\n";
+        cout << "Unknown user" << endl;
     }
 
-    else cout << "Unknown response\n";
+    else cout << "Unknown response" << endl;
 }
 
 void openStatus(string response){
@@ -71,26 +69,26 @@ void openStatus(string response){
         if (command == "ROA"){
             
             if (status == "NOK" && iss.eof())
-                cout << "Auction could not be started\n";
+                cout << "Auction could not be started" << endl;
         
             else if (status == "NLG" && iss.eof())
-                cout << "User not logged in\n";
+                cout << "User not logged in" << endl;
 
             else if (status == "OK"){
                 if (iss >> aid && iss.eof()){
 
                     if (aid.size() == 3 && isNumeric(aid))
-                        cout << "Successful request, AID = " << aid << "\n";
+                        cout << "Successful request, AID = " << aid << "" << endl;
                     
-                    else cout << "Did not receive a valid AID\n";
+                    else cout << "Did not receive a valid AID" << endl;
                     
-                } else cout << "Unknown response\n";
+                } else cout << "Unknown response" << endl;
 
-            } else cout << "Unknown response\n";
+            } else cout << "Unknown response" << endl;
 
-        } else cout << "Unknown response\n";
+        } else cout << "Unknown response" << endl;
 
-    } else cout << "Unknown response\n";
+    } else cout << "Unknown response" << endl;
 }
 
 void closeStatus(string response){
@@ -119,11 +117,11 @@ void closeStatus(string response){
             else if (status == "END")
                 cout << "Auction " << tempAID << " has already ended" << endl;
 
-            else cout << "Unknown response\n";
+            else cout << "Unknown response" << endl;
 
-        } else cout << "Unknown response\n";
+        } else cout << "Unknown response" << endl;
  
-    } else cout << "Unknown response\n";
+    } else cout << "Unknown response" << endl;
  
 }
 
@@ -150,9 +148,13 @@ void myauctionsStatus(string response){
             } else if (status == "OK"){
                         
                 while (iss >> aid >> state) {
-                    
-                    cout << "Auction ID: "  << aid << ", State: " << state << endl;
+
+                    if (aid.size() == 3 && isNumeric(aid) && isValidState(state))
+
+                        cout << "Auction ID: "  << aid << ", State: " << state << endl;
+
                     if (iss.eof()) break;
+
                 }
 
             } else cout << "Unknown response" << endl; 
@@ -186,11 +188,11 @@ void bidStatus(string response){
             else if (status == "ILG")
                 cout << "Cannot bid on auction hosted by yourself" << endl;
 
-            else cout << "Unknown response\n";
+            else cout << "Unknown response" << endl;
 
-        } else cout << "Unknown response\n";
+        } else cout << "Unknown response" << endl;
  
-    } else cout << "Unknown response\n";
+    } else cout << "Unknown response" << endl;
 }
 
 void mybidsStatus(string response){
@@ -205,7 +207,7 @@ void mybidsStatus(string response){
             if (iss.eof()){
 
                 if (status == "NOK"){
-                    cout << "User " << userID << " does not have ongoing bids" << endl;
+                    cout << "User " << userID << " has not placed any bids" << endl;
                 }
 
                 else if (status == "NLG"){
@@ -219,7 +221,8 @@ void mybidsStatus(string response){
             else if (status == "OK"){
                         
                 while (iss >> aid >> state) {
-                    cout << "Auction ID: "  << aid << ", State: " << state << endl;
+                    if (aid.size() == 3 && isNumeric(aid) && isValidState(state))
+                        cout << "Auction ID: "  << aid << ", State: " << state << endl;
                     if (iss.eof()) break;
                 }
 
@@ -251,7 +254,8 @@ void listStatus(string response){
             else if (status == "OK"){
                         
                 while (iss >> aid >> state) {
-                    cout << "Auction ID: "  << aid << ", State: " << state << endl;
+                    if (aid.size() == 3 && isNumeric(aid) && isValidState(state))
+                        cout << "Auction ID: "  << aid << ", State: " << state << endl;
                     if (iss.eof()) break;
                 }
 
@@ -282,38 +286,38 @@ void show_assetStatus(string response) {
             else if (status == "OK") {
 
                 if (iss >> fName >> fSize) {
-                    
-                    vector<char> fData((istreambuf_iterator<char>(iss)), {});
-                    
-                    istringstream dataStream;
-                    
-                    dataStream >> command >> status >> fName >> fSize;
 
-                     // Read until the end of the stream
-                    dataStream.seekg(response.find(fSize) + fSize.size());
-                    string remainingContent((istreambuf_iterator<char>(dataStream)), {});
+                    if (isFileName(fName) && isValidFileSize(fSize)){
 
-
-                    // Construct the full path for the file in the destination directory
-                    //string fullPath = destinationDirectory + "/" + fName;
-
-                    string fullPath = fName;
-
-                    // Open a file for writing in binary mode
-                    ofstream file(fullPath, ios::binary);
-
-                    if (file.is_open()) {
+                        vector<char> fData((istreambuf_iterator<char>(iss)), {});
                         
-                        // Write the received data to the file
-                        file.write(fData.data() + 1, fData.size() - 2);
+                        istringstream dataStream;
+                        
+                        dataStream >> command >> status >> fName >> fSize;
 
-                        // Close the file after writing
-                        file.close();
+                        // Read until the end of the stream
+                        dataStream.seekg(response.find(fSize) + fSize.size());
+                        string remainingContent((istreambuf_iterator<char>(dataStream)), {});
 
-                        cout << "File " << fName << " of " << fSize << " bytes stored at: " << fullPath << endl;
+                        string path = fName;
 
-                    } else cout << "Error opening file for writing." << endl;
+                        // Open a file for writing in binary mode
+                        ofstream file(path, ios::binary);
 
+                        if (file.is_open()) {
+                            
+                            // Write the received data to the file
+                            file.write(fData.data() + 1, fData.size() - 2);
+
+                            // Close the file after writing
+                            file.close();
+
+                            cout << "File " << fName << " of " << fSize << " bytes stored in: " << path << endl;
+
+                        } else cout << "Error opening file for writing." << endl;
+
+                    } else cout << "Invalid file name or size" << endl;
+                    
                 } else cout << "Unknown response" << endl;
 
             } else cout << "Unknown response" << endl;
@@ -348,7 +352,7 @@ void show_recordStatus(string response){
                         
                 if (iss >> host_UID >> auction_name >> asset_fName >> start_value >> start_date >> start_time >> timeactive) {
 
-                    //cout << host_UID << " " << auction_name << " " << asset_fName << " " << start_value << " " << start_date << " " << start_time << " " << timeactive << endl;
+                    
                     cout << "Auction \"" << auction_name << "\" with file \"" << asset_fName << "\" started by user " << host_UID 
                         << " in " << start_date << " at " << start_time << ". Start Value was " << start_value << " and it was/has been active for " 
                         << timeactive << " seconds" << endl;
@@ -364,7 +368,7 @@ void show_recordStatus(string response){
 
                                     cout << "Bidder UID: " << bidder_UID << ", Bid Value: " << bid_value << ", Bid Date and Time: " 
                                         << bid_date << " at " << bid_time << ", Time since the auction started: " << bid_sec_time << " seconds" << endl;
-                                    //cout << bidder_UID << " " << bid_value << " " << bid_date << " " << bid_time << " " << bid_sec_time << endl; 
+                                    
                                 }
                                 if (iss >> identifier && !iss.eof()) continue;
                             }
@@ -380,12 +384,12 @@ void show_recordStatus(string response){
                                     cout << "Auction ended in " << end_date << " at " << end_time 
                                         << ", " << end_sec_time << " seconds after it started" << endl;
 
-                                    //cout << end_date << " " << end_time << " " << end_sec_time << endl;
                                 } else cout << "Unknown response" << endl;
 
                             } else cout << "Unknown response" << endl;
 
-                        } else if (iss.eof()) cout << endl << "Auction has not ended yet" << endl;
+                        } else if (iss.eof()) 
+                            cout << endl << "Auction has not ended yet" << endl;
 
                     } else cout << "Auction has not ended yet, and no bids have been made" << endl;
                     

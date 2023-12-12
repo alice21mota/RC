@@ -17,8 +17,7 @@ string login(string command){
                 return "LIN " + userID + " " + password;
             }
 
-            else return "Incorrect login attempt"; 
-            //TODO -> Passar o userID e password a ""?              
+            else return "Incorrect login attempt";               
 
         } else return "Incorrect login attempt";
 
@@ -28,17 +27,17 @@ string login(string command){
 
 string logout(){
 
-    if (userID != "" && password != ""){
+    if (logged_in == true){
         return "LOU " + userID + " " + password;
     }
 
     else return "User not logged in";
-    //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
+    
 }
 
 string unregister(){
 
-    if (userID != "" && password != ""){
+    if (logged_in == true){
 
         if (isUID(userID) && isPassword(password)){
 
@@ -46,14 +45,13 @@ string unregister(){
             
         } else return "User not known";    
 
-    } else return "User not known";
+    } else return "User not logged in";
 
-    //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
 }
 
 string myauctions(){
 
-    if ((userID != "" && password != "") || logged_in == true ){
+    if (logged_in == true ){
         
         if (isUID(userID) && isPassword(password)){
 
@@ -61,13 +59,13 @@ string myauctions(){
 
         } else return "User not known"; 
 
-    } else return "User not known";
+    } else return "User not logged in";
 
 }
 
 string mybids(){
     
-    if ((userID != "" && password != "") || logged_in == true ){
+    if (logged_in == true ){
         
         if (isUID(userID) && isPassword(password)){
             
@@ -75,7 +73,7 @@ string mybids(){
 
         } else return "User not known"; 
 
-    } else return "User not known";
+    } else return "User not logged in";
 }
 
 string list(string command){
@@ -95,19 +93,16 @@ string show_record(string command){
     string whichCommand, aid;
     istringstream iss(command);
 
-    if (userID != "" && password != ""){
+    if (iss >> whichCommand >> aid && iss.eof()){
 
-        if (iss >> whichCommand >> aid && iss.eof()){
-
-            if (isNumeric(aid) && aid.size() == 3){
-                
-                tempAID = aid;
-
-                return "SRC " + aid;
+        if (isNumeric(aid) && aid.size() == 3){
             
-            } else return "Invalid AID";
+            tempAID = aid;
 
-        } else return "Invalid command";
+            return "SRC " + aid;
+        
+        } else return "Invalid AID";
 
-    } else return "User not known";
+    } else return "Invalid command";
+    
 }

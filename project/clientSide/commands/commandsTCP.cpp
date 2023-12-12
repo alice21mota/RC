@@ -11,15 +11,12 @@ string open(string command){
     string toReturn, fSize;
     istringstream iss(command);
 
-    if (userID != "" && password != ""){
+    if (logged_in == true){
 
         if (iss >> whichCommand >> name >> asset_fname >> start_value >> timeactive && iss.eof()) {
             
             if (isDescription(name) && isFileName(asset_fname) && isStartValue(start_value) && isDuration(timeactive)){
                 
-                //filePath = "ASSETS/" + asset_fname;
-
-                //Check if the file exists
                 if (fileExists(asset_fname)) {
                     
                     fName = asset_fname;
@@ -45,7 +42,7 @@ string open(string command){
 
         } else return "Command not as expected";
 
-    } else return "Not logged in User Application";
+    } else return "User not logged in";
 }
 
 string close(string command){
@@ -53,7 +50,7 @@ string close(string command){
     string whichCommand, aid;    
     istringstream iss(command);
 
-    if ((userID != "" && password != "") || logged_in == true ){
+    if (logged_in == true ){
 
         if (iss >> whichCommand >> aid && iss.eof()) {
             
@@ -66,7 +63,7 @@ string close(string command){
 
         } else return "Incorrect command format";
 
-    } else return "User not logged in User Appplication";
+    } else return "User not logged in ";
 }
 
 string bid(string command){
@@ -74,14 +71,15 @@ string bid(string command){
     string whichCommand, aid, value;
     istringstream iss(command);
 
-    if ((userID != "" && password != "") || logged_in == true ){
+    if (logged_in == true ){
 
         if (iss >> whichCommand >> aid >> value && iss.eof()) {
             
             if (isNumeric(aid) && aid.size() == 3){
+                
                 tempAID = aid;
 
-                if (isNumeric(value)){
+                if (isNumeric(value) && value.size() <= 6){
 
                     return "BID " + userID + " " + password + " " + aid + " " + value;
                 
@@ -91,7 +89,7 @@ string bid(string command){
 
         } else return "Incorrect command format";
 
-    } else return "User not logged in User Appplication";
+    } else return "User not logged in";
 }
 
 string show_asset(string command){
@@ -99,19 +97,16 @@ string show_asset(string command){
     string whichCommand, aid;
     istringstream iss(command);
 
-    if (userID != "" && password != ""){
 
-        if (iss >> whichCommand >> aid && iss.eof()) {
+    if (iss >> whichCommand >> aid && iss.eof()) {
 
-            tempAID = aid;
-            
-            if (isNumeric(aid) && aid.size() == 3){
+        tempAID = aid;
+        
+        if (isNumeric(aid) && aid.size() == 3){
 
-                return "SAS " + aid;
+            return "SAS " + aid;
 
-            } else return "Invalid AID";
+        } else return "Invalid AID";
 
-        } else return "Incorrect command format";
-
-    } else return "User not logged in User Appplication";
+    } else return "Incorrect command format";
 }

@@ -38,4 +38,10 @@ bool fileExists(string asset_fname);
 //Checks if file is of valid size
 bool isFileSizeValid(size_t fileSize);
 
+//Checks if state if valid
+bool isValidState(string state);
+
+//Checks if string represents a valid file Size
+bool isValidFileSize(string fileSizeStr);
+
 #endif // VALIDATIONS_H
