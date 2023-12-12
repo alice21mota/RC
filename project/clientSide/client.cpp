@@ -130,8 +130,6 @@ void getCommand(string command){
 
         if (request.substr(0, 3) == "OPA"){
             
-            //result = sendTCP(request, filePath);
-            cout << fName << endl;
             result = sendTCP(request, fName);
             status = result.substr(0, result.find('\n'));
             
@@ -163,7 +161,7 @@ void getCommand(string command){
             result = sendUDP(request);
             status = result.substr(0, result.find('\n'));
             
-            cout << "RESPONSE: ";
+            cout << "RESPONSE: " << endl;
             myauctionsStatus(status);
 
         } else cout << "Error: " << request << endl;
@@ -177,7 +175,7 @@ void getCommand(string command){
             result = sendUDP(request);
             status = result.substr(0, result.find('\n'));
             
-            cout << "RESPONSE: ";
+            cout << "RESPONSE: " << endl;
             mybidsStatus(status);
 
         } else cout << "Error: " << request << endl;
@@ -203,8 +201,9 @@ void getCommand(string command){
         if (request.substr(0, 3) == "SAS"){
         
             result = sendTCP(request, "");
+
             cout << "RESPONSE: ";
-            show_assetStatus(result, "RECEIVED_FILES");
+            show_assetStatus(result);
 
         } else cout << "Error: " << request << endl;
 

@@ -263,24 +263,23 @@ void listStatus(string response){
 
 }
 
-void show_assetStatus(string response, string destinationDirectory) {
+void show_assetStatus(string response) {
     
     istringstream iss(response);
-    string command, status, fName, fSize, fData;
+    string command, status, fName, fSize, fData, chara;
 
     if (iss >> command >> status) {
 
         if (command == "RSA") {
 
-            if (iss.eof()) {
+            if (status == "NOK"){
 
-                if (status == "NOK") {
+                cout << "Problems receiving file" << endl;
 
-                    cout << "Problems receiving file" << endl;
+            }
 
-                } else cout << "Unknown response" << endl;
 
-            } else if (status == "OK") {
+            else if (status == "OK") {
 
                 if (iss >> fName >> fSize) {
                     
@@ -294,30 +293,26 @@ void show_assetStatus(string response, string destinationDirectory) {
                     dataStream.seekg(response.find(fSize) + fSize.size());
                     string remainingContent((istreambuf_iterator<char>(dataStream)), {});
 
-                    // If a destination directory is specified, store the file there
-                    if (!destinationDirectory.empty()) {
 
-                        // Construct the full path for the file in the destination directory
-                        //string fullPath = destinationDirectory + "/" + fName;
+                    // Construct the full path for the file in the destination directory
+                    //string fullPath = destinationDirectory + "/" + fName;
 
-                        string fullPath = "/" + fName;
+                    string fullPath = fName;
 
-                        // Open a file for writing in binary mode
-                        ofstream file(fullPath, ios::binary);
+                    // Open a file for writing in binary mode
+                    ofstream file(fullPath, ios::binary);
 
-                        if (file.is_open()) {
-                            
-                            // Write the received data to the file
-                            file.write(fData.data() + 1, fData.size() - 2);
+                    if (file.is_open()) {
+                        
+                        // Write the received data to the file
+                        file.write(fData.data() + 1, fData.size() - 2);
 
-                            // Close the file after writing
-                            file.close();
+                        // Close the file after writing
+                        file.close();
 
-                            cout << "File " << fName << " of " << fSize << " bytes stored at: " << fullPath << endl;
+                        cout << "File " << fName << " of " << fSize << " bytes stored at: " << fullPath << endl;
 
-                        } else cout << "Error opening file for writing." << endl;
-
-                    } else cout << "Destination directory not specified" << endl;
+                    } else cout << "Error opening file for writing." << endl;
 
                 } else cout << "Unknown response" << endl;
 

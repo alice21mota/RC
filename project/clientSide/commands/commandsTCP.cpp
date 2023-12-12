@@ -20,13 +20,13 @@ string open(string command){
                 //filePath = "ASSETS/" + asset_fname;
 
                 //Check if the file exists
-                if (fileExists(filePath)) {
+                if (fileExists(asset_fname)) {
                     
                     fName = asset_fname;
-                    size_t fileSize = getFileSize(filePath);
+                    size_t fileSize = getFileSize(fName);
                     if (isFileSizeValid(fileSize)){
                         
-                        fSize = fileSizeString(filePath);
+                        fSize = fileSizeString(asset_fname);
 
                         if (fSize != "Too many digits"){
 
@@ -102,9 +102,10 @@ string show_asset(string command){
     if (userID != "" && password != ""){
 
         if (iss >> whichCommand >> aid && iss.eof()) {
+
+            tempAID = aid;
             
             if (isNumeric(aid) && aid.size() == 3){
-                tempAID = aid;
 
                 return "SAS " + aid;
 

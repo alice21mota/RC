@@ -33,7 +33,7 @@ void mybidsStatus(string response);
 
 void listStatus(string response);
 
-void show_assetStatus(string response, string destinationDirectory);
+void show_assetStatus(string response);
 
 void show_recordStatus(string response);
 
