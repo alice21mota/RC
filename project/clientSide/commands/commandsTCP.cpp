@@ -54,7 +54,7 @@ string close(string command){
 
         if (iss >> whichCommand >> aid && iss.eof()) {
             
-            if (isNumeric(aid) && aid.size() == 3){
+            if (isValidAID(aid)){
 
                 tempAID = aid; //Used to return error to user if needed
                 return "CLS " + userID + " " + password + " " + aid;
@@ -75,11 +75,11 @@ string bid(string command){
 
         if (iss >> whichCommand >> aid >> value && iss.eof()) {
             
-            if (isNumeric(aid) && aid.size() == 3){
+            if (isValidAID(aid)){
                 
                 tempAID = aid;
 
-                if (isNumeric(value) && value.size() <= 6){
+                if (isBidValue(value)){
 
                     return "BID " + userID + " " + password + " " + aid + " " + value;
                 
@@ -102,7 +102,7 @@ string show_asset(string command){
 
         tempAID = aid;
         
-        if (isNumeric(aid) && aid.size() == 3){
+        if (isValidAID(aid)){
 
             return "SAS " + aid;
 

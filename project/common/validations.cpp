@@ -9,7 +9,6 @@ bool isAlphanumeric(string str) {
     return (all_of(str.begin(), str.end(), ::isalnum));
 }
 
-
 bool isUID(string uid){
     return (uid.size()==6 && isNumeric(uid));
 }
@@ -84,4 +83,33 @@ bool isValidFileSize(string fileSizeStr) {
         cerr << "Value out of range for int" << endl;
         return false;
     }
+}
+
+bool isValidAID(string aid){
+    return (isNumeric(aid) && aid.size() == 3);
+}
+
+bool isValidDate(string date) {
+   
+    // Define the regular expression for the date format "YYYY-MM-DD"
+    regex dateRegex(R"(\d{4}-\d{2}-\d{2})");
+    
+    return regex_match(date, dateRegex);
+
+}
+
+bool isValidTime(string time){
+    
+    regex timeRegex(R"(\d{2}:\d{2}:\d{2})");
+
+    // Use std::regex_match to check if the input string matches the pattern
+    return regex_match(time, timeRegex);
+}
+
+bool isValidSecTime(string sec_time){
+    return (isNumeric(sec_time) && sec_time.size() <= 5);
+}
+
+bool isBidValue(string value){
+    return (isNumeric(value) && value.size() <= 6);
 }

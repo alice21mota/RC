@@ -95,7 +95,7 @@ string show_record(string command){
 
     if (iss >> whichCommand >> aid && iss.eof()){
 
-        if (isNumeric(aid) && aid.size() == 3){
+        if (isValidAID(aid)){
             
             tempAID = aid;
 
