@@ -130,7 +130,9 @@ void getCommand(string command){
 
         if (request.substr(0, 3) == "OPA"){
             
-            result = sendTCP(request, filePath);
+            //result = sendTCP(request, filePath);
+            cout << fName << endl;
+            result = sendTCP(request, fName);
             status = result.substr(0, result.find('\n'));
             
             cout << "RESPONSE: ";

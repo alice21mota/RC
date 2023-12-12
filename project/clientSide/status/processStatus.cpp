@@ -298,7 +298,9 @@ void show_assetStatus(string response, string destinationDirectory) {
                     if (!destinationDirectory.empty()) {
 
                         // Construct the full path for the file in the destination directory
-                        string fullPath = destinationDirectory + "/" + fName;
+                        //string fullPath = destinationDirectory + "/" + fName;
+
+                        string fullPath = "/" + fName;
 
                         // Open a file for writing in binary mode
                         ofstream file(fullPath, ios::binary);

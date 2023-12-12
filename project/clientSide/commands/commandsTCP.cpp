@@ -17,7 +17,7 @@ string open(string command){
             
             if (isDescription(name) && isFileName(asset_fname) && isStartValue(start_value) && isDuration(timeactive)){
                 
-                filePath = "ASSETS/" + asset_fname;
+                //filePath = "ASSETS/" + asset_fname;
 
                 //Check if the file exists
                 if (fileExists(filePath)) {
