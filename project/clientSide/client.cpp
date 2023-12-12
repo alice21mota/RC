@@ -130,7 +130,7 @@ void getCommand(string command){
 
         if (request.substr(0, 3) == "OPA"){
             
-            result = sendTCP(request, fName);
+            result = sendTCP(request, fName, "");
             status = result.substr(0, result.find('\n'));
             
             cout << "RESPONSE: ";
@@ -144,7 +144,7 @@ void getCommand(string command){
 
         if (request.substr(0, 3) == "CLS"){
             
-            result = sendTCP(request, "");
+            result = sendTCP(request, "", "");
             status = result.substr(0, result.find('\n'));
             
             cout << "RESPONSE: ";
@@ -200,7 +200,7 @@ void getCommand(string command){
 
         if (request.substr(0, 3) == "SAS"){
         
-            result = sendTCP(request, "");
+            result = sendTCP(request, "", "SAS");
 
             cout << "RESPONSE: ";
             show_assetStatus(result);
@@ -213,7 +213,7 @@ void getCommand(string command){
 
         if (request.substr(0, 3) == "BID"){
             
-            result = sendTCP(request, "");
+            result = sendTCP(request, "", "");
             status = result.substr(0, result.find('\n'));
             
             cout << "RESPONSE: ";

@@ -105,7 +105,7 @@ void sendFileChunks(int fd, string fileName) {
     file.close();
 }
 
-string sendTCP(string message, string fileName){
+/*string sendTCP(string message, string fileName){
     
     if (fileName == ""){
         message = message + "\n";
@@ -192,4 +192,200 @@ string sendTCP(string message, string fileName){
     close(fd);
 
     return finalBuffer;
+}*/
+
+
+string sendTCP(string message, string fileName, string comm) {
+    if (fileName == ""){
+        message = message + "\n";
+    }
+
+    int fd, errcode;
+    ssize_t n, bytesRead;
+    size_t fileSize;
+    socklen_t addrlen;
+    char buffer[128];
+    char newline = '\n';
+    string finalBuffer, fSize;
+    
+
+    struct addrinfo hints, *res;
+    struct sockaddr_in addr;
+
+    fd = socket(AF_INET, SOCK_STREAM, 0);
+    
+    if (fd == -1)
+    {
+        cerr << "Error creating socket." << endl;
+        return "ERROR";
+    }
+
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_INET; // IPv4
+    hints.ai_socktype = SOCK_STREAM;
+
+    errcode = getaddrinfo(ip.c_str(), port.c_str(), &hints, &res);
+    
+    if (errcode != 0)
+    {   
+        cerr << "Error getting address information." << endl;
+        close(fd);
+        return "ERROR";
+    }
+
+    n = connect(fd, res->ai_addr, res->ai_addrlen);
+    
+    if (n == -1)
+    {
+        cerr << "Error connecting to the server." << endl;
+        close(fd);
+        return "ERROR";
+    }
+
+    // Send the message
+    n = write(fd, message.c_str(), message.length());
+    if (n == -1) {
+        cerr << "Error writing message." << endl;
+        close(fd);
+        return "ERROR";
+    }
+
+    if (fileName != "") {
+        sendFileChunks(fd, fileName);
+
+        // Sending a newline to indicate the end of file
+        ssize_t n = write(fd, &newline, 1);
+        if (n == -1) {
+            cerr << "Error sending file." << endl;
+            close(fd);
+            return "ERROR";
+        }
+    }
+
+    cout << "COMM " << comm << endl;
+
+    if (comm == "SAS"){
+         
+        cout << "in\n";
+
+        n = read(fd, buffer, sizeof(buffer) - 1);
+
+
+        if (n == -1) {
+        
+            cerr << "Error reading response." << endl;
+            close(fd);
+            return "ERROR";
+            
+        }
+
+        if (n == 8){
+            freeaddrinfo(res);
+            close(fd);
+            cout << buffer << endl;
+            return buffer;
+        }
+
+
+        else {
+            
+            bytesRead = n;
+             // to store the dynamically read file size
+            //cout << "final ->>> " << finalBuffer << endl;
+
+            cout << " BR1 " << bytesRead << " " << endl;
+            finalBuffer.append(buffer, n);
+            //cout << "final 1 ->>> " << finalBuffer << endl;
+
+            n = read(fd, buffer, sizeof(buffer) - 1);
+            
+            cout << " BR2 " << bytesRead << " " << endl;
+
+            finalBuffer.append(buffer, n);
+            bytesRead += n;
+
+            cout << " BR3 " << bytesRead << " " << endl;
+            cout << finalBuffer << endl;
+            //cout << "final 2 ->>> " << finalBuffer << endl;  
+
+            regex pattern(R"(RSA OK ([A-Za-z0-9_-]{1,21}\.[A-Za-z0-9_-]{3}) (\d{1,8}))");
+            smatch match; //Used to match with the patern
+
+            if (regex_search(finalBuffer, match, pattern)) {
+                cout << "Parsed values:" << endl;
+                if (match.size() == 3) {
+                    fSize = match[2];
+                     
+                    //cout << "Fname: " << match[1] << endl;
+                    cout << "Fsize: " << match[2] << endl;
+                } else {
+                    cerr << "Unexpected number of matches." << endl;
+                    return "ERROR";
+                }
+            } else {
+                cerr << "Failed to match pattern." << endl;
+                return "ERROR";
+            }
+
+            try {
+                fileSize = stoll(fSize);
+                cout << "Converted value: " << fileSize << endl;
+            } catch (const invalid_argument& e) {
+                cerr << "Invalid argument: " << e.what() << endl;
+            } catch (const out_of_range& e) {
+                cerr << "Out of range: " << e.what() << endl;
+            }
+
+            cout << "bytes read " << bytesRead << endl;
+
+            while (bytesRead < fileSize) {
+                //buffer[n] = '\0';  // Null-terminate buffer
+                cout << " before reading " << bytesRead << " " << endl;
+                n = read(fd, buffer, min(sizeof(buffer) - 1, fileSize - bytesRead));
+                
+                finalBuffer.append(buffer, n);
+                bytesRead += n;
+                cout << " n " << bytesRead << " " << endl;
+            }
+
+            if (n == -1) {
+            
+                cerr << "Error reading response." << endl;
+                close(fd);
+                return "ERROR";
+                
+            }
+
+            
+ 
+            //cout << "final ->>> " << finalBuffer << endl;
+        }
+
+
+    }
+    else {
+
+        while ((n = read(fd, buffer, sizeof(buffer) - 1)) > 0) {
+            //buffer[n] = '\0';  // Null-terminate buffer
+            cout << "IN here";
+            finalBuffer.append(buffer, n);
+        }
+
+        if (n == -1) {
+        
+            cerr << "Error reading response." << endl;
+            close(fd);
+            return "ERROR";
+            
+        }
+    }
+
+    // The 'finalBuffer' now contains the contents of the selected file
+
+    freeaddrinfo(res);
+    close(fd);
+    //cout << finalBuffer << endl;
+    return finalBuffer; // or any appropriate success message
 }
+
+
