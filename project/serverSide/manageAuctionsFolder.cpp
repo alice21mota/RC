@@ -56,8 +56,22 @@ bool createAuctionStartFile(string auctionId, string userId, string name, string
 bool createAuctionEndFile(string auctionId) {
     filesystem::path endFilePath = "AUCTIONS/" + auctionId + "/END_" + auctionId + ".txt";
 
-    int end_sec_time = getAuctionStartFullTime(auctionId) + getAuctionTimeactive(auctionId);
-    string end_datetime = secondsToDate((time_t)end_sec_time);
+    int timeactive = getAuctionTimeactive(auctionId);
+    int startFulltime = getAuctionStartFullTime(auctionId);
+    long int now = getSeconds();
+
+    int end_time;
+    int end_sec_time;
+    if (now > startFulltime + timeactive) {
+        end_time = startFulltime + timeactive;
+        end_sec_time = timeactive;
+    }
+    else {
+        end_time = now;
+        end_sec_time = now - startFulltime;
+    }
+
+    string end_datetime = secondsToDate((time_t)end_time);
 
     string contentEndFile = end_datetime + " " + to_string(end_sec_time);
     return createFile(endFilePath, contentEndFile);

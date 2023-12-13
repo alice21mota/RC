@@ -143,7 +143,7 @@ string getBidsString(string auctionId) {
     int nBids = bids.size();
     for (int i = 0;i < nBids; i++) {
         filesystem::path bidFilePath = directotyPath / bids[i];
-        final += "\nB " + readFromFile(bidFilePath);
+        final += " B " + readFromFile(bidFilePath);
     }
     return final;
 }
@@ -161,7 +161,7 @@ string showRecord(string auctionId) {
 
     if (!isAuctionActive(auctionId)) {
         filesystem::path endFilePath = "AUCTIONS/" + auctionId + "/END_" + auctionId + ".txt";
-        finalString += "\nE " + readFromFile(endFilePath);
+        finalString += " E " + readFromFile(endFilePath);
     }
 
     return command + "OK " + finalString;
