@@ -85,7 +85,7 @@ int getAuctionStartFullTime(string auctionId) {
     filesystem::path startFilePath("AUCTIONS/" + auctionId + "/START_" + auctionId + ".txt");
     string infos = readFromFile(startFilePath);
     int infosLen = infos.length();
-    string start_fulltime = infos.substr(infosLen - 1 - FULLTIME_NCHARS, FULLTIME_NCHARS);
+    string start_fulltime = infos.substr(infosLen - FULLTIME_NCHARS, FULLTIME_NCHARS);
     return stoi(start_fulltime);
 }
 
