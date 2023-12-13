@@ -130,7 +130,7 @@ void getCommand(string command){
 
         if (request.substr(0, 3) == "OPA"){
             
-            result = sendTCP(request, filePath);
+            result = sendTCP(request, fName, "");
             status = result.substr(0, result.find('\n'));
             
             cout << "RESPONSE: ";
@@ -144,7 +144,7 @@ void getCommand(string command){
 
         if (request.substr(0, 3) == "CLS"){
             
-            result = sendTCP(request, "");
+            result = sendTCP(request, "", "");
             status = result.substr(0, result.find('\n'));
             
             cout << "RESPONSE: ";
@@ -161,7 +161,7 @@ void getCommand(string command){
             result = sendUDP(request);
             status = result.substr(0, result.find('\n'));
             
-            cout << "RESPONSE: ";
+            cout << "RESPONSE: " << endl;
             myauctionsStatus(status);
 
         } else cout << "Error: " << request << endl;
@@ -175,7 +175,7 @@ void getCommand(string command){
             result = sendUDP(request);
             status = result.substr(0, result.find('\n'));
             
-            cout << "RESPONSE: ";
+            cout << "RESPONSE: " << endl;
             mybidsStatus(status);
 
         } else cout << "Error: " << request << endl;
@@ -199,10 +199,12 @@ void getCommand(string command){
         request = show_asset(command);
 
         if (request.substr(0, 3) == "SAS"){
-        
-            result = sendTCP(request, "");
+            
+            // rec indicates that this command may be receiving a file
+            result = sendTCP(request, "", "rec");
+
             cout << "RESPONSE: ";
-            show_assetStatus(result, "RECEIVED_FILES");
+            show_assetStatus(result);
 
         } else cout << "Error: " << request << endl;
 
@@ -212,7 +214,7 @@ void getCommand(string command){
 
         if (request.substr(0, 3) == "BID"){
             
-            result = sendTCP(request, "");
+            result = sendTCP(request, "", "");
             status = result.substr(0, result.find('\n'));
             
             cout << "RESPONSE: ";

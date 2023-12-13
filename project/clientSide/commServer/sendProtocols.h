@@ -23,7 +23,7 @@ void sendFileChunks(int fd, string fileName);
 
 //string receiveResponse(int fd);
 
-string sendTCP(string message, string fileName);
+string sendTCP(string message, string fileName, string comm);
 
 
 #endif // SENDPROTOCOLS_H 

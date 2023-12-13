@@ -38,4 +38,25 @@ bool fileExists(string asset_fname);
 //Checks if file is of valid size
 bool isFileSizeValid(size_t fileSize);
 
+//Checks if state if valid
+bool isValidState(string state);
+
+//Checks if string represents a valid file Size
+bool isValidFileSize(string fileSizeStr);
+
+//Checks is string is a valid aid
+bool isValidAID(string aid);
+
+//Checks if date is in valid format
+bool isValidDate(string date);
+
+//Checks if time is in valid format
+bool isValidTime(string time);
+
+//Checks if it is valid sec_time
+bool isValidSecTime(string sec_time);
+
+//Checks if it is a valid bid value
+bool isBidValue(string value);
+
 #endif // VALIDATIONS_H
