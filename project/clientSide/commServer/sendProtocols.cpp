@@ -11,7 +11,7 @@ string sendUDP(string message) {
 
     struct addrinfo hints, *res;
     struct sockaddr_in addr;
-   
+
 
     fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (fd == -1)
@@ -75,7 +75,7 @@ string sendUDP(string message) {
 }
 
 void sendFileChunks(int fd, string fileName) {
-    size_t chunkSize = 1024;
+    size_t chunkSize = 80;
     char buffer[chunkSize];
 
     // Open the file
@@ -102,9 +102,9 @@ void sendFileChunks(int fd, string fileName) {
     file.close();
 }
 
-string sendTCP(string message, string fileName){
+string sendTCP(string message, string fileName) {
     cout << "GOT in TCP\n";
-    if (fileName == ""){
+    if (fileName == "") {
         message = message + "\n";
     }
 
@@ -122,7 +122,7 @@ string sendTCP(string message, string fileName){
         cout << "GOT in socket\n";
         exit(1);
     }
-    
+
 
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_INET; // IPv4
@@ -149,10 +149,10 @@ string sendTCP(string message, string fileName){
         exit(1);
     }
 
-    if (fileName != ""){
-        
+    if (fileName != "") {
+
         sendFileChunks(fd, fileName);
-        
+
         char newline = '\n';
         ssize_t n = write(fd, &newline, 1);
         if (n == -1) {
@@ -167,7 +167,7 @@ string sendTCP(string message, string fileName){
         cout << "GOT in read\n";
         exit(1);
     }
-    
+
     cout << "ALMOST OUT\n";
     freeaddrinfo(res);
     close(fd);

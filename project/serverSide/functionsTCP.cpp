@@ -1,7 +1,7 @@
 #include "functionsTCP.h"
 
 string open(string userId, string password, string name, string start_value, string timeactive, string Fname, string Fsize, string Fdata) {
-    // cout << "entrei no OPEN" << endl; // Debug
+    cout << "entrei no OPEN" << endl; // Debug
     string aid;
     string command = "ROA ";
 
@@ -16,7 +16,7 @@ string open(string userId, string password, string name, string start_value, str
     if (!writeAsset(aid, Fname, Fsize, Fdata)) return command + "NOK";
 
     if (!createAuctionStartFile(aid, userId, name, start_value, timeactive, Fname)) return command + "NOK";
-    return command + "OK " + aid;
+    return command + "OK " + aid; // FIXME not sure se não tenho de enviar um '\n'
 
 }
 

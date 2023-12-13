@@ -9,7 +9,7 @@
 - [ ] whiles nos reads
 - [x] enviar resposta no TCP
 - [ ] Ver se é mesmo suposto ter o `exit` como comando do server
-- [ ] Aproveitar "os eventos gerados pelas aplicações clientes que lhe acedem de forma concorrente, para veriﬁcar se um dado leilão se encontra expirado" (ver `2.1 a)` do guia do projeto)
+- [x] Aproveitar "os eventos gerados pelas aplicações clientes que lhe acedem de forma concorrente, para veriﬁcar se um dado leilão se encontra expirado" (ver `2.1 a)` do guia do projeto)
 - [ ] Fazer as verificações dos valores recebidos
 - [ ] Checkar que não há espaços entre as mensagens trocadas com o client (se houverem, tem de dar erro)
 - [ ] Mensagens de erro ao ler do UDP (ver mail `Servidor AS/UDP - esclarecimento importante` do dia 23/11)
@@ -22,6 +22,8 @@
 - [ ] Quando estou a enviar um ficheiro tenho de garantir que acaba com `\n`
 - [ ] Garantir que não há mais do que 50 bids -> not sure, [estava no slack](https://rc-2324.slack.com/archives/C0614L96BUN/p1701964605129539)
 - [ ] Alterar a data de quando os leilões expiram -> ver mail Encerramento de leilões - servidor AS
+- [ ] Aceitar files com `-` e com `_` (ver email `Projecto - caracteres especiais admitidos em nome de leilão`)
+- [ ] '\n'
 
 - Testar
 - [ ] correr o `isCorrectPassword()` com um user que não existe
