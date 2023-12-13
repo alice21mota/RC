@@ -239,6 +239,14 @@ string sendTCP(string message, string fileName, string comm) {
                 
                 n = read(fd, buffer, min(sizeof(buffer), fileSize - bytesRead));
                 
+                if (n == -1) {
+            
+                    cerr << "Error reading response." << endl;
+                    close(fd);
+                    return "ERROR";
+                    
+                }
+                
                 finalBuffer.append(buffer, n);
                 bytesRead += n;
 
