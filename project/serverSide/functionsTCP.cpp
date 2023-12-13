@@ -68,5 +68,5 @@ string addBid(string userId, string password, string auctionId, int bid) {
     if (!isCorrectPassword(userId, password)) return command + "NOK";
     if (bid < getLastBid(auctionId)) return command + "REF";
     if (!createBidFile(auctionId, bid, userId)) return command + "NOK";
-    return command + "OK";
+    return command + "ACC";
 }

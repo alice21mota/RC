@@ -122,7 +122,7 @@ string getAuctionOwner(string auctionId) {
     cout << "getAuctionOwner " << auctionId << endl; // Debug
     filesystem::path startFilePath("AUCTIONS/" + auctionId + "/START_" + auctionId + ".txt");
     string infos = readFromFile(startFilePath);
-    return infos.substr(USERID_NCHARS);
+    return infos.substr(0, USERID_NCHARS);
 }
 
 int checkExpiredAuctions() {
