@@ -27,7 +27,7 @@ bool isDescription(string description){
 }
 
 bool isFileName(string fileName){
-    const regex pattern("^([0-9]{1,20}\\.)?[a-zA-Z0-9_-]{1,20}\\.[a-zA-Z0-9]{3}$");
+    const regex pattern("^([0-9]{1,20}\\.)?[a-zA-Z0-9_-]{1,20}\\.[a-zA-Z]{3}$");
     return regex_match(fileName, pattern);
 }
 

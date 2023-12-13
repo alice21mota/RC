@@ -293,31 +293,36 @@ string sendTCP(string message, string fileName, string comm) {
              // to store the dynamically read file size
             //cout << "final ->>> " << finalBuffer << endl;
 
-            cout << " BR1 " << bytesRead << " " << endl;
+            //cout << " BR1 " << bytesRead << " " << endl;
             finalBuffer.append(buffer, n);
             //cout << "final 1 ->>> " << finalBuffer << endl;
 
             n = read(fd, buffer, sizeof(buffer) - 1);
             
-            cout << " BR2 " << bytesRead << " " << endl;
 
             finalBuffer.append(buffer, n);
             bytesRead += n;
 
             cout << " BR3 " << bytesRead << " " << endl;
-            cout << finalBuffer << endl;
+            
             //cout << "final 2 ->>> " << finalBuffer << endl;  
 
-            regex pattern(R"(RSA OK ([A-Za-z0-9_-]{1,21}\.[A-Za-z0-9_-]{3}) (\d{1,8}))");
+            regex pattern(R"(RSA OK ([A-Za-z0-9_.-]{1,20}\.[A-Za-z]{3}) (\d{1,8}))");
             smatch match; //Used to match with the patern
 
             if (regex_search(finalBuffer, match, pattern)) {
                 cout << "Parsed values:" << endl;
                 if (match.size() == 3) {
                     fSize = match[2];
-                     
+                     cout << " BR1 " << bytesRead << " " << endl;
                     //cout << "Fname: " << match[1] << endl;
                     cout << "Fsize: " << match[2] << endl;
+                    size_t matchedBytes = match.position(0) + match.length(0) + 2;
+
+                    cout << "MATCHED BYTES " << matchedBytes << endl;
+
+                    bytesRead -= matchedBytes;
+                    cout << " BR after minus  " << bytesRead << " " << endl;
                 } else {
                     cerr << "Unexpected number of matches." << endl;
                     return "ERROR";
@@ -339,9 +344,9 @@ string sendTCP(string message, string fileName, string comm) {
             cout << "bytes read " << bytesRead << endl;
 
             while (bytesRead < fileSize) {
+                //cout << " before reading " << bytesRead << " " << endl;
+                n = read(fd, buffer, min(sizeof(buffer), fileSize - bytesRead));
                 //buffer[n] = '\0';  // Null-terminate buffer
-                cout << " before reading " << bytesRead << " " << endl;
-                n = read(fd, buffer, min(sizeof(buffer) - 1, fileSize - bytesRead));
                 
                 finalBuffer.append(buffer, n);
                 bytesRead += n;
