@@ -56,10 +56,8 @@ bool createAuctionStartFile(string auctionId, string userId, string name, string
 bool createAuctionEndFile(string auctionId) {
     filesystem::path endFilePath = "AUCTIONS/" + auctionId + "/END_" + auctionId + ".txt";
 
-    time_t end_fulltime = getSeconds();
-    string end_datetime = secondsToDate(end_fulltime);
-
-    int end_sec_time = end_fulltime - getAuctionStartFullTime(auctionId);
+    int end_sec_time = getAuctionStartFullTime(auctionId) + getAuctionTimeactive(auctionId);
+    string end_datetime = secondsToDate((time_t)end_sec_time);
 
     string contentEndFile = end_datetime + " " + to_string(end_sec_time);
     return createFile(endFilePath, contentEndFile);
@@ -124,7 +122,7 @@ int checkExpiredAuctions() {
         if (isAuctionActive(auctionId)) {
             int timeactive = getAuctionTimeactive(auctionId);
             int startFulltime = getAuctionStartFullTime(auctionId);
-            int now = getSeconds();
+            long int now = getSeconds();
             if (now > startFulltime + timeactive) {
                 createAuctionEndFile(auctionId);
                 sumExpired++;

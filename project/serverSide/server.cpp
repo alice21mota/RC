@@ -33,6 +33,8 @@ string getUDPCommand(string command) {
     string whichCommand;
     iss >> whichCommand;
 
+    checkExpiredAuctions();
+
     if (whichCommand == "LIN") {
         string user, password, status;
         iss >> user >> password;
@@ -77,7 +79,6 @@ string getTCPCommand(string command) {
     iss >> whichCommand;
 
     checkExpiredAuctions();
-    cout << "after checkExpiredAuctions" << endl; // Debug 
 
     if (whichCommand == "OPA") {
         string user, password, name, start_value, timeactive, Fname, Fsize, Fdata;

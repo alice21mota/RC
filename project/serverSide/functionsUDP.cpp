@@ -164,5 +164,5 @@ string showRecord(string auctionId) {
         finalString += "\nE " + readFromFile(endFilePath);
     }
 
-    return command + finalString;
+    return command + "OK " + finalString;
 }
