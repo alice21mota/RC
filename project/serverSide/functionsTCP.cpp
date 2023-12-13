@@ -31,7 +31,7 @@ string showAsset(string auctionId) {
         else {
             string Fname = files[0];
             filesystem::path filePath = directoryPath / Fname;
-            string Fdata = readFromFile(filePath);
+            string Fdata = getFileData(filePath);
             if (Fdata == "-1") status = "NOK";
             else {
                 int Fsize = Fdata.length();

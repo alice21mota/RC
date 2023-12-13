@@ -367,7 +367,7 @@ int main(int argc, char *argv[])
 
                 if (!isOpen) returnString = getTCPCommand(finalBuffer);
 
-                cout << "vou devolver por TCP: " << returnString << endl;
+                // cout << "vou devolver por TCP: " << returnString << endl;
 
                 nWritten = write(new_tfd, returnString.c_str(), returnString.length()); // Send message to client
                 if (nWritten == -1) // Will always get an error when using 'nc'
