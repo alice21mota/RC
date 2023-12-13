@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <sstream>
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -20,6 +21,9 @@ string sendUDP(string message);
 
 void sendFileChunks(int fd, string fileName);
 
+//string receiveResponse(int fd);
+
 string sendTCP(string message, string fileName);
+
 
 #endif // SENDPROTOCOLS_H 

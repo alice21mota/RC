@@ -28,7 +28,7 @@ bool isDescription(string description){
 }
 
 bool isFileName(string fileName){
-    const regex pattern("^([0-9]{1,21}\\.)?[a-zA-Z0-9_-]{1,21}\\.[a-zA-Z0-9_-]{3}$");
+    const regex pattern("^([0-9]{1,20}\\.)?[a-zA-Z0-9_-]{1,20}\\.[a-zA-Z0-9]{3}$");
     return regex_match(fileName, pattern);
 }
 
@@ -51,8 +51,6 @@ bool isDuration(string duration){
 }
 
 bool fileExists(string filePath) {
-    //string filePath = "ASSETS/" + asset_fname;
-    cout << "Checking for file: " << filePath << endl;
     return filesystem::exists(filePath);
 }
 

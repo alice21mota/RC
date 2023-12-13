@@ -2,10 +2,11 @@
 
 //Gets file size in bytes
 size_t getFileSize(string asset_fname) {
+
     ifstream file(asset_fname, ios::binary | ios::ate);
     size_t size = file.tellg();
     file.close();
-    cout << "Size is " << size << endl;
+    
     return size;
 }
 

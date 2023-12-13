@@ -90,3 +90,24 @@ string list(string command){
     } else return "Incorrect command format";
 }
 
+string show_record(string command){
+    
+    string whichCommand, aid;
+    istringstream iss(command);
+
+    if (userID != "" && password != ""){
+
+        if (iss >> whichCommand >> aid && iss.eof()){
+
+            if (isNumeric(aid) && aid.size() == 3){
+                
+                tempAID = aid;
+
+                return "SRC " + aid;
+            
+            } else return "Invalid AID";
+
+        } else return "Invalid command";
+
+    } else return "User not known";
+}

@@ -262,3 +262,144 @@ void listStatus(string response){
     } else cout << "Unknown response" << endl;
 
 }
+
+void show_assetStatus(string response, string destinationDirectory) {
+    
+    istringstream iss(response);
+    string command, status, fName, fSize, fData;
+
+    if (iss >> command >> status) {
+
+        if (command == "RSA") {
+
+            if (iss.eof()) {
+
+                if (status == "NOK") {
+
+                    cout << "Problems receiving file" << endl;
+
+                } else cout << "Unknown response" << endl;
+
+            } else if (status == "OK") {
+
+                if (iss >> fName >> fSize) {
+                    
+                    vector<char> fData((istreambuf_iterator<char>(iss)), {});
+                    
+                    istringstream dataStream;
+                    
+                    dataStream >> command >> status >> fName >> fSize;
+
+                     // Read until the end of the stream
+                    dataStream.seekg(response.find(fSize) + fSize.size());
+                    string remainingContent((istreambuf_iterator<char>(dataStream)), {});
+
+                    // If a destination directory is specified, store the file there
+                    if (!destinationDirectory.empty()) {
+
+                        // Construct the full path for the file in the destination directory
+                        string fullPath = destinationDirectory + "/" + fName;
+
+                        // Open a file for writing in binary mode
+                        ofstream file(fullPath, ios::binary);
+
+                        if (file.is_open()) {
+                            
+                            // Write the received data to the file
+                            file.write(fData.data() + 1, fData.size() - 2);
+
+                            // Close the file after writing
+                            file.close();
+
+                            cout << "File " << fName << " of " << fSize << " bytes stored at: " << fullPath << endl;
+
+                        } else cout << "Error opening file for writing." << endl;
+
+                    } else cout << "Destination directory not specified" << endl;
+
+                } else cout << "Unknown response" << endl;
+
+            } else cout << "Unknown response" << endl;
+
+        } else cout << "Unknown response" << endl;
+
+    } else cout << "Unknown response" << endl;
+}
+
+void show_recordStatus(string response){
+    
+    istringstream iss(response);
+    string command, status, aid, state;
+    string host_UID, auction_name, asset_fName, start_value, start_date, start_time, timeactive;
+    string identifier, bidder_UID, bid_value, bid_date, bid_time, bid_sec_time;
+    string end_date, end_time, end_sec_time;
+
+    if (iss >> command >> status){
+        
+        if (command == "RRC"){
+
+            if (iss.eof()){
+
+                if (status == "NOK"){
+
+                    cout << "Auction " << tempAID << " does not exist" << endl;
+
+                } else cout << "Unknown response" << endl;
+            } 
+
+            else if (status == "OK"){
+                        
+                if (iss >> host_UID >> auction_name >> asset_fName >> start_value >> start_date >> start_time >> timeactive) {
+
+                    //cout << host_UID << " " << auction_name << " " << asset_fName << " " << start_value << " " << start_date << " " << start_time << " " << timeactive << endl;
+                    cout << "Auction \"" << auction_name << "\" with file \"" << asset_fName << "\" started by user " << host_UID 
+                        << " in " << start_date << " at " << start_time << ". Start Value was " << start_value << " and it was/has been active for " 
+                        << timeactive << " seconds" << endl;
+
+                    if (!iss.eof()){
+
+                        cout << "Bids Information:" << endl;
+
+                        if (iss >> identifier && identifier == "B"){
+
+                            while (identifier == "B"){
+                                if (iss >> bidder_UID >> bid_value >> bid_date >> bid_time >> bid_sec_time){
+
+                                    cout << "Bidder UID: " << bidder_UID << ", Bid Value: " << bid_value << ", Bid Date and Time: " 
+                                        << bid_date << " at " << bid_time << ", Time since the auction started: " << bid_sec_time << " seconds" << endl;
+                                    //cout << bidder_UID << " " << bid_value << " " << bid_date << " " << bid_time << " " << bid_sec_time << endl; 
+                                }
+                                if (iss >> identifier && !iss.eof()) continue;
+                            }
+
+                        } else cout << "No bids were/have been made" << endl;
+
+                        if (!iss.eof()){
+
+                            if (identifier == "E"){
+
+                                if (iss >> end_date >> end_time >> end_sec_time && iss.eof()){
+
+                                    cout << "Auction ended in " << end_date << " at " << end_time 
+                                        << ", " << end_sec_time << " seconds after it started" << endl;
+
+                                    //cout << end_date << " " << end_time << " " << end_sec_time << endl;
+                                }
+
+                            } else cout << "Unknown response" << endl;
+                        }
+
+                        else if (iss.eof()) cout << endl << "Auction has not ended yet" << endl;
+
+
+                    } else cout << "Auction has not ended yet, and no bids have been made" << endl;
+                    
+                } else cout << "Unknown response" << endl; 
+
+            } else cout << "Unknown response" << endl; 
+
+        } else cout << "Unknown response" << endl;
+       
+    } else cout << "Unknown response" << endl;
+
+}
