@@ -1,13 +1,13 @@
 #include "manageUsersFolder.h"
 
-void createUsersFolder() {
+bool createUsersFolder() {
     filesystem::path directoryPath("USERS");
-    createFolder(directoryPath);
+    return createFolder(directoryPath);
 }
 
-void createUserFolder(string userId) {
+bool createUserFolder(string userId) {
     filesystem::path directoryPath("USERS/" + userId);
-    createFolder(directoryPath);
+    return createFolder(directoryPath);
 }
 
 bool createUserPasswordFile(string userId, string password) {
@@ -21,24 +21,22 @@ bool deleteUserPasswordFile(string userId) { // TODO: deal with the errors
     return filesystem::remove(filePath);
 }
 
-void createUserLoginFile(string userId) {
+bool createUserLoginFile(string userId) {
     filesystem::path filePath = "USERS/" + userId + "/" + userId + "_login.txt";
-    createFile(filePath);
+    return createFile(filePath);
 }
 
 bool deleteUserLoginFile(string userId) { // TODO: deal with the errors
     filesystem::path filePath = "USERS/" + userId + "/" + userId + "_login.txt";
-    if (filesystem::remove(filePath))
-        return true;
-    else return false;
+    return filesystem::remove(filePath);
 }
 
-void createHostedFolder(string userId) {
+bool createHostedFolder(string userId) {
     filesystem::path directoryPath("USERS/" + userId + "/HOSTED/");
-    createFolder(directoryPath);
+    return createFolder(directoryPath);
 }
 
-void createBiddedFolder(string userId) {
+bool createBiddedFolder(string userId) {
     filesystem::path directoryPath("USERS/" + userId + "/BIDDED/");
-    createFolder(directoryPath);
+    return createFolder(directoryPath);
 }

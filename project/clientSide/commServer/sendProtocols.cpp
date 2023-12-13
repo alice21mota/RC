@@ -10,7 +10,7 @@ string sendUDP(string message) {
 
     struct addrinfo hints, *res;
     struct sockaddr_in addr;
-   
+
 
     fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (fd == -1)
@@ -43,7 +43,7 @@ string sendUDP(string message) {
     char headerBuffer[sizeof(int)]; //Storing message size
 
     ssize_t headerBytes = recvfrom(fd, headerBuffer, sizeof(headerBuffer), MSG_PEEK, (struct sockaddr *)&addr, &addrlen);
-    
+
     if (headerBytes == -1) {
 
         cerr << "Error receiving message size." << endl;
@@ -56,7 +56,7 @@ string sendUDP(string message) {
 
     char* fullMessage = new char[messageSize];
     ssize_t messageBytes = recvfrom(fd, fullMessage, messageSize, 0, (struct sockaddr *)&addr, &addrlen);
-    
+
     if (messageBytes == -1) {
 
         cerr << "Error receiving message." << endl;
@@ -72,12 +72,12 @@ string sendUDP(string message) {
 }
 
 void sendFileChunks(int fd, string fileName) {
-    size_t chunkSize = 1024;
+    size_t chunkSize = 80;
     char buffer[chunkSize];
 
     // Open the file
     ifstream file(fileName, ios::binary);
-    
+
     if (!file.is_open()) {
         cerr << "Error opening file." << endl;
         return;
@@ -91,7 +91,7 @@ void sendFileChunks(int fd, string fileName) {
         // Check if anything was read
         if (file.gcount() > 0) {
             ssize_t n = write(fd, buffer, file.gcount());
-            
+
             if (n == -1) {
 
                 cerr << "Error writing file chunk." << endl;
@@ -105,9 +105,9 @@ void sendFileChunks(int fd, string fileName) {
     file.close();
 }
 
-string sendTCP(string message, string fileName){
-    
-    if (fileName == ""){
+string sendTCP(string message, string fileName) {
+
+    if (fileName == "") {
         message = message + "\n";
     }
 
@@ -121,7 +121,7 @@ string sendTCP(string message, string fileName){
     struct sockaddr_in addr;
 
     fd = socket(AF_INET, SOCK_STREAM, 0);
-    
+
     if (fd == -1)
     {
         cerr << "Error creating socket." << endl;
@@ -133,16 +133,16 @@ string sendTCP(string message, string fileName){
     hints.ai_socktype = SOCK_STREAM;
 
     errcode = getaddrinfo(ip.c_str(), port.c_str(), &hints, &res);
-    
+
     if (errcode != 0)
-    {   
+    {
         cerr << "Error getting address information." << endl;
         close(fd);
         return "ERROR";
     }
 
     n = connect(fd, res->ai_addr, res->ai_addrlen);
-    
+
     if (n == -1)
     {
         cerr << "Error connecting to the server." << endl;
@@ -159,11 +159,11 @@ string sendTCP(string message, string fileName){
         return "ERROR";
     }
 
-    if (fileName != ""){
+    if (fileName != "") {
         sendFileChunks(fd, fileName);
-        
+
         ssize_t n = write(fd, &newline, 1);
-        
+
         if (n == -1) {
 
             cerr << "Error sending file." << endl;
@@ -179,13 +179,13 @@ string sendTCP(string message, string fileName){
         //buffer[n] = '\0';  // Null-terminate buffer
         finalBuffer.append(buffer, n);
     }
-    
+
     if (n == -1) {
-        
+
         cerr << "Error reading response." << endl;
         close(fd);
         return "ERROR";
-        
+
     }
 
     freeaddrinfo(res);

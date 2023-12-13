@@ -20,6 +20,6 @@ string getMyBids(string userId);
 
 string listAuctions();
 
-// string showRecord(string auctionId);
+string showRecord(string auctionId);
 
 #endif

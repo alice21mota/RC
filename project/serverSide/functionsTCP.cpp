@@ -1,45 +1,72 @@
 #include "functionsTCP.h"
 
-string getAID() {
-    filesystem::path directoryPath = "AUCTIONS/";
-    vector<string> filenames = getSortedFilesFromDirectory(directoryPath);
-    if (filenames.size() == 0) return "001";
-    string lastAID = getSortedFilesFromDirectory(directoryPath).back();
-    int newId = stoi(lastAID) + 1;
-    ostringstream oss;
-    oss << setw(3) << std::setfill('0') << newId;
-    // FIXME what if aid > 999 ?
-    return oss.str();
+string open(string userId, string password, string name, string start_value, string timeactive, string Fname, string Fsize, string Fdata) {
+    cout << "entrei no OPEN" << endl; // Debug
+    string aid;
+    string command = "ROA ";
+
+    if (!isLoggedIn(userId)) return command + "NLG";    // FIXME what should return first
+    if (!isCorrectPassword(userId, password)) return command + "NOK"; // FIXME what should return first
+
+    if (!existAuctions()) createAuctionsFolder(); // FIXME: should i check this (?)
+    cout << "já há o auctions folder";
+    if ((aid = createAuctionFolder()) == "-1") return command + "NOK";
+    cout << "aid  = " << aid << endl; // Debug
+    if (!createAuctionAssetFolder(aid)) return command + "NOK";
+    if (!writeAsset(aid, Fname, Fsize, Fdata)) return command + "NOK";
+
+    if (!createAuctionStartFile(aid, userId, name, start_value, timeactive, Fname)) return command + "NOK";
+    return command + "OK " + aid; // FIXME not sure se não tenho de enviar um '\n'
+
 }
 
-string open(string userId, string password, string name, string start_value, string timeactive, string Fname, string Fsize, string Fdata) {
-    // cout << "entrei no OPEN" << endl; // Debug
+string showAsset(string auctionId) {
     string status;
-
-    if (!isLoggedIn(userId)) status = "NLG";    // FIXME what should return first
-    else if (!isCorrectPassword(userId, password)) status = "NOK"; // FIXME what should return first
-    else {
-        if (!existAuctions()) createAuctionsFolder();
-
-        string aid = getAID();
-        cout << "aid  = " << aid << endl; // Debug
-        createAuctionFolder(aid);
-        createAuctionAssetFolder(aid);
-
-        filesystem::path assetFilePath = "AUCTIONS/" + aid + "/ASSET/" + Fname;
-
-        if (!writeFile(assetFilePath, Fsize, Fdata)) status = "NOK";
+    if (!isExistingAuction(auctionId)) status = "NOK";
+    else
+    {
+        filesystem::path directoryPath = "AUCTIONS/" + auctionId + "/ASSET/";
+        vector<string> files = getSortedFilesFromDirectory(directoryPath);
+        if (files.size() != 1) status = "NOK";
         else {
-            cout << "escreveu o file" << endl; // Debug
-            filesystem::path startFilePath = "AUCTIONS/" + aid + "/START_" + aid + ".txt";
-
-            time_t start_fulltime = getSeconds();
-            string start_datetime = secondsToDate(start_fulltime);
-
-            string contentStartFile = userId + ", " + name + ", " + Fname + ", " + start_value + ", " + timeactive + ", " + start_datetime + ", " + to_string(start_fulltime) + "\n";
-            if (!createFile(startFilePath, contentStartFile)) status = "NOK";
-            else status = "OK " + aid;
+            string Fname = files[0];
+            filesystem::path filePath = directoryPath / Fname;
+            string Fdata = readFromFile(filePath);
+            if (Fdata == "-1") status = "NOK";
+            else {
+                int Fsize = Fdata.length();
+                status = "OK " + Fname + " " + to_string(Fsize) + " " + Fdata;
+            }
         }
     }
-    return "ROA " + status;
+    return "RSA " + status;
+}
+
+string closeAuction(string userId, string password, string auctionId) {
+    string command = "RCL ";
+    if (!isLoggedIn(userId)) return command + "NLG";
+    if (!isExistingAuction(auctionId)) return command + "EAU";
+    if (!isOwner(userId, auctionId)) return command + "EOW";
+    if (!isAuctionActive(auctionId)) return command + "END";
+    if (!isCorrectPassword(userId, password)) return command + "NOK"; //FIXME: não está no enunciado
+    if (!createAuctionEndFile(auctionId)) return command + "NOK";
+    return command + "OK";
+}
+
+int getLastBid(string auctionId) {
+    filesystem::path directoryPath("AUCTIONS/" + auctionId + "/BIDS/");
+    if (!hasAnyBid(auctionId)) return 0;
+    vector<string> bids = getSortedFilesFromDirectory(directoryPath);
+    return stoi(bids.back());
+}
+
+string addBid(string userId, string password, string auctionId, int bid) {
+    string command = "RBD ";
+    if (!isAuctionActive(auctionId)) return command + "NOK";
+    if (!isLoggedIn(userId)) return command + "NLG";
+    if (isOwner(userId, auctionId)) return command + "ILG";
+    if (!isCorrectPassword(userId, password)) return command + "NOK";
+    if (bid < getLastBid(auctionId)) return command + "REF";
+    if (!createBidFile(auctionId, bid, userId)) return command + "NOK";
+    return command + "OK";
 }

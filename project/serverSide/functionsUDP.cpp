@@ -113,3 +113,56 @@ string listAuctions() {
     }
     return "RMA " + status;
 }
+
+string auctionToString(string auctionId) {
+    filesystem::path startFilePath("AUCTIONS/" + auctionId + "/START_" + auctionId + ".txt");
+    string infos = readFromFile(startFilePath);
+
+    string timeactive = to_string(getAuctionTimeactive(auctionId));
+    int indexTimeactive = infos.find(timeactive);
+    infos = infos.erase(indexTimeactive, timeactive.length() + 1);
+    infos += timeactive;
+
+    string startFulltime = to_string(getAuctionStartFullTime(auctionId));
+    int indexStartFulltime = infos.find(startFulltime);
+    infos = infos.erase(indexStartFulltime, startFulltime.length());
+
+    int index = infos.find(',');
+    while (index != -1) {
+        infos = infos.erase(index, 1);
+        index = infos.find(',');
+    }
+
+    return infos;
+}
+
+string getBidsString(string auctionId) {
+    string final = "";
+    filesystem::path directotyPath = "AUCTIONS/" + auctionId + "/BIDS/";
+    vector<string> bids = getSortedFilesFromDirectory(directotyPath);
+    int nBids = bids.size();
+    for (int i = 0;i < nBids; i++) {
+        filesystem::path bidFilePath = directotyPath / bids[i];
+        final += "\nB " + readFromFile(bidFilePath);
+    }
+    return final;
+}
+
+string showRecord(string auctionId) {
+    string command = "RRC ";
+    string finalString;
+    if (!isExistingAuction(auctionId)) return command + "NOK";
+
+    finalString = auctionToString(auctionId);
+
+    if (hasAnyBid(auctionId)) {
+        finalString += getBidsString(auctionId);
+    }
+
+    if (!isAuctionActive(auctionId)) {
+        filesystem::path endFilePath = "AUCTIONS/" + auctionId + "/END_" + auctionId + ".txt";
+        finalString += "\nE " + readFromFile(endFilePath);
+    }
+
+    return command + finalString;
+}

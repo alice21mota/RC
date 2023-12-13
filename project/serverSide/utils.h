@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include "filesystem.h"
+#include "manageAuctionsFolder.h"
 
 #include <iostream>
 using namespace std;
@@ -55,6 +56,14 @@ bool isAuctionActive(string auctionId);
  */
 bool existAuctions();
 
+/**
+ * Checks if the provided auction exists
+ * by verifying if the AUCTIONS/auctionId folder exists.
+ */
+bool isExistingAuction(string auctionId);
+
+bool hasAnyBid(string auctionId);
+
 // string getDate();
 
 /**
@@ -66,5 +75,8 @@ time_t getSeconds();
  * Convert time to YYYY−MM−DD  HH:MM:SS
  */
 string secondsToDate(time_t  fulltime);
+
+bool isOwner(string userId, string auctionId);
+
 
 #endif
