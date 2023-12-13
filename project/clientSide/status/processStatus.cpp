@@ -440,7 +440,7 @@ void show_recordStatus(string response) {
                         else cout << "Auction has not ended yet, and no bids have been made" << endl;
 
                     }
-                    else cout << "Invalid Auction information received";
+                    else cout << "Invalid Auction information received" << endl;
 
                 }
                 else cout << "Unknown response" << endl;

@@ -1,13 +1,6 @@
 #ifndef STATUS_H
 #define STATUS_H
 
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <regex>
-#include <filesystem> 
-#include <vector>
 
 #include "../globalsClient/globals.h"
 #include "../../common/validations.h"

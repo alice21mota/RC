@@ -1,11 +1,7 @@
 #ifndef COMMANDSUDP_H
 #define COMMANDSUDP_H
 
-#include <string>
-#include <regex>
-#include <filesystem>
-#include <iostream>
-#include <sstream>
+
 #include "../globalsClient/globals.h"
 #include "../../common/validations.h"
 

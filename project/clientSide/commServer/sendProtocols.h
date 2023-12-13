@@ -1,16 +1,6 @@
 #ifndef SENDPROTOCOLS_H
 #define SENDPROTOCOLS_H
 
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <sstream>
-#include <iostream>
-#include <fstream>
-#include <cstring>
-
 #include "../globalsClient/globals.h"
 #include "../../common/validations.h"
 
