@@ -199,8 +199,9 @@ void getCommand(string command){
         request = show_asset(command);
 
         if (request.substr(0, 3) == "SAS"){
-        
-            result = sendTCP(request, "", "SAS");
+            
+            // rec indicates that this command may be receiving a file
+            result = sendTCP(request, "", "rec");
 
             cout << "RESPONSE: ";
             show_assetStatus(result);

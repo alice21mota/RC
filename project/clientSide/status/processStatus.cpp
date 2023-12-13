@@ -364,14 +364,16 @@ void show_recordStatus(string response){
                             cout << "Bids Information:" << endl;
 
                             if (iss >> identifier && identifier == "B"){
-
-                                while (identifier == "B"){
+                                int nBids = 0;
+                                while (identifier == "B" && nBids <= 50){
                                     if (iss >> bidder_UID >> bid_value >> bid_date >> bid_time >> bid_sec_time){
 
                                         if (isUID(bidder_UID) && isBidValue(bid_value) && isValidDate(bid_date) && isValidTime(bid_time) && isValidSecTime(timeactive)){
 
                                             cout << "Bidder UID: " << bidder_UID << ", Bid Value: " << bid_value << ", Bid Date and Time: " 
                                                 << bid_date << " at " << bid_time << ", Time since the auction started: " << bid_sec_time << " seconds" << endl;
+                                            
+                                            nBids ++;
 
                                         } else cout << "Invalid Bid information received" << endl;
 
