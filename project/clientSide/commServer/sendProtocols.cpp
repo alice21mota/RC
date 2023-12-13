@@ -1,5 +1,24 @@
 #include "sendProtocols.h"
 
+
+bool setSocketTimeout(int fd, int seconds) {
+    struct timeval timeout;
+    timeout.tv_sec = seconds;
+    timeout.tv_usec = 0;
+
+    if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0) {
+        cerr << "Error setting receive timeout." << endl;
+        return false;
+    }
+
+    if (setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(timeout)) < 0) {
+        cerr << "Error setting send timeout." << endl;
+        return false;
+    }
+
+    return true;
+}
+
 string sendUDP(string message) {
     message = message + "\n";
 
@@ -29,6 +48,14 @@ string sendUDP(string message) {
         close(fd);
         return "ERROR";
     }
+
+    // socket's timeout
+    if (!setSocketTimeout(fd, 5)) {
+        freeaddrinfo(res);
+        close(fd);
+        return "ERROR";
+    }
+
 
     n = sendto(fd, message.c_str(), message.length(), 0, res->ai_addr, res->ai_addrlen);
     if (n == -1)
@@ -138,6 +165,13 @@ string sendTCP(string message, string fileName, string comm) {
     if (errcode != 0)
     {
         cerr << "Error getting address information." << endl;
+        close(fd);
+        return "ERROR";
+    }
+
+    // Add timeout to the socket
+    if (!setSocketTimeout(fd, 5)) {
+        freeaddrinfo(res);
         close(fd);
         return "ERROR";
     }
@@ -286,6 +320,6 @@ string sendTCP(string message, string fileName, string comm) {
     close(fd);
 
     return finalBuffer;
-
 }
+
 

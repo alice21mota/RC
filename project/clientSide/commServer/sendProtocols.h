@@ -7,11 +7,11 @@
 using namespace std;
 
 
+bool setSocketTimeout(int fd, int seconds);
+
 string sendUDP(string message);
 
 void sendFileChunks(int fd, string fileName);
-
-//string receiveResponse(int fd);
 
 string sendTCP(string message, string fileName, string comm);
 

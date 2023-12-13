@@ -1,12 +1,7 @@
 #ifndef AUXFUNCS_H
 #define AUXFUNCS_H
 
-#include <string>
-#include <regex>
-#include <filesystem>
-#include <iostream>
-#include <sstream>
-#include <fstream>
+
 #include "../clientSide/globalsClient/globals.h"
 #include "validations.h"
 
