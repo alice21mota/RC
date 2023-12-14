@@ -225,7 +225,8 @@ int main(int argc, char *argv[])
             }
             if (FD_ISSET(ufd, &testfds)) // Vê se foi pelo socket do UDP
             {
-                if (fork() == 0) {
+                pid_t pid = fork();
+                if (pid == 0) {
                     addrlen = sizeof(udp_useraddr);
                     ret = recvfrom(ufd, prt_str, 80, 0, (struct sockaddr *)&udp_useraddr, &addrlen);
                     if (ret > 0)
@@ -247,11 +248,16 @@ int main(int argc, char *argv[])
                     }
                     exit(0);
                 }
+                else if (pid == -1) {
+                    cout << "error pid UDP";
+                    exit(1);
+                }
 
             }
             if (FD_ISSET(tfd, &testfds)) // Vê se foi pelo socket do TCP
             {
-                if (fork() == 0) {
+                pid_t pid = fork();
+                if (pid == 0) {
                     addrlen = sizeof(tcp_useraddr);
                     if ((new_tfd = accept(tfd, (struct sockaddr *)&tcp_useraddr, &addrlen)) == -1)
                     {
@@ -380,6 +386,10 @@ int main(int argc, char *argv[])
 
                 // FD_SET(new_tfd, &inputs); // Set TCP read channel on
                     exit(0);
+                }
+                else if (pid == -1) {
+                    cout << "error pid TCP";
+                    exit(1);
                 }
             }
             // else if (FD_ISSET(new_tfd, &testfds)) // Depois do accept tem de voltar a entrar no select
