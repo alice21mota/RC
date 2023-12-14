@@ -47,6 +47,6 @@ bool writeFile(filesystem::path filePath, string fileSize, string fileData);
  */
 vector<string> getSortedFilesFromDirectory(filesystem::path directoryPath);
 
-
+string getFileData(filesystem::path filePath);
 
 #endif

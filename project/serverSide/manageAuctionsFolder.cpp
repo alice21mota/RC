@@ -56,10 +56,22 @@ bool createAuctionStartFile(string auctionId, string userId, string name, string
 bool createAuctionEndFile(string auctionId) {
     filesystem::path endFilePath = "AUCTIONS/" + auctionId + "/END_" + auctionId + ".txt";
 
-    time_t end_fulltime = getSeconds();
-    string end_datetime = secondsToDate(end_fulltime);
+    int timeactive = getAuctionTimeactive(auctionId);
+    int startFulltime = getAuctionStartFullTime(auctionId);
+    long int now = getSeconds();
 
-    int end_sec_time = end_fulltime - getAuctionStartFullTime(auctionId);
+    int end_time;
+    int end_sec_time;
+    if (now > startFulltime + timeactive) {
+        end_time = startFulltime + timeactive;
+        end_sec_time = timeactive;
+    }
+    else {
+        end_time = now;
+        end_sec_time = now - startFulltime;
+    }
+
+    string end_datetime = secondsToDate((time_t)end_time);
 
     string contentEndFile = end_datetime + " " + to_string(end_sec_time);
     return createFile(endFilePath, contentEndFile);
@@ -87,7 +99,7 @@ int getAuctionStartFullTime(string auctionId) {
     filesystem::path startFilePath("AUCTIONS/" + auctionId + "/START_" + auctionId + ".txt");
     string infos = readFromFile(startFilePath);
     int infosLen = infos.length();
-    string start_fulltime = infos.substr(infosLen - 1 - FULLTIME_NCHARS, FULLTIME_NCHARS);
+    string start_fulltime = infos.substr(infosLen - FULLTIME_NCHARS, FULLTIME_NCHARS);
     return stoi(start_fulltime);
 }
 
@@ -110,7 +122,7 @@ string getAuctionOwner(string auctionId) {
     cout << "getAuctionOwner " << auctionId << endl; // Debug
     filesystem::path startFilePath("AUCTIONS/" + auctionId + "/START_" + auctionId + ".txt");
     string infos = readFromFile(startFilePath);
-    return infos.substr(USERID_NCHARS);
+    return infos.substr(0, USERID_NCHARS);
 }
 
 int checkExpiredAuctions() {
@@ -124,7 +136,7 @@ int checkExpiredAuctions() {
         if (isAuctionActive(auctionId)) {
             int timeactive = getAuctionTimeactive(auctionId);
             int startFulltime = getAuctionStartFullTime(auctionId);
-            int now = getSeconds();
+            long int now = getSeconds();
             if (now > startFulltime + timeactive) {
                 createAuctionEndFile(auctionId);
                 sumExpired++;
