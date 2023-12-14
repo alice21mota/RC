@@ -251,18 +251,20 @@ int main(int argc, char *argv[])
             }
             if (FD_ISSET(tfd, &testfds)) // Vê se foi pelo socket do TCP
             {
-                addrlen = sizeof(tcp_useraddr);
-                if ((new_tfd = accept(tfd, (struct sockaddr *)&tcp_useraddr, &addrlen)) == -1)
-                {
-                    exit(1);
+                if (fork() == 0) {
+                    addrlen = sizeof(tcp_useraddr);
+                    if ((new_tfd = accept(tfd, (struct sockaddr *)&tcp_useraddr, &addrlen)) == -1)
+                    {
+                        exit(1);
+                    }
+                    cout << "Accepted TCP socket" << endl; // Debug
+
+                    errcode = getnameinfo((struct sockaddr *)&tcp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
+                    if (errcode == 0 && verbose)
+                        cout << "       Sent by [" << host << ":" << service << "]" << endl;
+                    FD_SET(new_tfd, &inputs); // Set TCP read channel on
+                    exit(0);
                 }
-                cout << "Accepted TCP socket" << endl; // Debug
-
-                errcode = getnameinfo((struct sockaddr *)&tcp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
-                if (errcode == 0 && verbose)
-                    cout << "       Sent by [" << host << ":" << service << "]" << endl;
-
-                FD_SET(new_tfd, &inputs); // Set TCP read channel on
             }
             else if (FD_ISSET(new_tfd, &testfds)) // Depois do accept tem de voltar a entrar no select
             {
@@ -382,11 +384,9 @@ int main(int argc, char *argv[])
 
                     close(new_tfd); // Close socket
                     cout << "TCP socket closed" << endl; // Debug
+                    FD_CLR(new_tfd, &inputs); // Set TCP read channel off
                     exit(0);
                 }
-                // else {
-                FD_CLR(new_tfd, &inputs); // Set TCP read channel off
-            // }
             }
         }
     }
