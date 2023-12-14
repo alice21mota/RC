@@ -12,12 +12,18 @@ string open(string userId, string password, string name, string start_value, str
     cout << "já há o auctions folder";
     if ((aid = createAuctionFolder()) == "-1") return command + "NOK";
     cout << "aid  = " << aid << endl; // Debug
-    if (!createAuctionAssetFolder(aid)) return command + "NOK";
-    if (!writeAsset(aid, Fname, Fsize, Fdata)) return command + "NOK";
 
-    if (!createAuctionStartFile(aid, userId, name, start_value, timeactive, Fname)) return command + "NOK";
-    return command + "OK " + aid; // FIXME not sure se não tenho de enviar um '\n'
+    if (!createAuction(aid, userId, name, start_value, timeactive, Fname, Fsize, Fdata)) return command + "NOK";
+    return command + "OK " + aid;
 
+}
+
+bool createAuction(string auctionId, string userId, string name, string start_value, string timeactive, string Fname, string Fsize, string Fdata) {
+    if (!createAuctionAssetFolder(auctionId)) return false;
+    if (!writeAsset(auctionId, Fname, Fsize, Fdata)) return false;
+    if (!createAuctionStartFile(auctionId, userId, name, start_value, timeactive, Fname)) return false;
+    if (!createUserHostedFile(userId, auctionId)) return false;
+    return true;
 }
 
 string showAsset(string auctionId) {
@@ -57,7 +63,12 @@ int getLastBid(string auctionId) {
     filesystem::path directoryPath("AUCTIONS/" + auctionId + "/BIDS/");
     if (!hasAnyBid(auctionId)) return 0;
     vector<string> bids = getSortedFilesFromDirectory(directoryPath);
-    return stoi(bids.back());
+    return stoi(removeExtension(bids.back()));
+}
+
+bool createBid(string auctionId, int bid, string userId) {
+    if (!createAuctionBidFile(auctionId, bid, userId)) return false;
+    return createUserBiddedFile(userId, auctionId);
 }
 
 string addBid(string userId, string password, string auctionId, int bid) {
@@ -67,6 +78,6 @@ string addBid(string userId, string password, string auctionId, int bid) {
     if (isOwner(userId, auctionId)) return command + "ILG";
     if (!isCorrectPassword(userId, password)) return command + "NOK";
     if (bid < getLastBid(auctionId)) return command + "REF";
-    if (!createBidFile(auctionId, bid, userId)) return command + "NOK";
+    if (!createBid(auctionId, bid, userId)) return command + "NOK";
     return command + "ACC";
 }
