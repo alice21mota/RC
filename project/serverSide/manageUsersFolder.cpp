@@ -12,7 +12,7 @@ bool createUserFolder(string userId) {
 
 bool createUserPasswordFile(string userId, string password) {
     filesystem::path filePath = "USERS/" + userId + "/" + userId + "_pass.txt";
-    if (createFile(filePath, password) != -1) return true;
+    if (createFile(filePath, password)) return true;
     return false;
 }
 

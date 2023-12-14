@@ -95,7 +95,7 @@ string getMyBids(string userId) {
             status += " " + bids[i] + " " + (isAuctionActive(bids[i]) ? "1" : "0");
         }
     }
-    return "RMA " + status;
+    return "RMB " + status;
 }
 
 string listAuctions() {
@@ -111,7 +111,7 @@ string listAuctions() {
             status += " " + auctions[i] + " " + (isAuctionActive(auctions[i]) ? "1" : "0");
         }
     }
-    return "RMA " + status;
+    return "RLS " + status;
 }
 
 string auctionToString(string auctionId) {
@@ -120,13 +120,14 @@ string auctionToString(string auctionId) {
 
     string timeactive = to_string(getAuctionTimeactive(auctionId));
     int indexTimeactive = infos.find(timeactive);
-    infos = infos.erase(indexTimeactive, timeactive.length() + 1);
+    infos = infos.erase(indexTimeactive, timeactive.length() + 2);
     infos += timeactive;
 
     string startFulltime = to_string(getAuctionStartFullTime(auctionId));
     int indexStartFulltime = infos.find(startFulltime);
     infos = infos.erase(indexStartFulltime, startFulltime.length());
 
+    // remove all ,
     int index = infos.find(',');
     while (index != -1) {
         infos = infos.erase(index, 1);
@@ -143,7 +144,7 @@ string getBidsString(string auctionId) {
     int nBids = bids.size();
     for (int i = 0;i < nBids; i++) {
         filesystem::path bidFilePath = directotyPath / bids[i];
-        final += "\nB " + readFromFile(bidFilePath);
+        final += " B " + readFromFile(bidFilePath);
     }
     return final;
 }
@@ -161,8 +162,8 @@ string showRecord(string auctionId) {
 
     if (!isAuctionActive(auctionId)) {
         filesystem::path endFilePath = "AUCTIONS/" + auctionId + "/END_" + auctionId + ".txt";
-        finalString += "\nE " + readFromFile(endFilePath);
+        finalString += " E " + readFromFile(endFilePath);
     }
 
-    return command + finalString;
+    return command + "OK " + finalString;
 }

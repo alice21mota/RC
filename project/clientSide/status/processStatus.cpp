@@ -64,8 +64,10 @@ void openStatus(string response) {
     istringstream iss(response);
     string command, status, aid;
 
-    if (iss >> command >> status) {
+    cout << "response" << endl;
+    cout << response << endl;
 
+    if (iss >> command >> status) {
         if (command == "ROA") {
 
             if (status == "NOK" && iss.eof())
@@ -83,16 +85,19 @@ void openStatus(string response) {
                     else cout << "Did not receive a valid AID" << endl;
 
                 }
-                else cout << "Unknown response" << endl;
+                else cout << "!!!Unknown response" << endl;
 
             }
-            else cout << "Unknown response" << endl;
+            else cout << "Unknown!!!response" << endl;
 
         }
-        else cout << "Unknown response" << endl;
+        else cout << "Unknown response!!!" << endl;
 
     }
-    else cout << "Unknown response" << endl;
+    else {
+        cout << command << endl << status << endl;
+        cout << "Unknown         response" << endl;
+    }
 }
 
 void closeStatus(string response) {
@@ -360,6 +365,8 @@ void show_recordStatus(string response) {
     string identifier, bidder_UID, bid_value, bid_date, bid_time, bid_sec_time;
     string end_date, end_time, end_sec_time;
 
+    cout << response << "<-response\n ";
+
     if (iss >> command >> status) {
 
         if (command == "RRC") {
@@ -382,7 +389,7 @@ void show_recordStatus(string response) {
                         isValidDate(start_date) && isValidTime(start_time) && isValidSecTime(timeactive)) {
 
                         cout << "Auction \"" << auction_name << "\" with file \"" << asset_fName << "\" started by user " << host_UID
-                            << " in " << start_date << " at " << start_time << ". Start Value was " << start_value << " and it was/has been active for "
+                            << " in " << start_date << " at " << start_time << ". Start Value was " << start_value << " and it can/was active for "
                             << timeactive << " seconds" << endl;
 
                         if (!iss.eof()) {
@@ -396,9 +403,8 @@ void show_recordStatus(string response) {
 
                                         if (isUID(bidder_UID) && isBidValue(bid_value) && isValidDate(bid_date) && isValidTime(bid_time) && isValidSecTime(timeactive)) {
 
-                                            cout << "Bidder UID: " << bidder_UID <<
-                                                ", Bid Value: " << bid_value <<
-                                                ", Bid Date and Time: " << bid_date << " at " << bid_time << ", Time since the auction started: " << bid_sec_time << " seconds" << endl;
+                                            cout << "Bidder UID: " << bidder_UID << ", Bid Value: " << bid_value << ", Bid Date and Time: "
+                                                << bid_date << " at " << bid_time << ", Time since the auction started: " << bid_sec_time << " seconds" << endl;
 
                                             nBids++;
 
@@ -406,7 +412,8 @@ void show_recordStatus(string response) {
                                         else cout << "Invalid Bid information received" << endl;
 
                                     }
-                                    if (iss >> identifier && !iss.eof()) continue;
+                                    if (iss.eof()) break;
+                                    else iss >> identifier;
                                 }
 
                             }
@@ -434,13 +441,13 @@ void show_recordStatus(string response) {
 
                             }
                             else if (iss.eof())
-                                cout << endl << "Auction has not ended yet" << endl;
+                                cout << "Auction has not ended yet" << endl;
 
                         }
                         else cout << "Auction has not ended yet, and no bids have been made" << endl;
 
                     }
-                    else cout << "Invalid Auction information received" << endl;
+                    else cout << "Invalid Auction information received";
 
                 }
                 else cout << "Unknown response" << endl;

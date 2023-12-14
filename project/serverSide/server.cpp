@@ -33,6 +33,8 @@ string getUDPCommand(string command) {
     string whichCommand;
     iss >> whichCommand;
 
+    checkExpiredAuctions();
+
     if (whichCommand == "LIN") {
         string user, password, status;
         iss >> user >> password;
@@ -77,7 +79,6 @@ string getTCPCommand(string command) {
     iss >> whichCommand;
 
     checkExpiredAuctions();
-    cout << "after checkExpiredAuctions" << endl; // Debug 
 
     if (whichCommand == "OPA") {
         string user, password, name, start_value, timeactive, Fname, Fsize, Fdata;
@@ -357,6 +358,7 @@ int main(int argc, char *argv[])
                             cout << match[0] << " - " << match[1] << " - " << match[2] << " - " << match[3] << " - " << match[4] << " - " << match[5] << " - " << match[6] << " - " << match[7] << endl;
                             isOpen = true;
                             returnString = open(match[1], match[2], match[3], match[4], match[5], match[6], match[7], Ffile) + '\n';
+                            //cout << "returnString " << returnString << "<-\n";
                             break;
                         }
                     }
@@ -367,7 +369,7 @@ int main(int argc, char *argv[])
 
                 if (!isOpen) returnString = getTCPCommand(finalBuffer);
 
-                cout << "vou devolver por TCP: " << returnString << endl;
+                cout << "vou devolver por TCP: ->" << returnString << "<-\n";
 
                 nWritten = write(new_tfd, returnString.c_str(), returnString.length()); // Send message to client
                 if (nWritten == -1) // Will always get an error when using 'nc'
@@ -376,9 +378,9 @@ int main(int argc, char *argv[])
                 }
 
 
-                close(new_tfd); // Close socket
+                // close(new_tfd); // Close socket
                 FD_CLR(new_tfd, &inputs); // Set TCP read channel off
-                cout << "TCP socket closed" << endl; // Debug
+                // cout << "TCP socket closed" << endl; // Debug
             }
         }
     }

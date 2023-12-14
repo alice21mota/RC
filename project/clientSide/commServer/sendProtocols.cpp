@@ -1,24 +1,5 @@
 #include "sendProtocols.h"
 
-
-bool setSocketTimeout(int fd, int seconds) {
-    struct timeval timeout;
-    timeout.tv_sec = seconds;
-    timeout.tv_usec = 0;
-
-    if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0) {
-        cerr << "Error setting receive timeout." << endl;
-        return false;
-    }
-
-    if (setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(timeout)) < 0) {
-        cerr << "Error setting send timeout." << endl;
-        return false;
-    }
-
-    return true;
-}
-
 string sendUDP(string message) {
     message = message + "\n";
 
@@ -29,6 +10,7 @@ string sendUDP(string message) {
 
     struct addrinfo hints, *res;
     struct sockaddr_in addr;
+
 
     fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (fd == -1)
@@ -48,14 +30,6 @@ string sendUDP(string message) {
         close(fd);
         return "ERROR";
     }
-
-    // socket's timeout
-    if (!setSocketTimeout(fd, 5)) {
-        freeaddrinfo(res);
-        close(fd);
-        return "ERROR";
-    }
-
 
     n = sendto(fd, message.c_str(), message.length(), 0, res->ai_addr, res->ai_addrlen);
     if (n == -1)
@@ -165,13 +139,6 @@ string sendTCP(string message, string fileName, string comm) {
     if (errcode != 0)
     {
         cerr << "Error getting address information." << endl;
-        close(fd);
-        return "ERROR";
-    }
-
-    // Add timeout to the socket
-    if (!setSocketTimeout(fd, 5)) {
-        freeaddrinfo(res);
         close(fd);
         return "ERROR";
     }
@@ -298,26 +265,40 @@ string sendTCP(string message, string fileName, string comm) {
             }
         }
     }
+
     else {
 
-        while ((n = read(fd, buffer, sizeof(buffer) - 1)) > 0) {
+        int totalRead = 0;
+        while ((n = read(fd, buffer, sizeof(buffer) - 1)) != 0) {
             //TODO CHECK THIS 
             //buffer[n] = '\0';  // Null-terminate buffer
+            cout << n << " <- n \n";
+
+            if (n == -1) {
+
+                cout << "Error reading response." << endl;
+                close(fd);
+                return "ERROR";
+
+            }
 
             finalBuffer.append(buffer, n);
+            /*cout << finalBuffer << " < - finalBuffer\n";
+            totalRead = n;
+            string command = finalBuffer.substr(0,3)*/
+            if (finalBuffer.find(newline)) break;
+
+            //if (totalRead >= 11) break;
         }
 
-        if (n == -1) {
 
-            cerr << "Error reading response." << endl;
-            close(fd);
-            return "ERROR";
-
-        }
+        finalBuffer.append(buffer, n);
     }
 
     freeaddrinfo(res);
     close(fd);
+
+    //cout << finalBuffer << " < - finalBu123123123ffer\n";
 
     return finalBuffer;
 }

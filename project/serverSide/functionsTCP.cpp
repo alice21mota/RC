@@ -31,7 +31,7 @@ string showAsset(string auctionId) {
         else {
             string Fname = files[0];
             filesystem::path filePath = directoryPath / Fname;
-            string Fdata = readFromFile(filePath);
+            string Fdata = getFileData(filePath);
             if (Fdata == "-1") status = "NOK";
             else {
                 int Fsize = Fdata.length();
@@ -68,5 +68,5 @@ string addBid(string userId, string password, string auctionId, int bid) {
     if (!isCorrectPassword(userId, password)) return command + "NOK";
     if (bid < getLastBid(auctionId)) return command + "REF";
     if (!createBidFile(auctionId, bid, userId)) return command + "NOK";
-    return command + "OK";
+    return command + "ACC";
 }

@@ -106,3 +106,28 @@ bool writeFile(filesystem::path filePath, string fileSize, string fileData) {
         return false;
     }
 }
+
+string getFileData(filesystem::path filePath) {
+    string finalBuffer;
+    size_t chunkSize = 1024;
+    char buffer[chunkSize];
+
+    ifstream file(filePath, ios::binary);
+
+    if (!file.is_open()) {
+        cerr << "Error opening file." << endl;
+        return "-1";
+    }
+
+    while (!file.eof()) {
+        file.read(buffer, chunkSize);
+
+        if (file.gcount() > 0) {
+            finalBuffer.append(buffer, file.gcount());
+        }
+    }
+
+    file.close();
+
+    return finalBuffer;
+}
