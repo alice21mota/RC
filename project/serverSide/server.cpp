@@ -225,27 +225,30 @@ int main(int argc, char *argv[])
             }
             if (FD_ISSET(ufd, &testfds)) // Vê se foi pelo socket do UDP
             {
-                addrlen = sizeof(udp_useraddr);
+                if (fork() == 0) {
+                    addrlen = sizeof(udp_useraddr);
+                    // FIXME: read with an while loop
+                    ret = recvfrom(ufd, prt_str, 80, 0, (struct sockaddr *)&udp_useraddr, &addrlen);
+                    if (ret > 0)
+                    {
+                        if (strlen(prt_str) > 0)
+                            prt_str[ret - 1] = 0;
+                        cout << "---UDP socket: " << prt_str << endl;
 
-                // FIXME: read with an while loop
-                ret = recvfrom(ufd, prt_str, 80, 0, (struct sockaddr *)&udp_useraddr, &addrlen);
-                if (ret > 0)
-                {
-                    if (strlen(prt_str) > 0)
-                        prt_str[ret - 1] = 0;
-                    cout << "---UDP socket: " << prt_str << endl;
+                        string returnString = getUDPCommand(prt_str);
 
-                    string returnString = getUDPCommand(prt_str);
+                        errcode = getnameinfo((struct sockaddr *)&udp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
+                        if (errcode == 0 && verbose)
+                            cout << "       Sent by [" << host << ":" << service << "]" << endl;
 
-                    errcode = getnameinfo((struct sockaddr *)&udp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
-                    if (errcode == 0 && verbose)
-                        cout << "       Sent by [" << host << ":" << service << "]" << endl;
-
-                    cout << "vou devolver: " << returnString << endl;
-                    n = sendto(ufd, returnString.c_str(), returnString.length(), 0, (struct sockaddr *)&udp_useraddr, addrlen); // Send message to client
-                    if (n == -1) /*error*/
-                        exit(1);
+                        cout << "vou devolver: " << returnString << endl;
+                        n = sendto(ufd, returnString.c_str(), returnString.length(), 0, (struct sockaddr *)&udp_useraddr, addrlen); // Send message to client
+                        if (n == -1) /*error*/
+                            exit(1);
+                    }
+                    exit(0);
                 }
+
             }
             if (FD_ISSET(tfd, &testfds)) // Vê se foi pelo socket do TCP
             {
@@ -264,123 +267,124 @@ int main(int argc, char *argv[])
             }
             else if (FD_ISSET(new_tfd, &testfds)) // Depois do accept tem de voltar a entrar no select
             {
-                cout << "Entrei no read TCP" << endl; // Debug
+                if (fork() == 0) {
+                    cout << "Entrei no read TCP" << endl; // Debug
 
-                int nWritten, nRead;
-                string finalBuffer, fSize;
-                ssize_t bytesRead, matchedBytes;
-                size_t fileSize;
-                int len;
-                bool isOpen = false;
-                string returnString;
-                while ((nRead = read(new_tfd, buffer, 127)) != 0)
-                {
-                    if (nRead < 0)
-                        exit(1);
-                    finalBuffer.append(buffer, nRead);
+                    int nWritten, nRead;
+                    string finalBuffer, fSize;
+                    ssize_t bytesRead, matchedBytes;
+                    size_t fileSize;
+                    int len;
+                    bool isOpen = false;
+                    string returnString;
+                    while ((nRead = read(new_tfd, buffer, 127)) != 0)
+                    {
+                        if (nRead < 0)
+                            exit(1);
+                        finalBuffer.append(buffer, nRead);
 
-                    len = finalBuffer.length();
-                    cout << "len" << endl;
-                    cout << len << endl;
-                    if (len >= 3) {
-                        string command = finalBuffer.substr(0, 3);
-                        if (command == "OPA") {
-                            //pattern of the beggining of the response, up until file Size 
-                            regex pattern(R"(OPA (\d{6}) ([a-zA-Z0-9]{8}) ([a-zA-Z0-9_-]{1,10}) (\d{1,6}) (\d{1,5}) ([a-zA-Z0-9_.-]+) (\d+) )");
-                            smatch match; //Used to match with the patern
+                        len = finalBuffer.length();
+                        cout << "len" << endl;
+                        cout << len << endl;
+                        if (len >= 3) {
+                            string command = finalBuffer.substr(0, 3);
+                            if (command == "OPA") {
+                                //pattern of the beggining of the response, up until file Size 
+                                regex pattern(R"(OPA (\d{6}) ([a-zA-Z0-9]{8}) ([a-zA-Z0-9_-]{1,10}) (\d{1,6}) (\d{1,5}) ([a-zA-Z0-9_.-]+) (\d+) )");
+                                smatch match; //Used to match with the patern
 
-                            if (regex_search(finalBuffer, match, pattern)) {
-                                cout << "finalBuffer" << endl;
-                                cout << finalBuffer << endl;
-                                cout << "match.size() = " << match.size() << endl;
-                                if (match.size() == 8) {
-                                    fSize = match[7];
+                                if (regex_search(finalBuffer, match, pattern)) {
+                                    cout << "finalBuffer" << endl;
+                                    cout << finalBuffer << endl;
+                                    cout << "match.size() = " << match.size() << endl;
+                                    if (match.size() == 8) {
+                                        fSize = match[7];
 
-                                    //+2 to make up for an extra two " "
-                                    matchedBytes = match.position(0) + match.length(0);
+                                        //+2 to make up for an extra two " "
+                                        matchedBytes = match.position(0) + match.length(0);
 
-                                    cout << "matchedBytes" << endl;
-                                    cout << matchedBytes << endl;
+                                        cout << "matchedBytes" << endl;
+                                        cout << matchedBytes << endl;
 
-                                    bytesRead = len;
-                                    bytesRead -= matchedBytes;
+                                        bytesRead = len;
+                                        bytesRead -= matchedBytes;
 
+                                    }
+                                    else {
+                                        cerr << "Unexpected number of matches." << endl;
+                                        // return "ERROR";
+                                        exit(1);
+                                    }
                                 }
                                 else {
-                                    cerr << "Unexpected number of matches." << endl;
+                                    cerr << "Failed to match pattern." << endl;
                                     // return "ERROR";
                                     exit(1);
                                 }
-                            }
-                            else {
-                                cerr << "Failed to match pattern." << endl;
-                                // return "ERROR";
-                                exit(1);
-                            }
 
-                             //TODO CHECK THIS
-                            try {
-                                fileSize = stoll(fSize);
-                            }
-                            catch (const invalid_argument& e) {
-                                cerr << "Invalid argument: " << e.what() << endl;
-                            }
-                            catch (const out_of_range& e) {
-                                cerr << "Out of range: " << e.what() << endl;
-                            }
-                            string Ffile = finalBuffer.substr(matchedBytes, bytesRead);
-                            // cout << "Ffile" << endl;
-                            // cout << Ffile << endl;
-                            cout << "fileSize" << endl;
-                            cout << fileSize << endl;
-                            while (bytesRead < fileSize) {
-
-                                n = read(new_tfd, buffer, min(sizeof(buffer) - 1, fileSize - bytesRead));
-
-                                Ffile.append(buffer, n);
-                                bytesRead += n;
-                                cout << "bytesRead" << endl;
-                                cout << bytesRead << endl;
-                                // cout << "Ffile do while" << endl;
+                                //TODO CHECK THIS
+                                try {
+                                    fileSize = stoll(fSize);
+                                }
+                                catch (const invalid_argument& e) {
+                                    cerr << "Invalid argument: " << e.what() << endl;
+                                }
+                                catch (const out_of_range& e) {
+                                    cerr << "Out of range: " << e.what() << endl;
+                                }
+                                string Ffile = finalBuffer.substr(matchedBytes, bytesRead);
+                                // cout << "Ffile" << endl;
                                 // cout << Ffile << endl;
+                                cout << "fileSize" << endl;
+                                cout << fileSize << endl;
+                                while (bytesRead < fileSize) {
+
+                                    n = read(new_tfd, buffer, min(sizeof(buffer) - 1, fileSize - bytesRead));
+
+                                    Ffile.append(buffer, n);
+                                    bytesRead += n;
+                                    cout << "bytesRead" << endl;
+                                    cout << bytesRead << endl;
+                                    // cout << "Ffile do while" << endl;
+                                    // cout << Ffile << endl;
+                                }
+
+                                if (n == -1) {
+
+                                    cerr << "Error reading response." << endl;
+                                    close(new_tfd);
+                                    // return "ERROR";
+                                    exit(1);
+
+                                }
+
+                                cout << "match: ";
+                                cout << match[0] << " - " << match[1] << " - " << match[2] << " - " << match[3] << " - " << match[4] << " - " << match[5] << " - " << match[6] << " - " << match[7] << endl;
+                                isOpen = true;
+                                returnString = open(match[1], match[2], match[3], match[4], match[5], match[6], match[7], Ffile) + '\n';
+                                //cout << "returnString " << returnString << "<-\n";
+                                break;
                             }
-
-                            if (n == -1) {
-
-                                cerr << "Error reading response." << endl;
-                                close(new_tfd);
-                                // return "ERROR";
-                                exit(1);
-
-                            }
-
-                            cout << "match: ";
-                            cout << match[0] << " - " << match[1] << " - " << match[2] << " - " << match[3] << " - " << match[4] << " - " << match[5] << " - " << match[6] << " - " << match[7] << endl;
-                            isOpen = true;
-                            returnString = open(match[1], match[2], match[3], match[4], match[5], match[6], match[7], Ffile) + '\n';
-                            //cout << "returnString " << returnString << "<-\n";
-                            break;
                         }
+
+                        if (nRead < 127 && buffer[nRead - 1] == '\n') break; // FIXME acho que não pode ser assim mas por enquanto está a funcionar :))
                     }
+                    // cout << "---TCP socket: " << finalBuffer << endl; // Debug
 
-                    if (nRead < 127 && buffer[nRead - 1] == '\n') break; // FIXME acho que não pode ser assim mas por enquanto está a funcionar :))
-                }
-                // cout << "---TCP socket: " << finalBuffer << endl; // Debug
+                    if (!isOpen) returnString = getTCPCommand(finalBuffer);
 
-                if (!isOpen) returnString = getTCPCommand(finalBuffer);
+                    cout << "vou devolver por TCP: ->" << returnString << "<-\n";
 
-                cout << "vou devolver por TCP: ->" << returnString << "<-\n";
-
-                nWritten = write(new_tfd, returnString.c_str(), returnString.length()); // Send message to client
-                if (nWritten == -1) // Will always get an error when using 'nc'
-                {
-                    exit(1);
+                    nWritten = write(new_tfd, returnString.c_str(), returnString.length()); // Send message to client
+                    if (nWritten == -1) // Will always get an error when using 'nc'
+                    {
+                        exit(1);
+                    }
                 }
 
-
-                // close(new_tfd); // Close socket
+                close(new_tfd); // Close socket
                 FD_CLR(new_tfd, &inputs); // Set TCP read channel off
-                // cout << "TCP socket closed" << endl; // Debug
+                cout << "TCP socket closed" << endl; // Debug
             }
         }
     }
