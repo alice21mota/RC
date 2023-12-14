@@ -31,12 +31,24 @@ bool deleteUserLoginFile(string userId) { // TODO: deal with the errors
     return filesystem::remove(filePath);
 }
 
-bool createHostedFolder(string userId) {
+bool createUserHostedFolder(string userId) {
     filesystem::path directoryPath("USERS/" + userId + "/HOSTED/");
     return createFolder(directoryPath);
 }
 
-bool createBiddedFolder(string userId) {
+bool createUserHostedFile(string userId, string auctionId) {
+    if (!hasOngoingAuctions(userId)) createUserHostedFolder(userId);
+    filesystem::path filePath = "USERS/" + userId + "/HOSTED/" + auctionId + ".txt";
+    return createFile(filePath);
+}
+
+bool createUserBiddedFolder(string userId) {
     filesystem::path directoryPath("USERS/" + userId + "/BIDDED/");
     return createFolder(directoryPath);
+}
+
+bool createUserBiddedFile(string userId, string auctionId) {
+    if (!hasOngoingBids(userId)) createUserBiddedFolder(userId);
+    filesystem::path filePath = "USERS/" + userId + "/BIDDED/" + auctionId + ".txt";
+    return createFile(filePath);
 }

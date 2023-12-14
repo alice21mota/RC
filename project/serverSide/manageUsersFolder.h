@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include "filesystem.h"
+#include "utils.h"
 
 #include <iostream>
 using namespace std;
@@ -49,12 +50,16 @@ bool deleteUserLoginFile(string userId);
  * Uma diretoria designada HOSTED contendo informação sobre todos os leilões iniciados pelo utilizador.
  * Para cada leilão iniciado pelo utilizador, corresponde um ficheiro dentro da diretoria HOSTED.
  */
-bool createHostedFolder(string userId);
+bool createUserHostedFolder(string userId);
+
+bool createUserHostedFile(string userId, string auctionId);
 
 /**
  * Uma diretoria designada BIDDED contendo informação sobre todos os leilões nos quais o utilizador licitou.
  * Para cada leilão no qual o utilizador licitou, corresponde um ficheiro dentro da diretoria BIDDED.
  */
-bool createBiddedFolder(string userId);
+bool createUserBiddedFolder(string userId);
+
+bool createUserBiddedFile(string userId, string auctionId);
 
 #endif
