@@ -380,12 +380,12 @@ int main(int argc, char *argv[])
                         exit(1);
                     }
 
+                    close(new_tfd); // Close socket
+                    FD_CLR(new_tfd, &inputs); // Set TCP read channel off
+                    cout << "TCP socket closed" << endl; // Debug
                     exit(0);
                 }
 
-                close(new_tfd); // Close socket
-                FD_CLR(new_tfd, &inputs); // Set TCP read channel off
-                cout << "TCP socket closed" << endl; // Debug
             }
         }
     }
