@@ -384,11 +384,9 @@ int main(int argc, char *argv[])
                     cout << "TCP socket closed" << endl; // Debug
                     exit(0);
                 }
-                else {
-                    close(new_tfd); // Close socket
-                    cout << "TCP socket closed" << endl; // Debug
-                    FD_CLR(new_tfd, &inputs); // Set TCP read channel off
-                }
+                // else {
+                FD_CLR(new_tfd, &inputs); // Set TCP read channel off
+            // }
             }
         }
     }
