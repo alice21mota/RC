@@ -87,3 +87,13 @@ RUR OK
 LIN 102618 aaaaaaaa
 RLI REG
 ```
+
+mkdir USERS
+mkdir USERS/111111
+mkdir USERS/222222
+mkdir USERS/333333
+mkdir USERS/444444
+echo "aaaaaaaa" > USERS/111111/111111_pass.txt
+echo "bbbbbbbb" > USERS/222222/222222_pass.txt
+echo "cccccccc" > USERS/333333/333333_pass.txt
+echo "dddddddd" > USERS/444444/444444_pass.txt
