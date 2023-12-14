@@ -95,7 +95,7 @@ string getMyBids(string userId) {
             status += " " + bids[i] + " " + (isAuctionActive(bids[i]) ? "1" : "0");
         }
     }
-    return "RMA " + status;
+    return "RMB " + status;
 }
 
 string listAuctions() {
@@ -111,7 +111,7 @@ string listAuctions() {
             status += " " + auctions[i] + " " + (isAuctionActive(auctions[i]) ? "1" : "0");
         }
     }
-    return "RMA " + status;
+    return "RLS " + status;
 }
 
 string auctionToString(string auctionId) {
@@ -120,13 +120,14 @@ string auctionToString(string auctionId) {
 
     string timeactive = to_string(getAuctionTimeactive(auctionId));
     int indexTimeactive = infos.find(timeactive);
-    infos = infos.erase(indexTimeactive, timeactive.length() + 1);
+    infos = infos.erase(indexTimeactive, timeactive.length() + 2);
     infos += timeactive;
 
     string startFulltime = to_string(getAuctionStartFullTime(auctionId));
     int indexStartFulltime = infos.find(startFulltime);
     infos = infos.erase(indexStartFulltime, startFulltime.length());
 
+    // remove all ,
     int index = infos.find(',');
     while (index != -1) {
         infos = infos.erase(index, 1);

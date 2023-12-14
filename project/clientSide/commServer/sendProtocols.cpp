@@ -10,7 +10,7 @@ string sendUDP(string message) {
 
     struct addrinfo hints, *res;
     struct sockaddr_in addr;
-   
+
 
     fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (fd == -1)
@@ -43,7 +43,7 @@ string sendUDP(string message) {
     char headerBuffer[sizeof(int)]; //Storing message size
 
     ssize_t headerBytes = recvfrom(fd, headerBuffer, sizeof(headerBuffer), MSG_PEEK, (struct sockaddr *)&addr, &addrlen);
-    
+
     if (headerBytes == -1) {
 
         cerr << "Error receiving message size." << endl;
@@ -56,7 +56,7 @@ string sendUDP(string message) {
 
     char* fullMessage = new char[messageSize];
     ssize_t messageBytes = recvfrom(fd, fullMessage, messageSize, 0, (struct sockaddr *)&addr, &addrlen);
-    
+
     if (messageBytes == -1) {
 
         cerr << "Error receiving message." << endl;
@@ -77,7 +77,7 @@ void sendFileChunks(int fd, string fileName) {
 
     // Open the file
     ifstream file(fileName, ios::binary);
-    
+
     if (!file.is_open()) {
         cerr << "Error opening file." << endl;
         return;
@@ -91,7 +91,7 @@ void sendFileChunks(int fd, string fileName) {
         // Check if anything was read
         if (file.gcount() > 0) {
             ssize_t n = write(fd, buffer, file.gcount());
-            
+
             if (n == -1) {
 
                 cerr << "Error writing file chunk." << endl;
@@ -106,7 +106,7 @@ void sendFileChunks(int fd, string fileName) {
 }
 
 string sendTCP(string message, string fileName, string comm) {
-    if (fileName == ""){
+    if (fileName == "") {
         message = message + "\n";
     }
 
@@ -117,13 +117,13 @@ string sendTCP(string message, string fileName, string comm) {
     char buffer[128];
     char newline = '\n';
     string finalBuffer, fSize;
-    
+
 
     struct addrinfo hints, *res;
     struct sockaddr_in addr;
 
     fd = socket(AF_INET, SOCK_STREAM, 0);
-    
+
     if (fd == -1)
     {
         cerr << "Error creating socket." << endl;
@@ -135,16 +135,16 @@ string sendTCP(string message, string fileName, string comm) {
     hints.ai_socktype = SOCK_STREAM;
 
     errcode = getaddrinfo(ip.c_str(), port.c_str(), &hints, &res);
-    
+
     if (errcode != 0)
-    {   
+    {
         cerr << "Error getting address information." << endl;
         close(fd);
         return "ERROR";
     }
 
     n = connect(fd, res->ai_addr, res->ai_addrlen);
-    
+
     if (n == -1)
     {
         cerr << "Error connecting to the server." << endl;
@@ -173,20 +173,20 @@ string sendTCP(string message, string fileName, string comm) {
     }
 
     //If it is receiving a file, 
-    if (comm == "rec"){
+    if (comm == "rec") {
 
         n = read(fd, buffer, sizeof(buffer) - 1);
 
 
         if (n == -1) {
-        
+
             cerr << "Error reading response." << endl;
             close(fd);
             return "ERROR";
-            
+
         }
 
-        if (n == 8){
+        if (n == 8) {
             freeaddrinfo(res);
             close(fd);
             cout << buffer << endl;
@@ -194,12 +194,12 @@ string sendTCP(string message, string fileName, string comm) {
         }
 
         else {
-            
+
             bytesRead = n;
             finalBuffer.append(buffer, n);
 
             n = read(fd, buffer, sizeof(buffer) - 1); //In order to get all the needed fields
-            finalBuffer.append(buffer, n); 
+            finalBuffer.append(buffer, n);
             bytesRead += n;
 
             //pattern of the beggining of the response, up until file Size 
@@ -207,7 +207,7 @@ string sendTCP(string message, string fileName, string comm) {
             smatch match; //Used to match with the patern
 
             if (regex_search(finalBuffer, match, pattern)) {
-                
+
                 if (match.size() == 3) {
                     fSize = match[2];
 
@@ -215,12 +215,14 @@ string sendTCP(string message, string fileName, string comm) {
                     matchedBytes = match.position(0) + match.length(0) + 2;
 
                     bytesRead -= matchedBytes;
-                    
-                } else {
+
+                }
+                else {
                     cerr << "Unexpected number of matches." << endl;
                     return "ERROR";
                 }
-            } else {
+            }
+            else {
                 cerr << "Failed to match pattern." << endl;
                 return "ERROR";
             }
@@ -228,61 +230,77 @@ string sendTCP(string message, string fileName, string comm) {
             //TODO CHECK THIS
             try {
                 fileSize = stoll(fSize);
-            } catch (const invalid_argument& e) {
+            }
+            catch (const invalid_argument& e) {
                 cerr << "Invalid argument: " << e.what() << endl;
-            } catch (const out_of_range& e) {
+            }
+            catch (const out_of_range& e) {
                 cerr << "Out of range: " << e.what() << endl;
             }
 
 
             while (bytesRead < fileSize) {
-                
+
                 n = read(fd, buffer, min(sizeof(buffer), fileSize - bytesRead));
-                
+
                 if (n == -1) {
-            
+
                     cerr << "Error reading response." << endl;
                     close(fd);
                     return "ERROR";
-                    
+
                 }
-                
+
                 finalBuffer.append(buffer, n);
                 bytesRead += n;
 
             }
 
             if (n == -1) {
-            
+
                 cerr << "Error reading response." << endl;
                 close(fd);
                 return "ERROR";
-                
+
             }
         }
     }
+
     else {
 
-        while ((n = read(fd, buffer, sizeof(buffer) - 1)) > 0) {
+        int totalRead = 0;
+        while ((n = read(fd, buffer, sizeof(buffer) - 1)) != 0) {
             //TODO CHECK THIS 
             //buffer[n] = '\0';  // Null-terminate buffer
-            
+            cout << n << " <- n \n";
+
+            if (n == -1) {
+
+                cout << "Error reading response." << endl;
+                close(fd);
+                return "ERROR";
+
+            }
+
             finalBuffer.append(buffer, n);
+            /*cout << finalBuffer << " < - finalBuffer\n";
+            totalRead = n;
+            string command = finalBuffer.substr(0,3)*/
+            if (finalBuffer.find(newline)) break;
+
+            //if (totalRead >= 11) break;
         }
 
-        if (n == -1) {
-        
-            cerr << "Error reading response." << endl;
-            close(fd);
-            return "ERROR";
-            
-        }
+
+        finalBuffer.append(buffer, n);
     }
 
     freeaddrinfo(res);
     close(fd);
-    
-    return finalBuffer; 
+
+    //cout << finalBuffer << " < - finalBu123123123ffer\n";
+
+    return finalBuffer;
 }
 
 
