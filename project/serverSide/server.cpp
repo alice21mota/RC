@@ -262,9 +262,9 @@ int main(int argc, char *argv[])
                     errcode = getnameinfo((struct sockaddr *)&tcp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
                     if (errcode == 0 && verbose)
                         cout << "       Sent by [" << host << ":" << service << "]" << endl;
-                    FD_SET(new_tfd, &inputs); // Set TCP read channel on
                     exit(0);
                 }
+                FD_SET(new_tfd, &inputs); // Set TCP read channel on
             }
             else if (FD_ISSET(new_tfd, &testfds)) // Depois do accept tem de voltar a entrar no select
             {
@@ -382,11 +382,11 @@ int main(int argc, char *argv[])
                         exit(1);
                     }
 
-                    close(new_tfd); // Close socket
-                    cout << "TCP socket closed" << endl; // Debug
-                    FD_CLR(new_tfd, &inputs); // Set TCP read channel off
                     exit(0);
                 }
+                close(new_tfd); // Close socket
+                cout << "TCP socket closed" << endl; // Debug
+                FD_CLR(new_tfd, &inputs); // Set TCP read channel off
             }
         }
     }
