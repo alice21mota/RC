@@ -227,7 +227,6 @@ int main(int argc, char *argv[])
             {
                 if (fork() == 0) {
                     addrlen = sizeof(udp_useraddr);
-                    // FIXME: read with an while loop
                     ret = recvfrom(ufd, prt_str, 80, 0, (struct sockaddr *)&udp_useraddr, &addrlen);
                     if (ret > 0)
                     {
@@ -380,6 +379,8 @@ int main(int argc, char *argv[])
                     {
                         exit(1);
                     }
+
+                    exit(0);
                 }
 
                 close(new_tfd); // Close socket
