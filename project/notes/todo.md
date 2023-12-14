@@ -16,10 +16,10 @@
 - [x] As funções de criar os ficheiros estão bué redundantes mas não sei como lidar com os erros
 - [ ] Check what sould return if is an **unlogged** user **without** bids
 - [ ] _maybe_ pôr as path como `const` e `getPath... functions`
-- [ ] Não permitir mais do 999 auctions
-- [ ] Ver a diferença entre o writeFile e o createFile
+- [X] Não permitir mais do 999 auctions
+- [X] Ver a diferença entre o writeFile e o createFile
 - [ ] Quando temos de retornar um `status` é suposto este ser `ERR` se os parametros forem errados
-- [ ] Quando estou a enviar um ficheiro tenho de garantir que acaba com `\n`
+- [X] Quando estou a enviar um ficheiro tenho de garantir que acaba com `\n`
 - [ ] Garantir que não há mais do que 50 bids -> not sure, [estava no slack](https://rc-2324.slack.com/archives/C0614L96BUN/p1701964605129539)
 - [ ] Alterar a data de quando os leilões expiram -> ver mail Encerramento de leilões - servidor AS
 - [ ] Aceitar files com `-` e com `_` (ver email `Projecto - caracteres especiais admitidos em nome de leilão`)

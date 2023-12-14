@@ -88,6 +88,7 @@ LIN 102618 aaaaaaaa
 RLI REG
 ```
 
+```
 mkdir USERS
 mkdir USERS/111111
 mkdir USERS/222222
@@ -97,3 +98,8 @@ echo "aaaaaaaa" > USERS/111111/111111_pass.txt
 echo "bbbbbbbb" > USERS/222222/222222_pass.txt
 echo "cccccccc" > USERS/333333/333333_pass.txt
 echo "dddddddd" > USERS/444444/444444_pass.txt
+```
+
+```
+echo "193.136.128.108 58000 26" | nc tejo.tecnico.ulisboa.pt 59000 > report_26.html
+```
