@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
     if (ufd == -1)
         exit(1);
 
-    if (bind(ufd, res->ai_addr, res->ai_addrlen) == -1)
+    if (::bind(ufd, res->ai_addr, res->ai_addrlen) == -1)
     {
         sprintf(prt_str, "Bind error UDP server\n");
         write(1, prt_str, strlen(prt_str));
@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
     if (tfd == -1)
         exit(1);
 
-    if (bind(tfd, res->ai_addr, res->ai_addrlen) == -1)
+    if (::bind(tfd, res->ai_addr, res->ai_addrlen) == -1)
     {
         sprintf(prt_str, "Bind error TCP server\n");
         write(1, prt_str, strlen(prt_str));
