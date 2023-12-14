@@ -12,6 +12,7 @@
 #include <regex>
 
 #include "server.h"
+#include <sys/wait.h>
 
 string myPort = "58000";
 bool verbose = false;
@@ -384,7 +385,7 @@ int main(int argc, char *argv[])
                     close(new_tfd); // Close socket
                     cout << "TCP socket closed" << endl; // Debug
 
-                // FD_SET(new_tfd, &inputs); // Set TCP read channel on
+                    // FD_SET(new_tfd, &inputs); // Set TCP read channel on
                     exit(0);
                 }
                 else if (pid == -1) {
@@ -515,6 +516,7 @@ int main(int argc, char *argv[])
             //     cout << "TCP socket closed" << endl; // Debug
             //     FD_CLR(new_tfd, &inputs); // Set TCP read channel off
             // }
+            wait(NULL);
         }
     }
 exit_loop:; // FIXME: should i force to close all the sockets here?
