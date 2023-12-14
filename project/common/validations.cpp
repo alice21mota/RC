@@ -19,9 +19,12 @@ bool isPassword(string password) {
 
 bool isDescription(string description) {
     if (description.size() > 0 && description.size() <= 10) {
-        if (isAlphanumeric(description))
-            return true;
-        return false;
+        for (char ch : description) {
+            if (!isalnum(ch) && ch != '-' && ch != '_') {
+                return false;
+            }
+        }
+        return true;
     }
     return false;
 }

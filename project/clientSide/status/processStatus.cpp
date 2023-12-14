@@ -165,6 +165,8 @@ void myauctionsStatus(string response) {
 
                         cout << "Auction ID: " << aid << ", State: " << state << endl;
 
+                    else cout << "Invalid Response";
+
                     if (iss.eof()) break;
 
                 }
