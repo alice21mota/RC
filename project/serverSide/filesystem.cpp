@@ -80,7 +80,8 @@ vector<string> getSortedFilesFromDirectory(filesystem::path directoryPath) {
     }
     else { // FIXME deal with the errors
         cerr << "O caminho especificado não é um diretório válido." << std::endl;
-        exit(-1);
+        // exit(-1);
+        return vector<string>();
     }
 }
 

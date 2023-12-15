@@ -280,7 +280,6 @@ int main(int argc, char *argv[])
 {
     getArgs(argc, argv);
 
-    // vector<string> files = getSortedFilesFromDirectory("AUCTIONS/");
     // for (int i = 0;i < files.size();i++) {
     //     cout << "aaaa ";
     //     cout << files[i] << endl;
@@ -369,7 +368,10 @@ int main(int argc, char *argv[])
             perror("select");
             exit(1);
         default:
-            checkExpiredAuctions();
+            for (int i = 0;i < 3;i++) {
+                if (checkExpiredAuctions() >= 0) break;;
+                cout << "trying to check expired auction AGAIN";
+            }
 
             if (FD_ISSET(0, &testfds)) // Vê se a posição 0 foi ativada. Se foi, foi por causa do teclado.
             {

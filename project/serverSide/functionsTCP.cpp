@@ -8,8 +8,10 @@ string open(string userId, string password, string name, string start_value, str
     if (!isLoggedIn(userId)) return command + "NLG";    // FIXME what should return first
     if (!isCorrectPassword(userId, password)) return command + "NOK"; // FIXME what should return first
 
-    if (!existAuctions()) createAuctionsFolder(); // FIXME: should i check this (?)
+    if (!existAuctions())
+        if (!createAuctionsFolder()) return command + "NOK"; // FIXME: should i check this (?)
     cout << "já há o auctions folder";
+
     if ((aid = createAuctionFolder()) == "-1") return command + "NOK";
     cout << "aid  = " << aid << endl; // Debug
 
@@ -63,6 +65,7 @@ int getLastBid(string auctionId) {
     filesystem::path directoryPath("AUCTIONS/" + auctionId + "/BIDS/");
     if (!hasAnyBid(auctionId)) return 0;
     vector<string> bids = getSortedFilesFromDirectory(directoryPath);
+    if (bids.size() < 1) return -1;
     return stoi(removeExtension(bids.back()));
 }
 
@@ -73,11 +76,13 @@ bool createBid(string auctionId, int bid, string userId) {
 
 string addBid(string userId, string password, string auctionId, int bid) {
     string command = "RBD ";
+    int lastBid;
     if (!isAuctionActive(auctionId)) return command + "NOK";
     if (!isLoggedIn(userId)) return command + "NLG";
     if (isOwner(userId, auctionId)) return command + "ILG";
     if (!isCorrectPassword(userId, password)) return command + "NOK";
-    if (bid < getLastBid(auctionId)) return command + "REF";
+    if ((lastBid = getLastBid(auctionId)) == -1) return command + "NOK";
+    if (bid < lastBid) return command + "REF";
     if (!createBid(auctionId, bid, userId)) return command + "NOK";
     return command + "ACC";
 }

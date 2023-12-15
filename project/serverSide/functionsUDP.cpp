@@ -3,14 +3,11 @@
 /**
  * Cria todas as diretorias e ficheiros necessários para guardar as informações do utilizador.
 */
-void createUser(string userId, string password) {
-    // cout << "creating the folder struct" << endl; // Debug
-    createUserFolder(userId);
-    // createHostedFolder(userId);
-    // createBiddedFolder(userId);
-    createUserPasswordFile(userId, password);
-    createUserLoginFile(userId);
-    // cout << "User folder struct created" << endl; // Debug
+bool createUser(string userId, string password) {
+    return
+        createUserFolder(userId) &&
+        createUserPasswordFile(userId, password) &&
+        createUserLoginFile(userId);
 }
 
 string login(string userId, string password) {
@@ -22,13 +19,13 @@ string login(string userId, string password) {
     if (isRegisteredUser(userId)) {
         if (!isCorrectPassword(userId, password)) { status = "NOK"; }
         else {
-            createUserLoginFile(userId);
-            status = "OK";
+            if (createUserLoginFile(userId)) { status = "OK"; }
+            else { status = "NOK"; }
         }
     }
     else {
-        createUser(userId, password);
-        status = "REG";
+        if (createUser(userId, password)) { status = "REG"; }
+        else { status = "NOK"; }
     }
     return "RLI " + status;
 }
@@ -73,6 +70,7 @@ string getMyAuctions(string userId) {
         vector<string> auctions = getSortedFilesFromDirectory(directoryPath);
 
         auctions = removeExtensionFromVector(auctions);
+        if (auctions.size() < 1) return "-1";
 
         int nAuctions = auctions.size();
         for (int i = 0;i < nAuctions;i++) {
@@ -93,6 +91,7 @@ string getMyBids(string userId) {
         vector<string> bids = getSortedFilesFromDirectory(directoryPath);
 
         bids = removeExtensionFromVector(bids);
+        if (bids.size() < 1) return "-1";
 
         int nBids = bids.size();
         for (int i = 0;i < nBids;i++) {
@@ -111,6 +110,7 @@ string listAuctions() {
         vector<string> auctions = getSortedFilesFromDirectory(directoryPath);
 
         auctions = removeExtensionFromVector(auctions);
+        if (auctions.size() < 1) return "-1";
 
         int nAuctions = auctions.size();
         for (int i = 0;i < nAuctions;i++) {
@@ -124,12 +124,18 @@ string auctionToString(string auctionId) {
     filesystem::path startFilePath("AUCTIONS/" + auctionId + "/START_" + auctionId + ".txt");
     string infos = readFromFile(startFilePath);
 
+    if (infos == "-1") return "-1";
+
     string timeactive = to_string(getAuctionTimeactive(auctionId));
+    if (timeactive == "-1") return "-1";
+
     int indexTimeactive = infos.find(timeactive);
     infos = infos.erase(indexTimeactive, timeactive.length() + 2);
     infos += timeactive;
 
     string startFulltime = to_string(getAuctionStartFullTime(auctionId));
+    if (startFulltime == "-1") return "-1";
+
     int indexStartFulltime = infos.find(startFulltime);
     infos = infos.erase(indexStartFulltime, startFulltime.length());
 
@@ -145,12 +151,16 @@ string auctionToString(string auctionId) {
 
 string getBidsString(string auctionId) {
     string final = "";
+    string bid;
     filesystem::path directotyPath = "AUCTIONS/" + auctionId + "/BIDS/";
     vector<string> bids = getSortedFilesFromDirectory(directotyPath);
     int nBids = bids.size();
     for (int i = 0;i < nBids; i++) {
         filesystem::path bidFilePath = directotyPath / bids[i];
-        final += " B " + readFromFile(bidFilePath);
+        bid = "";
+        bid = readFromFile(bidFilePath);
+        if (bid == "-1") return final;
+        final += " B " + bid;
     }
     return final;
 }
