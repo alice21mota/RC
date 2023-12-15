@@ -143,10 +143,9 @@ void getCommand(string command) {
         if (request.substr(0, 3) == "CLS") {
 
             result = sendTCP(request, "", "");
-            status = result.substr(0, result.find('\n'));
+            status = closeStatus(result);
 
-            cout << "RESPONSE: ";
-            closeStatus(status);
+            cout << "CLOSE REQUEST: " << status << endl;
 
         }
         else cout << "Error: " << request << endl;
@@ -220,10 +219,9 @@ void getCommand(string command) {
         if (request.substr(0, 3) == "BID") {
 
             result = sendTCP(request, "", "");
-            status = result.substr(0, result.find('\n'));
+            status = bidStatus(result);
 
-            cout << "RESPONSE: ";
-            bidStatus(status);
+            cout << "BID REQUEST: " << status << endl;
 
         }
         else cout << "Error: " << request << endl;

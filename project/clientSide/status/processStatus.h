@@ -17,11 +17,11 @@ string unregisterStatus(string response);
 
 string openStatus(string response);
 
-void closeStatus(string response);
+string closeStatus(string response);
 
 string myauctionsStatus(string response);
 
-void bidStatus(string response);
+string bidStatus(string response);
 
 string mybidsStatus(string response);
 

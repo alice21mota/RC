@@ -151,8 +151,16 @@ string openStatus(string response) {
     return "Unknown response";
 }
 
-void closeStatus(string response) {
-    istringstream iss(response);
+string closeStatus(string response) {
+
+    string evalResponse;
+
+    if (endsWithNewLine(response)) {
+        evalResponse = response.substr(0, response.size() - 1);
+    }
+    else return "Unknown response";
+
+    istringstream iss(evalResponse);
     string command, status;
 
     if (iss >> command >> status && iss.eof()) {
@@ -160,30 +168,30 @@ void closeStatus(string response) {
         if (command == "RCL") {
 
             if (status == "OK")
-                cout << "Auction closed successfully" << endl;
+                return "Auction closed successfully";
 
             else if (status == "NOK")
-                cout << "User or password incorrect" << endl;
+                return "User or password incorrect";
 
             else if (status == "NLG")
-                cout << "User not logged in" << endl;
+                return "User not logged in";
 
             else if (status == "EAU")
-                cout << "Auction " << tempAID << " does not exist" << endl;
+                return "Auction " + tempAID + " does not exist";
 
             else if (status == "EOW")
-                cout << "User " << userID << " does not own auction " << tempAID << endl;
+                return "User " + userID + " does not own auction " + tempAID;
 
             else if (status == "END")
-                cout << "Auction " << tempAID << " has already ended" << endl;
+                return "Auction " + tempAID + " has already ended";
 
-            else cout << "Unknown response" << endl;
+            else return "Unknown response";
 
         }
-        else cout << "Unknown response" << endl;
+        return "Unknown response";
 
     }
-    else cout << "Unknown response" << endl;
+    return "Unknown response";
 
 }
 
@@ -245,9 +253,16 @@ string myauctionsStatus(string response) {
     return "Unknown response\n";
 }
 
-void bidStatus(string response) {
+string bidStatus(string response) {
 
-    istringstream iss(response);
+    string evalResponse;
+
+    if (endsWithNewLine(response)) {
+        evalResponse = response.substr(0, response.size() - 1);
+    }
+    else return "Unknown response";
+
+    istringstream iss(evalResponse);
     string command, status;
 
     if (iss >> command >> status && iss.eof()) {
@@ -255,27 +270,27 @@ void bidStatus(string response) {
         if (command == "RBD") {
 
             if (status == "ACC")
-                cout << "Bid accepted" << endl;
+                return "Bid accepted";
 
             else if (status == "NOK")
-                cout << "Auction " << tempAID << " is not active" << endl;
+                return "Auction " + tempAID + " is not active";
 
             else if (status == "NLG")
-                cout << "User not logged in" << endl;
+                return "User not logged in";
 
             else if (status == "REF")
-                cout << "Bid refused. Larger bid placed previously" << endl;
+                return "Bid refused. Larger bid placed previously";
 
             else if (status == "ILG")
-                cout << "Cannot bid on auction hosted by yourself" << endl;
+                return "Cannot bid on auction hosted by yourself";
 
-            else cout << "Unknown response" << endl;
+            return "Unknown response";
 
         }
-        else cout << "Unknown response" << endl;
+        return "Unknown response";
 
     }
-    else cout << "Unknown response" << endl;
+    return "Unknown response";
 }
 
 string mybidsStatus(string response) {
