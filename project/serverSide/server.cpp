@@ -48,7 +48,7 @@ string getUDPCommand(string command) {
     string whichCommand;
     iss >> whichCommand;
 
-    checkExpiredAuctions();
+    // checkExpiredAuctions();
 
     if (whichCommand == "LIN") {
         string user, password, status;
@@ -93,7 +93,7 @@ string getTCPCommand(string command) {
     string whichCommand;
     iss >> whichCommand;
 
-    checkExpiredAuctions();
+    // checkExpiredAuctions();
 
     if (whichCommand == "OPA") {
         string user, password, name, start_value, timeactive, Fname, Fsize, Fdata;
@@ -369,6 +369,8 @@ int main(int argc, char *argv[])
             perror("select");
             exit(1);
         default:
+            checkExpiredAuctions();
+
             if (FD_ISSET(0, &testfds)) // Vê se a posição 0 foi ativada. Se foi, foi por causa do teclado.
             {
                 fgets(in_str, 50, stdin);

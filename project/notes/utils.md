@@ -101,13 +101,13 @@ echo "dddddddd" > USERS/444444/444444_pass.txt
 ```
 
 ```
-echo "193.136.128.109 58000 21" | nc tejo.tecnico.ulisboa.pt 59000 > report_21.html
-echo "193.136.128.109 58000 22" | nc tejo.tecnico.ulisboa.pt 59000 > report_22.html
-echo "193.136.128.109 58000 23" | nc tejo.tecnico.ulisboa.pt 59000 > report_23.html
-echo "193.136.128.109 58000 24" | nc tejo.tecnico.ulisboa.pt 59000 > report_24.html
-echo "193.136.128.109 58000 25" | nc tejo.tecnico.ulisboa.pt 59000 > report_25.html
-echo "193.136.128.109 58000 26" | nc tejo.tecnico.ulisboa.pt 59000 > report_26.html
-echo "193.136.128.109 58000 27" | nc tejo.tecnico.ulisboa.pt 59000 > report_27.html
-echo "193.136.128.109 58000 28" | nc tejo.tecnico.ulisboa.pt 59000 > report_28.html
-echo "193.136.128.109 58000 29" | nc tejo.tecnico.ulisboa.pt 59000 > report_29.html
+echo "193.136.128.104 58001 21" | nc tejo.tecnico.ulisboa.pt 59000 > report_21.html
+echo "193.136.128.104 58001 22" | nc tejo.tecnico.ulisboa.pt 59000 > report_22.html
+echo "193.136.128.104 58001 23" | nc tejo.tecnico.ulisboa.pt 59000 > report_23.html
+echo "193.136.128.104 58001 24" | nc tejo.tecnico.ulisboa.pt 59000 > report_24.html
+echo "193.136.128.104 58001 25" | nc tejo.tecnico.ulisboa.pt 59000 > report_25.html
+echo "193.136.128.104 58001 26" | nc tejo.tecnico.ulisboa.pt 59000 > report_26.html
+echo "193.136.128.104 58001 27" | nc tejo.tecnico.ulisboa.pt 59000 > report_27.html
+echo "193.136.128.104 58001 28" | nc tejo.tecnico.ulisboa.pt 59000 > report_28.html
+echo "193.136.128.104 58001 29" | nc tejo.tecnico.ulisboa.pt 59000 > report_29.html
 ```
