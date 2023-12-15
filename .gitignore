@@ -5,3 +5,6 @@ project/USERS/
 project/USERS/**
 project/AUCTIONS/
 project/AUCTIONS/**
+*.png
+*.jpg
+*.txt
