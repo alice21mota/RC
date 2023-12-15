@@ -2,6 +2,8 @@
 #define UTILS
 
 #include <filesystem>
+#include <vector>
+
 #include "filesystem.h"
 #include "manageAuctionsFolder.h"
 
@@ -78,5 +80,8 @@ string secondsToDate(time_t  fulltime);
 
 bool isOwner(string userId, string auctionId);
 
+string removeExtension(string filename);
+
+vector<string> removeExtensionFromVector(vector<string> vector);
 
 #endif

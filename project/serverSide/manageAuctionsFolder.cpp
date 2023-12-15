@@ -4,7 +4,7 @@ string getAID() {
     filesystem::path directoryPath = "AUCTIONS/";
     vector<string> filenames = getSortedFilesFromDirectory(directoryPath);
     if (filenames.size() == 0) return "001";
-    string lastAID = getSortedFilesFromDirectory(directoryPath).back();
+    string lastAID = filenames.back();
     int newId = stoi(lastAID) + 1;
     if (newId > 999) return "-1";
 
@@ -77,13 +77,13 @@ bool createAuctionEndFile(string auctionId) {
     return createFile(endFilePath, contentEndFile);
 }
 
-bool createBidsFolder(string auctionId) {
+bool createAuctionBidsFolder(string auctionId) {
     filesystem::path directoryPath("AUCTIONS/" + auctionId + "/BIDS/");
     return createFolder(directoryPath);
 }
 
-bool createBidFile(string auctionId, int bid_value, string userId) {
-    if (!hasAnyBid(auctionId)) createBidsFolder(auctionId);
+bool createAuctionBidFile(string auctionId, int bid_value, string userId) {
+    if (!hasAnyBid(auctionId)) createAuctionBidsFolder(auctionId);
     filesystem::path bidFilePath = "AUCTIONS/" + auctionId + "/BIDS/" + to_string(bid_value) + ".txt";
 
     time_t bid_fulltime = getSeconds();

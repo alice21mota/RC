@@ -5,8 +5,6 @@ project/USERS/
 project/USERS/**
 project/AUCTIONS/
 project/AUCTIONS/**
-project/teste.txt
-project/zor.PNG
-project/ola.png
-project/7.2-MB.jpg
-project/ASSETS/7.2-MB.jpg
+*.png
+*.jpg
+*.txt

@@ -31,9 +31,9 @@ bool createAuctionStartFile(string auctionId, string userId, string name, string
 
 bool createAuctionEndFile(string auctionId);
 
-bool createBidsFolder(string auctionId);
+bool createAuctionBidsFolder(string auctionId);
 
-bool createBidFile(string auctionId, int bid_value, string userId);
+bool createAuctionBidFile(string auctionId, int bid_value, string userId);
 
 int getAuctionStartFullTime(string auctionId);
 

@@ -72,6 +72,8 @@ string getMyAuctions(string userId) {
         filesystem::path directoryPath("USERS/" + userId + "/HOSTED/");
         vector<string> auctions = getSortedFilesFromDirectory(directoryPath);
 
+        auctions = removeExtensionFromVector(auctions);
+
         int nAuctions = auctions.size();
         for (int i = 0;i < nAuctions;i++) {
             status += " " + auctions[i] + " " + (isAuctionActive(auctions[i]) ? "1" : "0");
@@ -90,6 +92,8 @@ string getMyBids(string userId) {
         filesystem::path directoryPath("USERS/" + userId + "/BIDDED/");
         vector<string> bids = getSortedFilesFromDirectory(directoryPath);
 
+        bids = removeExtensionFromVector(bids);
+
         int nBids = bids.size();
         for (int i = 0;i < nBids;i++) {
             status += " " + bids[i] + " " + (isAuctionActive(bids[i]) ? "1" : "0");
@@ -105,6 +109,8 @@ string listAuctions() {
         status = "OK";
         filesystem::path directoryPath("AUCTIONS/");
         vector<string> auctions = getSortedFilesFromDirectory(directoryPath);
+
+        auctions = removeExtensionFromVector(auctions);
 
         int nAuctions = auctions.size();
         for (int i = 0;i < nAuctions;i++) {
