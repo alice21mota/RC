@@ -26,8 +26,10 @@
 #include <cstdlib>
 #include <cerrno>
 
-#define TCP_READ_TIMEOUT_SECONDS (5) // 1 minute
-#define TCP_WRITE_TIMEOUT_SECONDS (20 * 60)  // 20 minutes
+#define TCP_READ_TIMEOUT_SECONDS (1) // 1 minute
+#define TCP_WRITE_TIMEOUT_SECONDS (1)  // 20 minutes
+#define UDP_READ_TIMEOUT_SECONDS (1) // 1 minute
+#define UDP_WRITE_TIMEOUT_SECONDS (1)  // 20 minutes
 
 using namespace std;
 

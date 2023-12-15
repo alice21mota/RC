@@ -39,6 +39,45 @@ int openTcpSocket() {
     return fd;
 }
 
+int openUdpSocket() {
+    int fd;
+
+    if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
+
+        cerr << "Failed to create a TCP socket" << endl;
+        return fd;
+
+    }
+
+    struct timeval read_timeout;
+    read_timeout.tv_sec = UDP_READ_TIMEOUT_SECONDS;
+    read_timeout.tv_usec = 0;
+
+    int s;
+    if ((s = setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &read_timeout, sizeof(read_timeout))) < 0) {
+
+        cerr << "Failed to set TCP read timeout socket option" << endl;
+        close(fd);
+        return fd;
+
+    }
+    cout << "udp read timeout -> " << s << " <- \n";
+
+    struct timeval write_timeout;
+    write_timeout.tv_sec = UDP_WRITE_TIMEOUT_SECONDS;
+    write_timeout.tv_usec = 0;
+
+    if ((s = setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &write_timeout, sizeof(write_timeout))) < 0) {
+        cerr << "Failed to set TCP send timeout socket option" << endl;
+        close(fd);
+        return fd;
+    }
+
+    cout << "udp write timeout -> " << s << " <- \n";
+
+    return fd;
+}
+
 string sendUDP(string message) {
     message = message + "\n";
 
@@ -51,12 +90,21 @@ string sendUDP(string message) {
     struct sockaddr_in addr;
 
 
-    fd = socket(AF_INET, SOCK_DGRAM, 0);
+    /*fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (fd == -1)
     {
         cerr << "Error creating socket." << endl;
         return "ERROR";
+    }*/
+
+    fd = openUdpSocket();
+
+    if (fd == -1)
+    {
+        cerr << "Error creating socket" << endl;
+        return "ERROR";
     }
+
 
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_INET; // IPv4
@@ -172,7 +220,7 @@ string sendTCP(string message, string fileName, string comm) {
 
     if (fd == -1)
     {
-        cerr << "Error creating socket !!!!!!" << endl;
+        cerr << "Error creating socket" << endl;
         return "ERROR";
     }
 
