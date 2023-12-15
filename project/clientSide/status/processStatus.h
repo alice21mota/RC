@@ -27,7 +27,7 @@ string mybidsStatus(string response);
 
 string listStatus(string response);
 
-void show_assetStatus(string response);
+string show_assetStatus(string response);
 
 string show_recordStatus(string response);
 

@@ -204,9 +204,9 @@ void getCommand(string command) {
 
             // rec indicates that this command may be receiving a file
             result = sendTCP(request, "", "rec");
+            status = show_assetStatus(result);
 
-            cout << "RESPONSE: ";
-            show_assetStatus(result);
+            cout << "AUCTION " << tempAID << "'S ASSET:" << endl << status;
 
         }
         else cout << "Error: " << request << endl;

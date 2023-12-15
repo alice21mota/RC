@@ -23,7 +23,7 @@
 #include <cctype>
 #include <algorithm>
 
-#define TCP_READ_TIMEOUT_SECONDS (60) // 1 minute
+#define TCP_READ_TIMEOUT_SECONDS (5) // 1 minute
 #define TCP_WRITE_TIMEOUT_SECONDS (20 * 60)  // 20 minutes
 
 using namespace std;

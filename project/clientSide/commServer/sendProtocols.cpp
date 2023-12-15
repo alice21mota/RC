@@ -175,7 +175,6 @@ string sendTCP(string message, string fileName, string comm) {
         cerr << "Error creating socket !!!!!!" << endl;
         return "ERROR";
     }
-    cout << "fddddd -> " << fd << endl;
 
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_INET; // IPv4
@@ -240,7 +239,6 @@ string sendTCP(string message, string fileName, string comm) {
 
         n = read(fd, buffer, sizeof(buffer) - 1);
         buffer[n] = '\0';   //Null terminate buffer
-
 
         if (n == -1) {
 
@@ -334,11 +332,10 @@ string sendTCP(string message, string fileName, string comm) {
 
     else {
 
-        int totalRead = 0;
+
         while ((n = read(fd, buffer, sizeof(buffer) - 1)) != 0) {
-            //TODO CHECK THIS 
+
             buffer[n] = '\0';  // Null-terminate buffer
-            cout << n << " <- n \n";
 
             if (n == -1) {
 
@@ -349,22 +346,15 @@ string sendTCP(string message, string fileName, string comm) {
             }
 
             finalBuffer.append(buffer, n);
-            /*cout << finalBuffer << " < - finalBuffer\n";
-            totalRead = n;
-            string command = finalBuffer.substr(0,3)*/
+
             if (finalBuffer.find(newline)) break;
 
-            //if (totalRead >= 11) break;
         }
 
-
-        //finalBuffer.append(buffer, n);
     }
 
     freeaddrinfo(res);
     close(fd);
-
-    cout << "start " << finalBuffer << " < - finalBu123123123ffer\n";
 
     return finalBuffer;
 }

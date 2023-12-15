@@ -404,9 +404,16 @@ string listStatus(string response) {
 
 }
 
-void show_assetStatus(string response) {
+string show_assetStatus(string response) {
 
-    istringstream iss(response);
+    string evalResponse;
+
+    if (endsWithNewLine(response)) {
+        evalResponse = response;
+    }
+    else return "Unknown response";
+
+    istringstream iss(evalResponse);
     string command, status, fName, fSize, fData, chara;
 
     if (iss >> command >> status) {
@@ -415,10 +422,9 @@ void show_assetStatus(string response) {
 
             if (status == "NOK") {
 
-                cout << "Problems receiving file" << endl;
+                return "Problems receiving file";
 
             }
-
 
             else if (status == "OK") {
 
@@ -449,25 +455,25 @@ void show_assetStatus(string response) {
                             // Close the file after writing
                             file.close();
 
-                            cout << "File " << fName << " of " << fSize << " bytes stored in: " << path << endl;
+                            return "File " + fName + " of " + fSize + " bytes stored in: " + path + "\n";
 
                         }
-                        else cout << "Error opening file for writing." << endl;
+                        return "Error opening file for writing";
 
                     }
-                    else cout << "Invalid file name or size" << endl;
+                    return "Invalid file name or size";
 
                 }
-                else cout << "Unknown response" << endl;
+                return "Unknown response";
 
             }
-            else cout << "Unknown response" << endl;
+            return "Unknown response";
 
         }
-        else cout << "Unknown response" << endl;
+        return "Unknown response";
 
     }
-    else cout << "Unknown response" << endl;
+    return "Unknown response";
 }
 
 string show_recordStatus(string response) {
