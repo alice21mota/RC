@@ -286,6 +286,8 @@ int main(int argc, char *argv[])
     //     cout << files[i] << endl;
     // }
 
+    signal(SIGCHLD, SIG_IGN);
+
     // UDP SERVER SECTION
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
@@ -380,29 +382,29 @@ int main(int argc, char *argv[])
             }
             if (FD_ISSET(ufd, &testfds)) // Vê se foi pelo socket do UDP
             {
-                // pid_t pid = fork();
-                // if (pid == 0) {
-                dealWithUDP();
-            //     exit(0);
-            // }
-            // else if (pid == -1) {
-            //     cout << "error pid UDP";
-            //     exit(1);
-            // }
+                pid_t pid = fork();
+                if (pid == 0) {
+                    dealWithUDP();
+                    exit(0);
+                }
+                else if (pid == -1) {
+                    cout << "error pid UDP";
+                    exit(1);
+                }
             }
             if (FD_ISSET(tfd, &testfds)) // Vê se foi pelo socket do TCP
             {
-                // pid_t pid = fork();
-                // if (pid == 0) {
-                new_tfd = acceptTCP();
-                dealWithTCP();
-                // FD_SET(new_tfd, &inputs); // Set TCP read channel on
-            //     exit(0);
-            // }
-            // else if (pid == -1) {
-            //     cout << "error pid TCP";
-            //     exit(1);
-            // }
+                pid_t pid = fork();
+                if (pid == 0) {
+                    new_tfd = acceptTCP();
+                    dealWithTCP();
+                    // FD_SET(new_tfd, &inputs); // Set TCP read channel on
+                    exit(0);
+                }
+                else if (pid == -1) {
+                    cout << "error pid TCP";
+                    exit(1);
+                }
             }
             // else if (FD_ISSET(new_tfd, &testfds)) // Depois do accept tem de voltar a entrar no select
             // {
