@@ -98,3 +98,17 @@ string secondsToDate(time_t  fulltime) {
 bool isOwner(string userId, string auctionId) {
     return userId == getAuctionOwner(auctionId);
 }
+
+string removeExtension(string filename) {
+    size_t pos = filename.find_last_of(".");
+    if (pos == -1) return filename;
+    return filename.substr(0, pos);
+}
+
+vector<string> removeExtensionFromVector(vector<string> oldVector) {
+    vector<string> newVector;
+    for (string filename : oldVector) {
+        newVector.push_back(removeExtension(filename));
+    }
+    return newVector;
+}

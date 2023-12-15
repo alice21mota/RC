@@ -286,7 +286,7 @@ int main(int argc, char *argv[])
                         string command = finalBuffer.substr(0, 3);
                         if (command == "OPA") {
                             //pattern of the beggining of the response, up until file Size 
-                            regex pattern(R"(OPA (\d{6}) ([a-zA-Z0-9]{8}) ([a-zA-Z0-9]{1,10}) (\d{1,6}) (\d{1,5}) ([a-zA-Z0-9_.-]+) (\d+) )");
+                            regex pattern(R"(OPA (\d{6}) ([a-zA-Z0-9]{8}) ([a-zA-Z0-9_-]{1,10}) (\d{1,6}) (\d{1,5}) ([a-zA-Z0-9_.-]+) (\d+) )");
                             smatch match; //Used to match with the patern
 
                             if (regex_search(finalBuffer, match, pattern)) {
