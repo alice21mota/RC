@@ -26,6 +26,9 @@
 #include <cstdlib>
 #include <cerrno>
 
+#include "../../common/validations.h"
+#include "../../common/auxFuncs.h"
+
 #define TCP_READ_TIMEOUT_SECONDS (1) // 1 minute
 #define TCP_WRITE_TIMEOUT_SECONDS (1)  // 20 minutes
 #define UDP_READ_TIMEOUT_SECONDS (1) // 1 minute

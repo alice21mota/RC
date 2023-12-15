@@ -61,7 +61,6 @@ int openUdpSocket() {
         return fd;
 
     }
-    cout << "udp read timeout -> " << s << " <- \n";
 
     struct timeval write_timeout;
     write_timeout.tv_sec = UDP_WRITE_TIMEOUT_SECONDS;
@@ -72,8 +71,6 @@ int openUdpSocket() {
         close(fd);
         return fd;
     }
-
-    cout << "udp write timeout -> " << s << " <- \n";
 
     return fd;
 }
@@ -119,6 +116,7 @@ string sendUDP(string message) {
     }
 
     n = sendto(fd, message.c_str(), message.length(), 0, res->ai_addr, res->ai_addrlen);
+    cout << "message sent ->" << message << "<-\n";
     if (n == -1)
     {
         cerr << "Error sending message." << endl;
@@ -154,7 +152,7 @@ string sendUDP(string message) {
 
     freeaddrinfo(res);
     close(fd);
-
+    cout << "full Message ->" << fullMessage << endl;
     return fullMessage;
 }
 

@@ -64,7 +64,7 @@ string readCommands() {
 }
 
 void exit() {
-    
+
     if (logged_in == true)
         cout << "Please logout before exiting the application" << endl;
 
@@ -82,6 +82,7 @@ void getCommand(string command) {
     if (whichCommand == "login") {
 
         request = login(command);
+        cout << "result->" << request << "<-" << endl;
 
         if ((request.substr(0, 3) == "LIN")) {
 
@@ -245,13 +246,13 @@ void getCommand(string command) {
             status = show_recordStatus(result);
 
             cout << "AUCTION " << tempAID << " - RECORD: " << endl << status;
-            
+
         }
         else cout << "Error: " << request << endl;
 
     }
-    else if (!signalReceived){}
-    else cout << "Unknown command" << "  ->" << command<< endl;
+    else if (!signalReceived) {}
+    else cout << "Unknown command" << "  ->" << command << endl;
 }
 
 int main(int argc, char *argv[])
@@ -278,7 +279,7 @@ int main(int argc, char *argv[])
 
         getCommand(user_command);
         cin.clear();
-   
+
     }
 
     return EXIT_SUCCESS;

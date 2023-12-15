@@ -2,8 +2,6 @@
 #define COMMANDSTCP_H
 
 #include "../globalsClient/globals.h"
-#include "../../common/validations.h"
-#include "../../common/auxFuncs.h"
 
 using namespace std;
 
