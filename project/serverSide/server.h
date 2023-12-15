@@ -9,6 +9,9 @@
 #include "manageUsersFolder.h"
 #include "functionsUDP.h"
 #include "functionsTCP.h"
+#include "../common/validations.h"
+#include "../common/auxFuncs.h"
+
 
 #include <iostream>
 using namespace std;
