@@ -15,7 +15,7 @@ string logoutStatus(string response);
 
 string unregisterStatus(string response);
 
-void openStatus(string response);
+string openStatus(string response);
 
 void closeStatus(string response);
 

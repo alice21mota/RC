@@ -253,7 +253,7 @@ string sendTCP(string message, string fileName, string comm) {
         if (n == 8) {
             freeaddrinfo(res);
             close(fd);
-            cout << buffer << endl;
+            cout << buffer << " BUFFER" << endl;
             return buffer;
         }
 
@@ -358,13 +358,13 @@ string sendTCP(string message, string fileName, string comm) {
         }
 
 
-        finalBuffer.append(buffer, n);
+        //finalBuffer.append(buffer, n);
     }
 
     freeaddrinfo(res);
     close(fd);
 
-    //cout << finalBuffer << " < - finalBu123123123ffer\n";
+    cout << "start " << finalBuffer << " < - finalBu123123123ffer\n";
 
     return finalBuffer;
 }

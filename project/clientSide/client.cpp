@@ -128,10 +128,9 @@ void getCommand(string command) {
         if (request.substr(0, 3) == "OPA") {
 
             result = sendTCP(request, fName, "");
-            status = result.substr(0, result.find('\n'));
+            status = openStatus(result);
 
-            cout << "RESPONSE: ";
-            openStatus(status);
+            cout << "OPEN REQUEST: " << status << endl;
 
         }
         else cout << "Error: " << request << endl;

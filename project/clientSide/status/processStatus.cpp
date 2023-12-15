@@ -108,47 +108,47 @@ string unregisterStatus(string response) {
 
 }
 
-void openStatus(string response) {
+string openStatus(string response) {
 
-    istringstream iss(response);
+    string evalResponse;
+
+    if (endsWithNewLine(response)) {
+        evalResponse = response.substr(0, response.size() - 1);
+    }
+    else return "Unknown response";
+
+    istringstream iss(evalResponse);
     string command, status, aid;
-
-    cout << "response" << endl;
-    cout << response << endl;
 
     if (iss >> command >> status) {
         if (command == "ROA") {
 
             if (status == "NOK" && iss.eof())
-                cout << "Auction could not be started" << endl;
+                return "Auction could not be started";
 
             else if (status == "NLG" && iss.eof())
-                cout << "User not logged in" << endl;
+                return "User not logged in";
 
             else if (status == "OK") {
+
                 if (iss >> aid && iss.eof()) {
 
                     if (isValidAID(aid))
-                        cout << "Successful request, AID = " << aid << "" << endl;
+                        return "Successful request: AID = " + aid;
 
-                    else cout << "Did not receive a valid AID" << endl;
+                    return "Did not receive a valid AID";
 
                 }
-                else cout << "!!!Unknown response" << endl;
+                return "Unknown response";
 
             }
-            else cout << "Unknown!!!response" << endl;
+            return "Unknown response";
 
         }
-        else cout << "Unknown response!!!" << endl;
+        return "Unknown response";
 
     }
-    else {
-        cout << command << endl << status << endl;
-        cout << "Unknown         response" << endl;
-    }
-
-    // Check for extra content after newlin
+    return "Unknown response";
 }
 
 void closeStatus(string response) {
