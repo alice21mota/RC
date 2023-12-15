@@ -59,4 +59,7 @@ bool isValidSecTime(string sec_time);
 //Checks if it is a valid bid value
 bool isBidValue(string value);
 
+//Checks if a string ends with newline
+bool endsWithNewLine(string str);
+
 #endif // VALIDATIONS_H

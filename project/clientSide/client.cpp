@@ -47,196 +47,205 @@ void getArgs(int argc, char *argv[])
     }
 }
 
-string readCommands(){
+string readCommands() {
     string command;
     getline(cin, command);
     //cout << "Command is: " << command << endl;
     return command;
 }
 
-void exit(){
+void exit() {
     //TODO Check if user is logged in. If it is -> logout
     //If locally we have values for UID and passowrd, then the user is logged in.
     if (logged_in == true)
         cout << "Please logout before exiting the application" << endl;
-    
+
     else {
         cout << "Exiting the program." << endl;
         exit(0);
     }
 }
 
-string show_record(){
-    //TODO IS IT SUPPOSE TO LOSE USER INFORMATION ON CLIENT SIDE?
-    return "SRC";
-}
-
-//TODO Não esquecer de dar check do reply do server para cada command
-void getCommand(string command){
+void getCommand(string command) {
 
     string whichCommand, request, status, result;
     whichCommand = command.substr(0, command.find(" "));
 
-    if (whichCommand == "login"){
-        
+    if (whichCommand == "login") {
+
         request = login(command);
 
-        if ((request.substr(0, 3) == "LIN")){
+        if ((request.substr(0, 3) == "LIN")) {
 
             result = sendUDP(request);
-            status = result.substr(0, result.find('\n'));
+            status = loginStatus(result);
 
-            cout << "RESPONSE: ";
+            cout << "LOGIN: " << status << endl;
 
-            loginStatus(status);
+        }
+        else cout << "Error: " << request << endl;
 
-        } else cout << "Error: " << request << endl;
+    }
+    else if (whichCommand == "logout") {
 
-    } else if (whichCommand == "logout") {
-        
         request = logout();
 
-        if (request.substr(0, 3) == "LOU"){
-            
+        if (request.substr(0, 3) == "LOU") {
+
             result = sendUDP(request);
-            status = result.substr(0, result.find('\n'));
-            
-            cout << "RESPONSE: ";
-            logoutStatus(status);
+            status = logoutStatus(result);
 
-        } else cout << "Error: " << request << endl;
+            cout << "LOGOUT: " << status << endl;
 
-    } else if (whichCommand == "unregister") {
-        
+        }
+        else cout << "Error: " << request << endl;
+
+    }
+    else if (whichCommand == "unregister") {
+
         request = unregister();
 
-        if (request.substr(0, 3) == "UNR"){
-            
+        if (request.substr(0, 3) == "UNR") {
+
             result = sendUDP(request);
-            status = result.substr(0, result.find('\n'));
-            
-            cout << "RESPONSE: ";
-            unregisterStatus(status);
+            status = unregisterStatus(result);
 
-        } else cout << "Error: " << request << endl;
+            cout << "UNREGISTER: " << status << endl;
 
-    } else if (whichCommand == "exit") {
-        
+        }
+        else cout << "Error: " << request << endl;
+
+    }
+    else if (whichCommand == "exit") {
+
         exit();
 
-    } else if (whichCommand == "open") {
-        
+    }
+    else if (whichCommand == "open") {
+
         request = open(command);
 
-        if (request.substr(0, 3) == "OPA"){
-            
+        if (request.substr(0, 3) == "OPA") {
+
             result = sendTCP(request, fName, "");
             status = result.substr(0, result.find('\n'));
-            
+
             cout << "RESPONSE: ";
             openStatus(status);
 
-        } else cout << "Error: " << request << endl;
+        }
+        else cout << "Error: " << request << endl;
 
-    } else if (whichCommand == "close") {
-        
+    }
+    else if (whichCommand == "close") {
+
         request = close(command);
 
-        if (request.substr(0, 3) == "CLS"){
-            
+        if (request.substr(0, 3) == "CLS") {
+
             result = sendTCP(request, "", "");
             status = result.substr(0, result.find('\n'));
-            
+
             cout << "RESPONSE: ";
             closeStatus(status);
 
-        }else cout << "Error: " << request << endl;
+        }
+        else cout << "Error: " << request << endl;
 
-    } else if (whichCommand == "myauctions" || whichCommand == "ma") {
-        
+    }
+    else if (whichCommand == "myauctions" || whichCommand == "ma") {
+
         request = myauctions();
 
-        if (request.substr(0, 3) == "LMA"){
-            
+        if (request.substr(0, 3) == "LMA") {
+
             result = sendUDP(request);
-            status = result.substr(0, result.find('\n'));
-            
-            cout << "RESPONSE: " << endl;
-            myauctionsStatus(status);
+            status = myauctionsStatus(result);
 
-        } else cout << "Error: " << request << endl;
+            cout << "MY AUCTIONS:" << endl << status;
 
-    } else if (whichCommand == "mybids" || whichCommand == "mb") {
-        
+        }
+        else cout << "Error: " << request << endl;
+
+    }
+    else if (whichCommand == "mybids" || whichCommand == "mb") {
+
         request = mybids();
 
-        if (request.substr(0, 3) == "LMB"){
-            
+        if (request.substr(0, 3) == "LMB") {
+
             result = sendUDP(request);
-            status = result.substr(0, result.find('\n'));
-            
-            cout << "RESPONSE: " << endl;
-            mybidsStatus(status);
+            status = mybidsStatus(result);
 
-        } else cout << "Error: " << request << endl;
+            cout << "MY BIDS: " << endl << status;
 
-    } else if (whichCommand == "list" || whichCommand == "l") {
-        
+        }
+        else cout << "Error: " << request << endl;
+
+    }
+    else if (whichCommand == "list" || whichCommand == "l") {
+
         request = list(command);
 
-        if (request.substr(0, 3) == "LST"){
-            
+        if (request.substr(0, 3) == "LST") {
+
             result = sendUDP(request);
-            status = result.substr(0, result.find('\n'));
-        
-            cout << "RESPONSE: ";
-            listStatus(status);
+            status = listStatus(result);
 
-        } else cout << "Error: " << request << endl;
+            cout << "LIST OF AUCTIONS: " << endl << status;
 
-    } else if (whichCommand == "show_asset" || whichCommand == "sa") {
-        
+        }
+        else cout << "Error: " << request << endl;
+
+    }
+    else if (whichCommand == "show_asset" || whichCommand == "sa") {
+
         request = show_asset(command);
 
-        if (request.substr(0, 3) == "SAS"){
-            
+        if (request.substr(0, 3) == "SAS") {
+
             // rec indicates that this command may be receiving a file
             result = sendTCP(request, "", "rec");
 
             cout << "RESPONSE: ";
             show_assetStatus(result);
 
-        } else cout << "Error: " << request << endl;
+        }
+        else cout << "Error: " << request << endl;
 
-    } else if (whichCommand == "bid" || whichCommand == "b") {
-        
+    }
+    else if (whichCommand == "bid" || whichCommand == "b") {
+
         request = bid(command);
 
-        if (request.substr(0, 3) == "BID"){
-            
+        if (request.substr(0, 3) == "BID") {
+
             result = sendTCP(request, "", "");
             status = result.substr(0, result.find('\n'));
-            
+
             cout << "RESPONSE: ";
             bidStatus(status);
 
-        } else cout << "Error: " << request << endl;
-        
-    } else if (whichCommand == "show_record" || whichCommand == "sr") {
-        
+        }
+        else cout << "Error: " << request << endl;
+
+    }
+    else if (whichCommand == "show_record" || whichCommand == "sr") {
+
         request = show_record(command);
 
-        if (request.substr(0, 3) == "SRC"){
-    
+        if (request.substr(0, 3) == "SRC") {
+
             result = sendUDP(request);
-            status = result.substr(0, result.find('\n'));
+            status = show_recordStatus(result);
+
+            cout << "AUCTION " << tempAID << " - RECORD: " << endl << status;
             
-            cout << "RESPONSE:" << endl;
-            show_recordStatus(status);
+        }
+        else cout << "Error: " << request << endl;
 
-        } else cout << "Error: " << request << endl;
-
-    } else cout << "Unknown command\n";
+    }
+    else cout << "Unknown command\n";
 }
 
 int main(int argc, char *argv[])
@@ -245,10 +254,10 @@ int main(int argc, char *argv[])
 
     getArgs(argc, argv);
 
-    while (1){
+    while (1) {
 
         user_command = readCommands();
         getCommand(user_command);
     }
-    
+
 }

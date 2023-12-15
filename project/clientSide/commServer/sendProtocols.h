@@ -6,6 +6,7 @@
 
 using namespace std;
 
+int openTcpSocket(int fd);
 
 string sendUDP(string message);
 

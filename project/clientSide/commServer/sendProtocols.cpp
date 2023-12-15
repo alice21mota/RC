@@ -1,5 +1,44 @@
 #include "sendProtocols.h"
 
+int openTcpSocket() {
+    int fd;
+
+    if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+
+        cerr << "Failed to create a TCP socket" << endl;
+        return fd;
+
+    }
+
+    struct timeval read_timeout;
+    read_timeout.tv_sec = TCP_READ_TIMEOUT_SECONDS;
+    read_timeout.tv_usec = 0;
+
+    int s;
+    if ((s = setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &read_timeout, sizeof(read_timeout))) < 0) {
+
+        cerr << "Failed to set TCP read timeout socket option" << endl;
+        close(fd);
+        return fd;
+
+    }
+    cout << "tcp read timeout -> " << s << " <- \n";
+
+    struct timeval write_timeout;
+    write_timeout.tv_sec = TCP_WRITE_TIMEOUT_SECONDS;
+    write_timeout.tv_usec = 0;
+
+    if ((s = setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &write_timeout, sizeof(write_timeout))) < 0) {
+        cerr << "Failed to set TCP send timeout socket option" << endl;
+        close(fd);
+        return fd;
+    }
+
+    cout << "tcp write timeout -> " << s << " <- \n";
+
+    return fd;
+}
+
 string sendUDP(string message) {
     message = message + "\n";
 
@@ -118,17 +157,25 @@ string sendTCP(string message, string fileName, string comm) {
     char newline = '\n';
     string finalBuffer, fSize;
 
-
     struct addrinfo hints, *res;
     struct sockaddr_in addr;
 
-    fd = socket(AF_INET, SOCK_STREAM, 0);
+    //fd = socket(AF_INET, SOCK_STREAM, 0);
 
-    if (fd == -1)
+    /*if (fd == -1)
     {
         cerr << "Error creating socket." << endl;
         return "ERROR";
+    }*/
+
+    fd = openTcpSocket();
+
+    if (fd == -1)
+    {
+        cerr << "Error creating socket !!!!!!" << endl;
+        return "ERROR";
     }
+    cout << "fddddd -> " << fd << endl;
 
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_INET; // IPv4
@@ -144,10 +191,26 @@ string sendTCP(string message, string fileName, string comm) {
     }
 
     n = connect(fd, res->ai_addr, res->ai_addrlen);
+    cout << n << " connect\n ";
 
-    if (n == -1)
+    /*if (n == -1)
     {
         cerr << "Error connecting to the server." << endl;
+        close(fd);
+        return "ERROR";
+    }*/
+
+    if (n == -1) {
+        if (errno == ECONNREFUSED) {
+            cerr << "Connection refused. The server may not be running or the port is incorrect." << endl;
+        }
+        else if (errno == ETIMEDOUT) {
+            cerr << "Connection attempt timed out. The server may not be reachable." << endl;
+        }
+        else {
+            cerr << "Error connecting to the server." << endl;
+        }
+
         close(fd);
         return "ERROR";
     }
@@ -176,6 +239,7 @@ string sendTCP(string message, string fileName, string comm) {
     if (comm == "rec") {
 
         n = read(fd, buffer, sizeof(buffer) - 1);
+        buffer[n] = '\0';   //Null terminate buffer
 
 
         if (n == -1) {
@@ -199,6 +263,7 @@ string sendTCP(string message, string fileName, string comm) {
             finalBuffer.append(buffer, n);
 
             n = read(fd, buffer, sizeof(buffer) - 1); //In order to get all the needed fields
+            buffer[n] = '\0';   //Null terminate buffer
             finalBuffer.append(buffer, n);
             bytesRead += n;
 
@@ -242,6 +307,7 @@ string sendTCP(string message, string fileName, string comm) {
             while (bytesRead < fileSize) {
 
                 n = read(fd, buffer, min(sizeof(buffer), fileSize - bytesRead));
+                buffer[min(sizeof(buffer), fileSize - bytesRead) + 1] = '\0';  // Null-terminate buffer
 
                 if (n == -1) {
 
@@ -271,7 +337,7 @@ string sendTCP(string message, string fileName, string comm) {
         int totalRead = 0;
         while ((n = read(fd, buffer, sizeof(buffer) - 1)) != 0) {
             //TODO CHECK THIS 
-            //buffer[n] = '\0';  // Null-terminate buffer
+            buffer[n] = '\0';  // Null-terminate buffer
             cout << n << " <- n \n";
 
             if (n == -1) {

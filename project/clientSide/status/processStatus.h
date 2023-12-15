@@ -9,26 +9,26 @@
 
 using namespace std;
 
-void loginStatus(string status);
+string loginStatus(string response);
 
-void logoutStatus(string status);
+string logoutStatus(string response);
 
-void unregisterStatus(string status);
+string unregisterStatus(string response);
 
 void openStatus(string response);
 
 void closeStatus(string response);
 
-void myauctionsStatus(string response);
+string myauctionsStatus(string response);
 
 void bidStatus(string response);
 
-void mybidsStatus(string response);
+string mybidsStatus(string response);
 
-void listStatus(string response);
+string listStatus(string response);
 
 void show_assetStatus(string response);
 
-void show_recordStatus(string response);
+string show_recordStatus(string response);
 
 #endif // STATUS_H

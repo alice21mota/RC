@@ -118,3 +118,8 @@ bool isValidSecTime(string sec_time) {
 bool isBidValue(string value) {
     return (isNumeric(value) && value.size() <= 6);
 }
+
+bool endsWithNewLine(string str) {
+    // Check if the last character is a newline
+    return !str.empty() && str.back() == '\n';
+}

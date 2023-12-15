@@ -1,62 +1,111 @@
 #include "processStatus.h"
 
-void loginStatus(string status) {
+string loginStatus(string response) {
 
-    if (status == "RLI OK") {
-        logged_in = true;
-        cout << "Successful login" << endl;
+    string evalResponse;
+
+    if (endsWithNewLine(response)) {
+        evalResponse = response.substr(0, response.size() - 1);
     }
+    else return "Unknown response";
 
-    else if (status == "RLI NOK") {
-        cout << "Incorrect login attempt" << endl;
+    istringstream iss(evalResponse);
+    string command, status;
+
+    if (iss >> command >> status && iss.eof()) {
+
+        if (command == "RLI") {
+            if (status == "OK") {
+                logged_in = true;
+                return "Successful login";
+            }
+            else if (status == "NOK") {
+                return "Incorrect login attempt";
+            }
+            else if (status == "REG") {
+                logged_in = true;
+                return "New user registered";
+            }
+            else return "Unknown response";
+        }
+        else return "Unknown response";
     }
-
-    else if (status == "RLI REG") {
-        logged_in = true;
-        cout << "New user registered" << endl;
-    }
-
-    else cout << "Unknown response" << endl;
+    return "Unknown response";
 }
 
-void logoutStatus(string status) {
+string logoutStatus(string response) {
 
-    if (status == "RLO OK") {
+    string evalResponse;
 
-        logged_in = false;
-        cout << "Successful logout" << endl;
+    if (endsWithNewLine(response)) {
+        evalResponse = response.substr(0, response.size() - 1);
     }
+    else return "Unknown response";
 
-    else if (status == "RLO NOK") {
-        cout << "User not logged in" << endl;
+    istringstream iss(evalResponse);
+    string command, status;
+
+    if (iss >> command >> status && iss.eof()) {
+
+        if (command == "RLO") {
+
+            if (status == "OK") {
+
+                logged_in = false;
+                return "Successful logout";
+
+            }
+            else if (status == "NOK") {
+
+                return "User not logged in";
+            }
+            else if (status == "UNR") {
+
+                return "Unknown user";
+            }
+            else return "Unknown response";
+        }
+        else return "Unknown response";
     }
-
-    else if (status == "RLO UNR") {
-        cout << "Unknown user" << endl;
-    }
-
-    else cout << "Unknown response" << endl;
+    return "Unknown response";
 }
 
-void unregisterStatus(string status) {
+string unregisterStatus(string response) {
 
-    //TODO ALTER THIS TO BE THE SAME AS THE OTHERS
-    if (status == "RUR OK") {
+    string evalResponse;
 
-        logged_in = false;
-        cout << "Successful unregister" << endl;
-
+    if (endsWithNewLine(response)) {
+        evalResponse = response.substr(0, response.size() - 1);
     }
+    else return "Unknown response";
 
-    else if (status == "RUR NOK") {
-        cout << "Incorrect unregister attempt" << endl;
+    istringstream iss(evalResponse);
+    string command, status;
+
+    if (iss >> command >> status && iss.eof()) {
+
+        if (command == "RUR") {
+
+            if (status == "OK") {
+
+                logged_in = false;
+                return "Successful unregister";
+
+            }
+            else if (status == "NOK") {
+
+                return "Incorrect unregister attempt";
+            }
+            else if (status == "UNR") {
+
+                return "Unknown user";
+            }
+            else return "Unknown response";
+        }
+        else return "Unknown response";
     }
+    return "Unknown response";
 
-    else if (status == "RUR UNR") {
-        cout << "Unknown user" << endl;
-    }
-
-    else cout << "Unknown response" << endl;
 }
 
 void openStatus(string response) {
@@ -98,6 +147,8 @@ void openStatus(string response) {
         cout << command << endl << status << endl;
         cout << "Unknown         response" << endl;
     }
+
+    // Check for extra content after newlin
 }
 
 void closeStatus(string response) {
@@ -136,8 +187,15 @@ void closeStatus(string response) {
 
 }
 
-void myauctionsStatus(string response) {
-    istringstream iss(response);
+string myauctionsStatus(string response) {
+    string evalResponse;
+
+    if (endsWithNewLine(response)) {
+        evalResponse = response.substr(0, response.size() - 1);
+    }
+    else return "Unknown response\n";
+
+    istringstream iss(evalResponse);
     string command, status, aid, state;
 
     if (iss >> command >> status) {
@@ -147,38 +205,44 @@ void myauctionsStatus(string response) {
             if (iss.eof()) {
 
                 if (status == "NOK") {
-                    cout << "User " << userID << " does not have ongoing auctions" << endl;
+
+                    return "User " + userID + " does not have ongoing auctions\n";
+
                 }
 
                 else if (status == "NLG") {
-                    cout << "User not logged in" << endl;
+                    return "User not logged in\n";
                 }
 
-                else cout << "Unknown response" << endl;
+                return "Unknown response\n";
 
             }
             else if (status == "OK") {
+
+                string toReturn;
 
                 while (iss >> aid >> state) {
 
                     if (isValidAID(aid) && isValidState(state))
 
-                        cout << "Auction ID: " << aid << ", State: " << state << endl;
+                        toReturn += "Auction ID: " + aid + "\t State: " + state + "\n";
 
-                    else cout << "Invalid Response";
+                        //cout << "Auction ID: " << aid << ", State: " << state << endl;
 
-                    if (iss.eof()) break;
+                    else return "Invalid Response\n";
+
+                    if (iss.eof()) return toReturn;
 
                 }
 
             }
-            else cout << "Unknown response" << endl;
+            return "Unknown response\n";
 
         }
-        else cout << "Unknown response" << endl;
+        return "Unknown response\n";
 
     }
-    else cout << "Unknown response" << endl;
+    return "Unknown response\n";
 }
 
 void bidStatus(string response) {
@@ -214,9 +278,16 @@ void bidStatus(string response) {
     else cout << "Unknown response" << endl;
 }
 
-void mybidsStatus(string response) {
+string mybidsStatus(string response) {
 
-    istringstream iss(response);
+    string evalResponse;
+
+    if (endsWithNewLine(response)) {
+        evalResponse = response.substr(0, response.size() - 1);
+    }
+    else return "Unknown response\n";
+
+    istringstream iss(evalResponse);
     string command, status, aid, state;
 
     if (iss >> command >> status) {
@@ -226,39 +297,54 @@ void mybidsStatus(string response) {
             if (iss.eof()) {
 
                 if (status == "NOK") {
-                    cout << "User " << userID << " has not placed any bids" << endl;
+
+                    return "User " + userID + " has not placed any bids\n";
+
                 }
 
                 else if (status == "NLG") {
-                    cout << "User not logged in" << endl;
+                    return "User not logged in\n";
                 }
 
-                else cout << "Unknown response" << endl;
+                return "Unknown response\n";
 
             }
 
             else if (status == "OK") {
 
+                string toReturn;
+
                 while (iss >> aid >> state) {
                     if (isValidAID(aid) && isValidState(state))
-                        cout << "Auction ID: " << aid << ", State: " << state << endl;
-                    if (iss.eof()) break;
+
+                        toReturn += "Auction ID: " + aid + "\t State: " + state + "\n";
+
+                    else return "Invalid Response\n";
+
+                    if (iss.eof()) return toReturn;
                 }
 
             }
-            else cout << "Unknown response" << endl;
+            return "Unknown response\n";
 
         }
-        else cout << "Unknown response" << endl;
+        return "Unknown response\n";
 
     }
-    else cout << "Unknown response" << endl;
+    return "Unknown response\n";
 
 }
 
-void listStatus(string response) {
+string listStatus(string response) {
 
-    istringstream iss(response);
+    string evalResponse;
+
+    if (endsWithNewLine(response)) {
+        evalResponse = response.substr(0, response.size() - 1);
+    }
+    else return "Unknown response\n";
+
+    istringstream iss(evalResponse);
     string command, status, aid, state;
 
     if (iss >> command >> status) {
@@ -268,28 +354,38 @@ void listStatus(string response) {
             if (iss.eof()) {
 
                 if (status == "NOK") {
-                    cout << "No auction has been started" << endl;
+                    return "No auction has been started yet";
 
                 }
-                else cout << "Unknown response" << endl;
+                return "Unknown response";
             }
 
             else if (status == "OK") {
 
+                string toReturn;
+
                 while (iss >> aid >> state) {
+
                     if (isValidAID(aid) && isValidState(state))
-                        cout << "Auction ID: " << aid << ", State: " << state << endl;
-                    if (iss.eof()) break;
+
+                        toReturn += "Auction ID: " + aid + "\t State: " + state + "\n";
+
+                        //cout << "Auction ID: " << aid << ", State: " << state << endl;
+
+                    else return "Invalid Response\n";
+
+                    if (iss.eof()) return toReturn;
+
                 }
 
             }
-            else cout << "Unknown response" << endl;
+            return "Unknown response";
 
         }
-        else cout << "Unknown response" << endl;
+        return "Unknown response";
 
     }
-    else cout << "Unknown response" << endl;
+    return "Unknown response";
 
 }
 
@@ -359,15 +455,20 @@ void show_assetStatus(string response) {
     else cout << "Unknown response" << endl;
 }
 
-void show_recordStatus(string response) {
+string show_recordStatus(string response) {
 
-    istringstream iss(response);
+    string evalResponse;
+
+    if (endsWithNewLine(response)) {
+        evalResponse = response.substr(0, response.size() - 1);
+    }
+    else return "Unknown response\n";
+
+    istringstream iss(evalResponse);
     string command, status, aid, state;
     string host_UID, auction_name, asset_fName, start_value, start_date, start_time, timeactive;
     string identifier, bidder_UID, bid_value, bid_date, bid_time, bid_sec_time;
     string end_date, end_time, end_sec_time;
-
-    cout << response << "<-response\n ";
 
     if (iss >> command >> status) {
 
@@ -377,26 +478,32 @@ void show_recordStatus(string response) {
 
                 if (status == "NOK") {
 
-                    cout << "Auction " << tempAID << " does not exist" << endl;
+                    return "Auction " + tempAID + " does not exist\n";
 
                 }
-                else cout << "Unknown response" << endl;
+                else return "Unknown response\n";
             }
 
             else if (status == "OK") {
+
+                string toReturn;
 
                 if (iss >> host_UID >> auction_name >> asset_fName >> start_value >> start_date >> start_time >> timeactive) {
 
                     if (isUID(host_UID) && isDescription(auction_name) && isFileName(asset_fName) && isStartValue(start_value) &&
                         isValidDate(start_date) && isValidTime(start_time) && isValidSecTime(timeactive)) {
 
-                        cout << "Auction \"" << auction_name << "\" with file \"" << asset_fName << "\" started by user " << host_UID
-                            << " in " << start_date << " at " << start_time << ". Start Value was " << start_value << " and it can/was active for "
-                            << timeactive << " seconds" << endl;
+                        toReturn += "Auction \"" + auction_name + "\" with file \""
+                            + asset_fName + "\" started by user "
+                            + host_UID + " in "
+                            + start_date + " at "
+                            + start_time + ". Start Value was "
+                            + start_value + " and it can be/was active for "
+                            + timeactive + " seconds\n\n";
 
                         if (!iss.eof()) {
 
-                            cout << "Bids Information:" << endl;
+                            toReturn += "Bids Information:\n";
 
                             if (iss >> identifier && identifier == "B") {
                                 int nBids = 0;
@@ -405,13 +512,17 @@ void show_recordStatus(string response) {
 
                                         if (isUID(bidder_UID) && isBidValue(bid_value) && isValidDate(bid_date) && isValidTime(bid_time) && isValidSecTime(timeactive)) {
 
-                                            cout << "Bidder UID: " << bidder_UID << ", Bid Value: " << bid_value << ", Bid Date and Time: "
-                                                << bid_date << " at " << bid_time << ", Time since the auction started: " << bid_sec_time << " seconds" << endl;
+                                            toReturn += "Bidder UID: " + bidder_UID
+                                                + "\t Bid Value: " + bid_value
+                                                + "\t Bid Date and Time: " + bid_date
+                                                + " at " + bid_time
+                                                + "\t Time since the auction started: " + bid_sec_time
+                                                + " seconds\n";
 
                                             nBids++;
 
                                         }
-                                        else cout << "Invalid Bid information received" << endl;
+                                        else return "Invalid Bid information received\n";
 
                                     }
                                     if (iss.eof()) break;
@@ -419,7 +530,7 @@ void show_recordStatus(string response) {
                                 }
 
                             }
-                            else cout << "No bids were/have been made" << endl;
+                            else toReturn += "No bids were/have been made\n";
 
                             if (!iss.eof()) {
 
@@ -429,38 +540,47 @@ void show_recordStatus(string response) {
 
                                         if (isValidDate(end_date) && isValidTime(end_time) && isValidSecTime(end_sec_time)) {
 
-                                            cout << "Auction ended in " << end_date << " at " << end_time
-                                                << ", " << end_sec_time << " seconds after it started" << endl;
+                                            toReturn += "\nAuction ended in " + end_date
+                                                + " at " + end_time
+                                                + ", " + end_sec_time
+                                                + " seconds after it started\n";
+
+                                            return toReturn;
 
                                         }
-                                        else cout << "Invalid End information received" << endl;
+                                        return "Invalid End information received\n";
 
                                     }
-                                    else cout << "Unknown response" << endl;
+                                    return "Unknown response\n";
 
                                 }
-                                else cout << "Unknown response" << endl;
+                                return "Unknown response\n";
 
                             }
-                            else if (iss.eof())
-                                cout << "Auction has not ended yet" << endl;
+                            if (iss.eof()) {
+
+                                toReturn += "\nAuction has not ended yet\n";
+                                return toReturn;
+                            }
 
                         }
-                        else cout << "Auction has not ended yet, and no bids have been made" << endl;
-
+                        else {
+                            toReturn += "Auction has not ended yet, and no bids have been made\n";
+                            return toReturn;
+                        }
                     }
-                    else cout << "Invalid Auction information received";
+                    return "Invalid Auction information received\n";
 
                 }
-                else cout << "Unknown response" << endl;
+                return "Unknown response\n";
 
             }
-            else cout << "Unknown response" << endl;
+            return "Unknown response\n";
 
         }
-        else cout << "Unknown response" << endl;
+        return "Unknown response\n";
 
     }
-    else cout << "Unknown response" << endl;
+    return "Unknown response\n";
 
 }
