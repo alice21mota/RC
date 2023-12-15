@@ -193,8 +193,8 @@ void dealWithTCP() {
                         //+2 to make up for an extra two " "
                         matchedBytes = match.position(0) + match.length(0);
 
-                        cout << "matchedBytes" << endl;
-                        cout << matchedBytes << endl;
+                        // cout << "matchedBytes" << endl;
+                        // cout << matchedBytes << endl;
 
                         bytesRead = len;
                         bytesRead -= matchedBytes;
@@ -233,8 +233,8 @@ void dealWithTCP() {
 
                     Ffile.append(buffer, n);
                     bytesRead += n;
-                    cout << "bytesRead" << endl;
-                    cout << bytesRead << endl;
+                    // cout << "bytesRead" << endl;
+                    // cout << bytesRead << endl;
                     // cout << "Ffile do while" << endl;
                     // cout << Ffile << endl;
                 }
