@@ -35,6 +35,8 @@ string userID, password;
 string fName, fData, tempAID, filePath;
 
 bool logged_in = false;
+bool shouldExit = false;
+bool signalReceived = false; // Flag to indicate whether a signal was received
 
 void getArgs(int argc, char *argv[])
 {
@@ -50,13 +52,19 @@ void getArgs(int argc, char *argv[])
 string readCommands() {
     string command;
     getline(cin, command);
+
+    // Check if the input line is empty
+    if (command.empty()) {
+        return command;
+    }
+
+    cout << "Received command: " << command << endl;
     //cout << "Command is: " << command << endl;
     return command;
 }
 
 void exit() {
-    //TODO Check if user is logged in. If it is -> logout
-    //If locally we have values for UID and passowrd, then the user is logged in.
+    
     if (logged_in == true)
         cout << "Please logout before exiting the application" << endl;
 
@@ -206,7 +214,7 @@ void getCommand(string command) {
             result = sendTCP(request, "", "rec");
             status = show_assetStatus(result);
 
-            cout << "AUCTION " << tempAID << "'S ASSET:" << endl << status;
+            cout << "AUCTION " << tempAID << "'S ASSET:" << endl << status << endl;
 
         }
         else cout << "Error: " << request << endl;
@@ -242,19 +250,37 @@ void getCommand(string command) {
         else cout << "Error: " << request << endl;
 
     }
-    else cout << "Unknown command\n";
+    else if (!signalReceived){}
+    else cout << "Unknown command" << "  ->" << command<< endl;
 }
 
 int main(int argc, char *argv[])
 {
+    // Set up signal handlers
+    if (setup_signal_handlers() == EXIT_FAILURE) {
+        cerr << "Error setting up signal handlers. Exiting." << endl;
+        return EXIT_FAILURE;
+    }
+
     string result, user_command;
 
     getArgs(argc, argv);
 
-    while (1) {
-
+    while (!shouldExit) {
+        cout << "Enter a command: " << endl;
         user_command = readCommands();
+
+        if (signalReceived) {
+            //cout << endl << "Exiting the program." <<   endl;
+            // Perform any necessary cleanup here
+            break;  // Exit the loop
+        }
+
         getCommand(user_command);
+        cin.clear();
+   
     }
+
+    return EXIT_SUCCESS;
 
 }

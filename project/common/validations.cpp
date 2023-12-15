@@ -64,7 +64,7 @@ bool fileExists(string filePath) {
 
 bool isFileSizeValid(size_t fileSize) {
     size_t maxSize = 10 * 1024 * 1024; //10MB in bytes
-    return fileSize <= maxSize;
+    return (fileSize > 0 && fileSize <= maxSize);
 }
 
 bool isValidFileSize(string fileSizeStr) {

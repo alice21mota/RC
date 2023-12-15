@@ -22,6 +22,9 @@
 #include <string>
 #include <cctype>
 #include <algorithm>
+#include <csignal>
+#include <cstdlib>
+#include <cerrno>
 
 #define TCP_READ_TIMEOUT_SECONDS (5) // 1 minute
 #define TCP_WRITE_TIMEOUT_SECONDS (20 * 60)  // 20 minutes
@@ -37,6 +40,9 @@ extern string filePath;
 extern string port;
 extern string ip;
 extern bool logged_in;
+extern bool shouldExit;
+extern bool signalReceived; // Flag to indicate whether a signal was received
+
 
 
 #endif // GLOBALS_H

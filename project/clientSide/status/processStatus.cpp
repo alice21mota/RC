@@ -455,7 +455,7 @@ string show_assetStatus(string response) {
                             // Close the file after writing
                             file.close();
 
-                            return "File " + fName + " of " + fSize + " bytes stored in: " + path + "\n";
+                            return "File " + fName + " of " + fSize + " bytes stored in: " + path;
 
                         }
                         return "Error opening file for writing";
