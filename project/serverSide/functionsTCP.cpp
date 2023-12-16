@@ -15,6 +15,7 @@ string open(string userId, string password, string name, string start_value, str
     for (int i = 0;i < 10;i++) {
         auctionId = createAuction(userId, name, start_value, timeactive, Fname, Fsize, Fdata);
         if (auctionId > 0) return command + "OK " + to_string(auctionId);
+        cout << "-------------------------------------\n--------------------------------------------\n";
     }
 
     return command + "NOK";
