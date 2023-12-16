@@ -53,6 +53,7 @@ string getUDPCommand(string command) {
     iss >> whichCommand;
 
     cout << "command->" << command << "<-" << endl;
+
     // checkExpiredAuctions();
 
     if (whichCommand == "LIN") {
