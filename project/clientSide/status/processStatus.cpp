@@ -235,8 +235,6 @@ string myauctionsStatus(string response) {
 
                         toReturn += "Auction ID: " + aid + "\t State: " + state + "\n";
 
-                        //cout << "Auction ID: " << aid << ", State: " << state << endl;
-
                     else return "Invalid Response\n";
 
                     if (iss.eof()) return toReturn;
@@ -384,8 +382,6 @@ string listStatus(string response) {
                     if (isValidAID(aid) && isValidState(state))
 
                         toReturn += "Auction ID: " + aid + "\t State: " + state + "\n";
-
-                        //cout << "Auction ID: " << aid << ", State: " << state << endl;
 
                     else return "Invalid Response\n";
 

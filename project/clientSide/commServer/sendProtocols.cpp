@@ -22,7 +22,6 @@ int openTcpSocket() {
         return fd;
 
     }
-    cout << "tcp read timeout -> " << s << " <- \n";
 
     struct timeval write_timeout;
     write_timeout.tv_sec = TCP_WRITE_TIMEOUT_SECONDS;
@@ -33,8 +32,6 @@ int openTcpSocket() {
         close(fd);
         return fd;
     }
-
-    cout << "tcp write timeout -> " << s << " <- \n";
 
     return fd;
 }
@@ -86,14 +83,6 @@ string sendUDP(string message) {
     struct addrinfo hints, *res;
     struct sockaddr_in addr;
 
-
-    /*fd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (fd == -1)
-    {
-        cerr << "Error creating socket." << endl;
-        return "ERROR";
-    }*/
-
     fd = openUdpSocket();
 
     if (fd == -1)
@@ -116,7 +105,7 @@ string sendUDP(string message) {
     }
 
     n = sendto(fd, message.c_str(), message.length(), 0, res->ai_addr, res->ai_addrlen);
-    cout << "message sent ->" << message << "<-\n";
+
     if (n == -1)
     {
         cerr << "Error sending message." << endl;
@@ -152,7 +141,6 @@ string sendUDP(string message) {
 
     freeaddrinfo(res);
     close(fd);
-    cout << "full Message ->" << fullMessage << endl;
     return fullMessage;
 }
 
@@ -206,14 +194,6 @@ string sendTCP(string message, string fileName, string comm) {
     struct addrinfo hints, *res;
     struct sockaddr_in addr;
 
-    //fd = socket(AF_INET, SOCK_STREAM, 0);
-
-    /*if (fd == -1)
-    {
-        cerr << "Error creating socket." << endl;
-        return "ERROR";
-    }*/
-
     fd = openTcpSocket();
 
     if (fd == -1)
@@ -236,14 +216,6 @@ string sendTCP(string message, string fileName, string comm) {
     }
 
     n = connect(fd, res->ai_addr, res->ai_addrlen);
-    cout << n << " connect\n ";
-
-    /*if (n == -1)
-    {
-        cerr << "Error connecting to the server." << endl;
-        close(fd);
-        return "ERROR";
-    }*/
 
     if (n == -1) {
         if (errno == ECONNREFUSED) {
@@ -280,7 +252,7 @@ string sendTCP(string message, string fileName, string comm) {
         }
     }
 
-    //If it is receiving a file, 
+    //If it is receiving a file
     if (comm == "rec") {
 
         n = read(fd, buffer, sizeof(buffer) - 1);
@@ -297,7 +269,6 @@ string sendTCP(string message, string fileName, string comm) {
         if (n == 8) {
             freeaddrinfo(res);
             close(fd);
-            cout << buffer << " BUFFER" << endl;
             return buffer;
         }
 
@@ -336,7 +307,6 @@ string sendTCP(string message, string fileName, string comm) {
                 return "ERROR";
             }
 
-            //TODO CHECK THIS
             try {
                 fileSize = stoll(fSize);
             }
@@ -346,7 +316,6 @@ string sendTCP(string message, string fileName, string comm) {
             catch (const out_of_range& e) {
                 cerr << "Out of range: " << e.what() << endl;
             }
-
 
             while (bytesRead < fileSize) {
 
@@ -385,7 +354,6 @@ string sendTCP(string message, string fileName, string comm) {
 
             if (n == -1) {
 
-                cout << "Error reading response." << endl;
                 close(fd);
                 return "ERROR";
 
