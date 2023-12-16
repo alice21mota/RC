@@ -273,6 +273,25 @@ string getTCPCommand(string command) {
         string userId, password, auctionId, value;
         iss >> userId >> password >> auctionId >> value;
         response = addBid(userId, password, auctionId, stoi(value));
+
+        if (endsWithNewLine(command)) {
+
+            evalCommand = command.substr(0, command.size() - 1);
+            cout << "eval Command ->" << evalCommand << "<-\n";
+            istringstream iss(evalCommand);
+            string uid, password, aid, value;
+
+            if (iss >> whichCommand >> uid >> password >> aid >> value && iss.eof()) {
+                if (isUID(uid) && isPassword(password) && isValidAID(aid) && isBidValue(value)){
+                    
+                    response = addBid(uid, password, aid, stoi(value));
+                }
+                else response = "RBD ERR";
+            }
+            else response = "RBD ERR";
+        }
+        else response = "RBD ERR";
+
     }
     else response = "ERR";
     return response + "\n";
