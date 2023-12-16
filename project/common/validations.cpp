@@ -45,8 +45,11 @@ bool isStartValue(string startValue) {
 
 bool isDuration(string duration) {
     if (duration.size() > 0 && duration.size() <= 5) {
-        if (isNumeric(duration))
-            return true;
+        if (isNumeric(duration)) {
+            if (stoi(duration) > 0)
+                return true;
+            return false;
+        }
         return false;
     }
     return false;

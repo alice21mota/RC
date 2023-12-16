@@ -47,7 +47,6 @@ void exitUserApp(int sig) {
                 cout << "Logging out...";
                 logged_in = false;
 
-                //cout << endl << "Exiting the program." << endl;
                 shouldExit = true;  // Set the flag to exit the program
                 signalReceived = true;
             }

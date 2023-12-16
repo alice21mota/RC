@@ -235,8 +235,6 @@ string myauctionsStatus(string response) {
 
                         toReturn += "Auction ID: " + aid + "\t State: " + state + "\n";
 
-                        //cout << "Auction ID: " << aid << ", State: " << state << endl;
-
                     else return "Invalid Response\n";
 
                     if (iss.eof()) return toReturn;
@@ -385,8 +383,6 @@ string listStatus(string response) {
 
                         toReturn += "Auction ID: " + aid + "\t State: " + state + "\n";
 
-                        //cout << "Auction ID: " << aid << ", State: " << state << endl;
-
                     else return "Invalid Response\n";
 
                     if (iss.eof()) return toReturn;
@@ -520,7 +516,7 @@ string show_recordStatus(string response) {
                             + start_date + " at "
                             + start_time + ". Start Value was "
                             + start_value + " and it can be/was active for "
-                            + timeactive + " seconds\n\n";
+                            + timeactive + " seconds\n";
 
                         if (!iss.eof()) {
 
@@ -528,19 +524,21 @@ string show_recordStatus(string response) {
 
                             if (iss >> identifier && identifier == "B") {
                                 int nBids = 0;
-                                while (identifier == "B" && nBids <= 50) {
+                                vector<string> recentBids;
+                                while (identifier == "B") {
                                     if (iss >> bidder_UID >> bid_value >> bid_date >> bid_time >> bid_sec_time) {
 
                                         if (isUID(bidder_UID) && isBidValue(bid_value) && isValidDate(bid_date) && isValidTime(bid_time) && isValidSecTime(timeactive)) {
 
-                                            toReturn += "Bidder UID: " + bidder_UID
-                                                + "\t Bid Value: " + bid_value
-                                                + "\t Bid Date and Time: " + bid_date
+                                            string currentBid = "Bidder UID: " + bidder_UID
+                                                + ", Bid Value: " + bid_value
+                                                + ", Bid Date and Time: " + bid_date
                                                 + " at " + bid_time
-                                                + "\t Time since the auction started: " + bid_sec_time
+                                                + ", Time since the auction started: " + bid_sec_time
                                                 + " seconds\n";
 
-                                            nBids++;
+                                            recentBids.push_back(currentBid);
+                                               // nBids++;
 
                                         }
                                         else return "Invalid Bid information received\n";
@@ -548,6 +546,15 @@ string show_recordStatus(string response) {
                                     }
                                     if (iss.eof()) break;
                                     else iss >> identifier;
+                                }
+                                // Ensure that only the most recent 50 bids are kept
+                                if (recentBids.size() > 50) {
+                                    recentBids.erase(recentBids.begin(), recentBids.end() - 50);
+                                }
+
+                                // Concatenate bid information into the final result string
+                                for (const auto& bid : recentBids) {
+                                    toReturn += bid;
                                 }
 
                             }
@@ -561,7 +568,7 @@ string show_recordStatus(string response) {
 
                                         if (isValidDate(end_date) && isValidTime(end_time) && isValidSecTime(end_sec_time)) {
 
-                                            toReturn += "\nAuction ended in " + end_date
+                                            toReturn += "Auction ended in " + end_date
                                                 + " at " + end_time
                                                 + ", " + end_sec_time
                                                 + " seconds after it started\n";
@@ -580,7 +587,7 @@ string show_recordStatus(string response) {
                             }
                             if (iss.eof()) {
 
-                                toReturn += "\nAuction has not ended yet\n";
+                                toReturn += "Auction has not ended yet\n";
                                 return toReturn;
                             }
 

@@ -31,8 +31,6 @@ string readCommands() {
         return command;
     }
 
-    cout << "Received command: " << command << endl;
-    //cout << "Command is: " << command << endl;
     return command;
 }
 
@@ -55,7 +53,6 @@ void getCommand(string command) {
     if (whichCommand == "login") {
 
         request = login(command);
-        cout << "result->" << request << "<-" << endl;
 
         if ((request.substr(0, 3) == "LIN")) {
 
@@ -225,7 +222,7 @@ void getCommand(string command) {
 
     }
     else if (!signalReceived) {}
-    else cout << "Unknown command" << "  ->" << command << endl;
+    else cout << "Unknown command" << endl;
 }
 
 int main(int argc, char *argv[])
@@ -245,8 +242,7 @@ int main(int argc, char *argv[])
         user_command = readCommands();
 
         if (signalReceived) {
-            //cout << endl << "Exiting the program." <<   endl;
-            // Perform any necessary cleanup here
+
             break;  // Exit the loop
         }
 
