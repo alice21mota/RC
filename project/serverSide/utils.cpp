@@ -14,8 +14,7 @@ bool isRegisteredUser(string userId) {
 bool isCorrectPassword(string userId, string passwordToTest) {
     filesystem::path filePath = "USERS/" + userId + "/" + userId + "_pass.txt";
     string corretPassword = readFromFile(filePath);
-    if (corretPassword == "-1") return false; // FIXME: should i return true?
-
+    if (corretPassword == "-1") return false;
     return corretPassword == passwordToTest ? true : false;
 }
 

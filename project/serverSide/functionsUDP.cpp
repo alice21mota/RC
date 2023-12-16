@@ -4,8 +4,11 @@
  * Cria todas as diretorias e ficheiros necessários para guardar as informações do utilizador.
 */
 bool createUser(string userId, string password) {
+    filesystem::path directoryPath("USERS/" + userId);
+    if (!filesystem::exists(directoryPath))
+        if (!createUserFolder(userId))
+            return false;
     return
-        createUserFolder(userId) &&
         createUserPasswordFile(userId, password) &&
         createUserLoginFile(userId);
 }
@@ -154,7 +157,7 @@ string getBidsString(string auctionId) {
     string bid;
     filesystem::path directotyPath = "AUCTIONS/" + auctionId + "/BIDS/";
     vector<string> bids = getSortedFilesFromDirectory(directotyPath);
-    int nBids = bids.size();
+    int nBids = min((int)bids.size(), 50);
     for (int i = 0;i < nBids; i++) {
         filesystem::path bidFilePath = directotyPath / bids[i];
         bid = "";

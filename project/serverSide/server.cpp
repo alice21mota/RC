@@ -17,6 +17,10 @@
 string myPort = "58000";
 bool verbose = false;
 
+
+string clientPort;
+string clientIP;
+
 bool logged_in;     //Not being used, only to ble able to make
 bool shouldExit;        //Not being used, only to ble able to make
 bool signalReceived;        //Not being used, only to ble able to make
@@ -35,6 +39,17 @@ socklen_t addrlen;
 int ufd, tfd, new_tfd = -1;
 char host[NI_MAXHOST], service[NI_MAXSERV];
 
+void generalVerbose(string command, string ip, string port, string userId) {
+    string print = "";
+    print = "Received " + command + " command ";
+
+    if (!userId.empty()) {
+        print += "(with UID = " + userId + ")";
+    }
+    print += "from " + ip + ":" + port;
+    cout << print << endl;
+}
+
 void getArgs(int argc, char *argv[])
 {
     for (int i = 1; i < argc; i += 2)
@@ -46,7 +61,7 @@ void getArgs(int argc, char *argv[])
     }
 }
 
-string getUDPCommand(string command) {
+string getUDPCommand(string command, string ip, string port) {
     string response, evalCommand;
     istringstream iss(command);
     string whichCommand;
@@ -69,7 +84,8 @@ string getUDPCommand(string command) {
             string user, password, status;
 
             if (iss >> whichCommand >> user >> password && iss.eof()) {
-                if (isUID(user) && isPassword(password)){
+                if (isUID(user) && isPassword(password)) {
+                    if (verbose) generalVerbose("login", ip, port, user);
                     response = login(user, password);
                 }
                 else response = "RLI ERR";
@@ -93,8 +109,8 @@ string getUDPCommand(string command) {
             string user, password, status;
 
             if (iss >> whichCommand >> user >> password && iss.eof()) {
-                if (isUID(user) && isPassword(password)){
-                    
+                if (isUID(user) && isPassword(password)) {
+                    if (verbose) generalVerbose("logout", ip, port, user);
                     response = logout(user, password);
                 }
                 else response = "RLO ERR";
@@ -117,8 +133,8 @@ string getUDPCommand(string command) {
             string user, password, status;
 
             if (iss >> whichCommand >> user >> password && iss.eof()) {
-                if (isUID(user) && isPassword(password)){
-                    
+                if (isUID(user) && isPassword(password)) {
+                    if (verbose) generalVerbose("unregister", ip, port, user);
                     response = unregister(user, password);
                 }
                 else response = "RUR ERR";
@@ -143,7 +159,7 @@ string getUDPCommand(string command) {
 
             if (iss >> whichCommand >> user && iss.eof()) {
                 if (isUID(user)){
-                    
+                     if (verbose) generalVerbose("my_auctions", ip, port, user);
                     response = getMyAuctions(user);
                 }
                 else response = "RMA ERR";
@@ -236,7 +252,8 @@ string getTCPCommand(string command) {
 
             if (iss >> whichCommand >> aid && iss.eof()) {
                 if (isValidAID(aid)){
-                    
+                    if (verbose)
+            generalVerbose("show_asset", clientIP, clientPort, "");
                     response = showAsset(aid);
                 }
                 else response = "RSA ERR";
@@ -306,11 +323,12 @@ void dealWithUDP() {
             //prt_str[ret - 1] = 0;
             cout << "---UDP socket: " << prt_str << endl;
 
-        string returnString = getUDPCommand(prt_str);
-
         errcode = getnameinfo((struct sockaddr *)&udp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
         if (errcode == 0 && verbose)
             cout << "       Sent by [" << host << ":" << service << "]" << endl;
+
+        string returnString = getUDPCommand(prt_str, host, service);
+
 
         cout << "vou devolver: " << returnString << endl;
         n = sendto(ufd, returnString.c_str(), returnString.length(), 0, (struct sockaddr *)&udp_useraddr, addrlen); // Send message to client
@@ -330,6 +348,9 @@ int acceptTCP() {
     errcode = getnameinfo((struct sockaddr *)&tcp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
     if (errcode == 0 && verbose)
         cout << "       Sent by [" << host << ":" << service << "]" << endl;
+
+    clientIP = host;
+    clientPort = service;
 
     cout << "Entrei no read TCP" << endl; // Debug
     return new_tfd;
@@ -355,6 +376,8 @@ void dealWithTCP() {
         if (len >= 3) {
             string command = finalBuffer.substr(0, 3);
             if (command == "OPA") {
+                isOpen = true;
+
                 //pattern of the beggining of the response, up until file Size 
                 regex pattern(R"(OPA (\d{6}) ([a-zA-Z0-9]{8}) ([a-zA-Z0-9_.-]{1,10}) (\d{1,6}) (\d{1,5}) ([a-zA-Z0-9_.-]+) (\d+) )");
                 smatch match; //Used to match with the patern
@@ -364,12 +387,19 @@ void dealWithTCP() {
                     cout << finalBuffer << endl;
                     cout << "match.size() = " << match.size() << endl;
                     if (match.size() == 8) {
-                        
-                        //TODO VALIDATIONS  ANA
-                        //if(!//validatiosn){
-                            //returnString = "ROA ERR";
-                        //}
-                    
+
+                        if (
+                            !isUID(match[1]) ||
+                            !isPassword(match[2]) ||
+                            !isDescription(match[3]) ||
+                            !isStartValue(match[4]) ||
+                            !isDuration(match[5]) ||
+                            !isFileName(match[6]) ||
+                            !isValidFileSize(match[7])
+                            ) {
+                            returnString = "ROA ERR";
+                            break;
+                        }
                         fSize = match[7];
 
                         //+2 to make up for an extra two " "
@@ -382,62 +412,65 @@ void dealWithTCP() {
                         bytesRead -= matchedBytes;
 
 
+                        //TODO CHECK THIS
+                        try {
+                            fileSize = stoll(fSize);
+                        }
+                        catch (const invalid_argument& e) {
+                            cerr << "Invalid argument: " << e.what() << endl;
+                            returnString = "ROA ERR";
+                            break;
+                        }
+                        catch (const out_of_range& e) {
+                            cerr << "Out of range: " << e.what() << endl;
+                            returnString = "ROA ERR";
+                            break;
+                        }
+                        string Ffile = finalBuffer.substr(matchedBytes, bytesRead);
+                        // cout << "Ffile" << endl;
+                        // cout << Ffile << endl;
+                        cout << "fileSize" << endl;
+                        cout << fileSize << endl;
+                        while (bytesRead < fileSize) {
+
+                            n = read(new_tfd, buffer, min(sizeof(buffer) - 1, fileSize - bytesRead));
+
+                            Ffile.append(buffer, n);
+                            bytesRead += n;
+                            // cout << "bytesRead" << endl;
+                            // cout << bytesRead << endl;
+                            // cout << "Ffile do while" << endl;
+                            // cout << Ffile << endl;
+                        }
+
+                        if (n == -1) {
+
+                            cerr << "Error reading response." << endl;
+                            close(new_tfd);
+                            returnString = "ROA ERR";
+                            break;
+
+                        }
+
+                        cout << "match: ";
+                        cout << match[0] << " - " << match[1] << " - " << match[2] << " - " << match[3] << " - " << match[4] << " - " << match[5] << " - " << match[6] << " - " << match[7] << endl;
+                        returnString = open(match[1], match[2], match[3], match[4], match[5], match[6], match[7], Ffile) + '\n';
+                        //cout << "returnString " << returnString << "<-\n";
+                        break;
                     }
                     else {
                         cerr << "Unexpected number of matches." << endl;
-                        // return "ERROR";
-                        exit(1);
+                        returnString = "ROA ERR";
+                        break;
                     }
                 }
                 else {
                     cerr << "Failed to match pattern." << endl;
                     // return "ERROR";
-                    exit(1);
+                    // exit(1);
+                    returnString = "ROA ERR";
+                    break;
                 }
-
-                //TODO CHECK THIS
-                try {
-                    fileSize = stoll(fSize);
-                }
-                catch (const invalid_argument& e) {
-                    cerr << "Invalid argument: " << e.what() << endl;
-                }
-                catch (const out_of_range& e) {
-                    cerr << "Out of range: " << e.what() << endl;
-                }
-                string Ffile = finalBuffer.substr(matchedBytes, bytesRead);
-                // cout << "Ffile" << endl;
-                // cout << Ffile << endl;
-                cout << "fileSize" << endl;
-                cout << fileSize << endl;
-                while (bytesRead < fileSize) {
-
-                    n = read(new_tfd, buffer, min(sizeof(buffer) - 1, fileSize - bytesRead));
-
-                    Ffile.append(buffer, n);
-                    bytesRead += n;
-                    // cout << "bytesRead" << endl;
-                    // cout << bytesRead << endl;
-                    // cout << "Ffile do while" << endl;
-                    // cout << Ffile << endl;
-                }
-
-                if (n == -1) {
-
-                    cerr << "Error reading response." << endl;
-                    close(new_tfd);
-                    // return "ERROR";
-                    exit(1);
-
-                }
-
-                cout << "match: ";
-                cout << match[0] << " - " << match[1] << " - " << match[2] << " - " << match[3] << " - " << match[4] << " - " << match[5] << " - " << match[6] << " - " << match[7] << endl;
-                
-                isOpen = true;
-                returnString = open(match[1], match[2], match[3], match[4], match[5], match[6], match[7], Ffile) + '\n';
-                //cout << "returnString " << returnString << "<-\n";
-                break;
             }
         }
 
