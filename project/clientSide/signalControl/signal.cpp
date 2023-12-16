@@ -43,8 +43,8 @@ void exitUserApp(int sig) {
             res = sendUDP(comm);
             stat = logoutStatus(res);
 
-            if (stat == "Successful logout") {
-                cout << "Logging out...";
+            if (stat == "Successful !logout") {
+                cout << "Logging out..." << endl;
                 logged_in = false;
 
                 shouldExit = true;  // Set the flag to exit the program
@@ -52,10 +52,12 @@ void exitUserApp(int sig) {
             }
 
             else {
-                cout << stat << endl;
-                cout << "Continuing the program." << endl;
-                signalReceived = false;
-                return; // Continue the program without exiting
+                //cout << stat << endl;
+                cout << "Problems logging out in server. Exiting User Application anyway" << endl;
+                logged_in = false;
+
+                shouldExit = true;  // Set the flag to exit the program
+                signalReceived = true;
             }
 
         }
@@ -66,7 +68,7 @@ void exitUserApp(int sig) {
         }
     }
 
-    cout << endl << "Exiting the program." << endl;
+    cout << "Exiting the program." << endl;
     shouldExit = true;  // Set the flag to exit the program
     signalReceived = true;
 }
