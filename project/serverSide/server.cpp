@@ -275,6 +275,8 @@ void dealWithTCP() {
         if (len >= 3) {
             string command = finalBuffer.substr(0, 3);
             if (command == "OPA") {
+                isOpen = true;
+
                 //pattern of the beggining of the response, up until file Size 
                 regex pattern(R"(OPA (\d{6}) ([a-zA-Z0-9]{8}) ([a-zA-Z0-9_-]{1,10}) (\d{1,6}) (\d{1,5}) ([a-zA-Z0-9_.-]+) (\d+) )");
                 smatch match; //Used to match with the patern
@@ -284,6 +286,19 @@ void dealWithTCP() {
                     cout << finalBuffer << endl;
                     cout << "match.size() = " << match.size() << endl;
                     if (match.size() == 8) {
+
+                        if (
+                            !isUID(match[1]) ||
+                            !isPassword(match[2]) ||
+                            !isDescription(match[3]) ||
+                            !isStartValue(match[4]) ||
+                            !isDuration(match[5]) ||
+                            !isFileName(match[6]) ||
+                            !isValidFileSize(match[7])
+                            ) {
+                            returnString = "ROA ERR";
+                            break;
+                        }
                         fSize = match[7];
 
                         //+2 to make up for an extra two " "
@@ -295,61 +310,65 @@ void dealWithTCP() {
                         bytesRead = len;
                         bytesRead -= matchedBytes;
 
+                        //TODO CHECK THIS
+                        try {
+                            fileSize = stoll(fSize);
+                        }
+                        catch (const invalid_argument& e) {
+                            cerr << "Invalid argument: " << e.what() << endl;
+                            returnString = "ROA ERR";
+                            break;
+                        }
+                        catch (const out_of_range& e) {
+                            cerr << "Out of range: " << e.what() << endl;
+                            returnString = "ROA ERR";
+                            break;
+                        }
+                        string Ffile = finalBuffer.substr(matchedBytes, bytesRead);
+                        // cout << "Ffile" << endl;
+                        // cout << Ffile << endl;
+                        cout << "fileSize" << endl;
+                        cout << fileSize << endl;
+                        while (bytesRead < fileSize) {
+
+                            n = read(new_tfd, buffer, min(sizeof(buffer) - 1, fileSize - bytesRead));
+
+                            Ffile.append(buffer, n);
+                            bytesRead += n;
+                            // cout << "bytesRead" << endl;
+                            // cout << bytesRead << endl;
+                            // cout << "Ffile do while" << endl;
+                            // cout << Ffile << endl;
+                        }
+
+                        if (n == -1) {
+
+                            cerr << "Error reading response." << endl;
+                            close(new_tfd);
+                            returnString = "ROA ERR";
+                            break;
+
+                        }
+
+                        cout << "match: ";
+                        cout << match[0] << " - " << match[1] << " - " << match[2] << " - " << match[3] << " - " << match[4] << " - " << match[5] << " - " << match[6] << " - " << match[7] << endl;
+                        returnString = open(match[1], match[2], match[3], match[4], match[5], match[6], match[7], Ffile) + '\n';
+                        //cout << "returnString " << returnString << "<-\n";
+                        break;
                     }
                     else {
                         cerr << "Unexpected number of matches." << endl;
-                        // return "ERROR";
-                        exit(1);
+                        returnString = "ROA ERR";
+                        break;
                     }
                 }
                 else {
                     cerr << "Failed to match pattern." << endl;
                     // return "ERROR";
-                    exit(1);
+                    // exit(1);
+                    returnString = "ROA ERR";
+                    break;
                 }
-
-                //TODO CHECK THIS
-                try {
-                    fileSize = stoll(fSize);
-                }
-                catch (const invalid_argument& e) {
-                    cerr << "Invalid argument: " << e.what() << endl;
-                }
-                catch (const out_of_range& e) {
-                    cerr << "Out of range: " << e.what() << endl;
-                }
-                string Ffile = finalBuffer.substr(matchedBytes, bytesRead);
-                // cout << "Ffile" << endl;
-                // cout << Ffile << endl;
-                cout << "fileSize" << endl;
-                cout << fileSize << endl;
-                while (bytesRead < fileSize) {
-
-                    n = read(new_tfd, buffer, min(sizeof(buffer) - 1, fileSize - bytesRead));
-
-                    Ffile.append(buffer, n);
-                    bytesRead += n;
-                    // cout << "bytesRead" << endl;
-                    // cout << bytesRead << endl;
-                    // cout << "Ffile do while" << endl;
-                    // cout << Ffile << endl;
-                }
-
-                if (n == -1) {
-
-                    cerr << "Error reading response." << endl;
-                    close(new_tfd);
-                    // return "ERROR";
-                    exit(1);
-
-                }
-
-                cout << "match: ";
-                cout << match[0] << " - " << match[1] << " - " << match[2] << " - " << match[3] << " - " << match[4] << " - " << match[5] << " - " << match[6] << " - " << match[7] << endl;
-                isOpen = true;
-                returnString = open(match[1], match[2], match[3], match[4], match[5], match[6], match[7], Ffile) + '\n';
-                //cout << "returnString " << returnString << "<-\n";
-                break;
             }
         }
 
