@@ -105,7 +105,7 @@ echo "193.136.128.108 58010 1" | nc tejo.tecnico.ulisboa.pt 59000 > report_01.ht
 echo "193.136.128.108 58010 2" | nc tejo.tecnico.ulisboa.pt 59000 > report_02.html
 echo "193.136.128.108 58010 3" | nc tejo.tecnico.ulisboa.pt 59000 > report_03.html
 
-echo "193.136.128.108 58010 4" | nc tejo.tecnico.ulisboa.pt 59000 > report_04.html
+echo "193.136.128.109 58011 4" | nc tejo.tecnico.ulisboa.pt 59000 > report_04.html
 
 echo "193.136.128.108 58011 5" | nc tejo.tecnico.ulisboa.pt 59000 > report_05.html
 echo "193.136.128.108 58011 6" | nc tejo.tecnico.ulisboa.pt 59000 > report_06.html
