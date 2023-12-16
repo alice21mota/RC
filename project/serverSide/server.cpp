@@ -78,6 +78,7 @@ string getUDPCommand(string command) {
         }
         else response = "RLI ERR";
     }
+
     else if (whichCommand == "LOU") {
         /*string user, password, status;
         iss >> user >> password;
@@ -127,6 +128,7 @@ string getUDPCommand(string command) {
         else response = "RUR ERR";
 
     }
+
     else if (whichCommand == "LMA") {
         /*string user, status;
         iss >> user;
@@ -144,25 +146,68 @@ string getUDPCommand(string command) {
                     
                     response = getMyAuctions(user);
                 }
-                else response = "RUR ERR";
+                else response = "RMA ERR";
             }
-            else response = "RUR ERR";
+            else response = "RMA ERR";
         }
-        else response = "RUR ERR";
+        else response = "RMA ERR";
     }
 
     else if (whichCommand == "LMB") {
-        string user, status;
+        /*string user, status;
         iss >> user;
-        response = getMyBids(user);
+        response = getMyBids(user);*/
+
+        if (endsWithNewLine(command)) {
+
+            evalCommand = command.substr(0, command.size() - 1);
+            cout << "eval Command ->" << evalCommand << "<-\n";
+            istringstream iss(evalCommand);
+            string user;
+
+            if (iss >> whichCommand >> user && iss.eof()) {
+                if (isUID(user)){
+                    
+                    response = getMyBids(user);
+                }
+                else response = "RMB ERR";
+            }
+            else response = "RMB ERR";
+        }
+        else response = "RMB ERR";
+
     }
+
     else if (whichCommand == "LST") {
-        response = listAuctions();
+        if (endsWithNewLine(command))
+            response = listAuctions();
+        else response = "RLS ERR";
     }
+
     else if (whichCommand == "SRC") {
-        string auctionId;
+        /*string auctionId;
         iss >> auctionId;
-        response = showRecord(auctionId);
+        response = showRecord(auctionId);*/
+
+
+        if (endsWithNewLine(command)) {
+
+            evalCommand = command.substr(0, command.size() - 1);
+            cout << "eval Command ->" << evalCommand << "<-\n";
+            istringstream iss(evalCommand);
+            string aid;
+
+            if (iss >> whichCommand >> aid && iss.eof()) {
+                if (isValidAID(aid)){
+                    
+                    response = showRecord(aid);
+                }
+                else response = "RRC ERR";
+            }
+            else response = "RRC ERR";
+        }
+        else response = "RRC ERR";
+
     }
     else response = "ERR";
     return response + "\n";
@@ -170,20 +215,14 @@ string getUDPCommand(string command) {
 
 string getTCPCommand(string command) {
     string response;
+    cout << "Command is ->" << command << "<-" << endl;
     istringstream iss(command);
     string whichCommand;
     iss >> whichCommand;
 
     // checkExpiredAuctions();
 
-    if (whichCommand == "OPA") {
-        string user, password, name, start_value, timeactive, Fname, Fsize, Fdata;
-        iss >> user >> password >> name >> start_value >> timeactive >> Fname >> Fsize;
-        cout << "command.size() = " << command.size() << "\nstoi(Fsize) = " << stoi(Fsize) << endl; // Debug
-        Fdata = command.substr(command.size() - stoi(Fsize) - 1, stoi(Fsize));
-        response = open(user, password, name, start_value, timeactive, Fname, Fsize, Fdata);
-    }
-    else if (whichCommand == "SAS") {
+    if (whichCommand == "SAS") {
         string auctionId;
         iss >> auctionId;
         response = showAsset(auctionId);
@@ -261,7 +300,7 @@ void dealWithTCP() {
             string command = finalBuffer.substr(0, 3);
             if (command == "OPA") {
                 //pattern of the beggining of the response, up until file Size 
-                regex pattern(R"(OPA (\d{6}) ([a-zA-Z0-9]{8}) ([a-zA-Z0-9_-]{1,10}) (\d{1,6}) (\d{1,5}) ([a-zA-Z0-9_.-]+) (\d+) )");
+                regex pattern(R"(OPA (\d{6}) ([a-zA-Z0-9]{8}) ([a-zA-Z0-9_.-]{1,10}) (\d{1,6}) (\d{1,5}) ([a-zA-Z0-9_.-]+) (\d+) )");
                 smatch match; //Used to match with the patern
 
                 if (regex_search(finalBuffer, match, pattern)) {
@@ -269,6 +308,12 @@ void dealWithTCP() {
                     cout << finalBuffer << endl;
                     cout << "match.size() = " << match.size() << endl;
                     if (match.size() == 8) {
+                        
+                        //TODO VALIDATIONS  ANA
+                        //if(!//validatiosn){
+                            //returnString = "ROA ERR";
+                        //}
+                    
                         fSize = match[7];
 
                         //+2 to make up for an extra two " "
@@ -279,6 +324,7 @@ void dealWithTCP() {
 
                         bytesRead = len;
                         bytesRead -= matchedBytes;
+
 
                     }
                     else {
@@ -331,6 +377,7 @@ void dealWithTCP() {
 
                 cout << "match: ";
                 cout << match[0] << " - " << match[1] << " - " << match[2] << " - " << match[3] << " - " << match[4] << " - " << match[5] << " - " << match[6] << " - " << match[7] << endl;
+                
                 isOpen = true;
                 returnString = open(match[1], match[2], match[3], match[4], match[5], match[6], match[7], Ffile) + '\n';
                 //cout << "returnString " << returnString << "<-\n";

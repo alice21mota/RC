@@ -369,10 +369,10 @@ string listStatus(string response) {
             if (iss.eof()) {
 
                 if (status == "NOK") {
-                    return "No auction has been started yet";
+                    return "No auction has been started yet\n";
 
                 }
-                return "Unknown response";
+                return "Unknown response\n";
             }
 
             else if (status == "OK") {
@@ -394,13 +394,13 @@ string listStatus(string response) {
                 }
 
             }
-            return "Unknown response";
+            return "Unknown response\n";
 
         }
-        return "Unknown response";
+        return "Unknown response\n";
 
     }
-    return "Unknown response";
+    return "Unknown response\n";
 
 }
 
