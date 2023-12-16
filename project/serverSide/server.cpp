@@ -285,7 +285,7 @@ int main(int argc, char *argv[])
     //     cout << files[i] << endl;
     // }
 
-    signal(SIGCHLD, SIG_IGN);
+    // signal(SIGCHLD, SIG_IGN);
 
     // UDP SERVER SECTION
     memset(&hints, 0, sizeof(hints));
@@ -418,7 +418,7 @@ int main(int argc, char *argv[])
             //     cout << "TCP socket closed" << endl; // Debug
             //     FD_CLR(new_tfd, &inputs); // Set TCP read channel off
             // }
-            // wait(NULL);
+            wait(NULL);
         }
     }
 exit_loop:; // FIXME: should i force to close all the sockets here?
