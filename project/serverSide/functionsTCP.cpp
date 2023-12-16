@@ -2,7 +2,7 @@
 
 string open(string userId, string password, string name, string start_value, string timeactive, string Fname, string Fsize, string Fdata) {
     cout << "entrei no OPEN" << endl; // Debug
-    int auctionId;
+    string aid;
     string command = "ROA ";
 
     if (!isLoggedIn(userId)) return command + "NLG";    // FIXME what should return first
@@ -12,25 +12,20 @@ string open(string userId, string password, string name, string start_value, str
         if (!createAuctionsFolder()) return command + "NOK"; // FIXME: should i check this (?)
     cout << "já há o auctions folder";
 
-    // for (int i = 0;i < 3;i++) {
-    auctionId = createAuction(userId, name, start_value, timeactive, Fname, Fsize, Fdata);
-    if (auctionId > 0) return command + "OK " + to_string(auctionId);
-    // cout << "-------------------------------------\n--------------------------------------------\n";
-// }
+    if ((aid = createAuctionFolder()) == "-1") return command + "NOK";
+    cout << "aid  = " << aid << endl; // Debug
 
-    return command + "NOK";
+    if (!createAuction(aid, userId, name, start_value, timeactive, Fname, Fsize, Fdata)) return command + "NOK";
+    return command + "OK " + aid;
 
 }
 
-int createAuction(string userId, string name, string start_value, string timeactive, string Fname, string Fsize, string Fdata) {
-    string auctionId;
-    if ((auctionId = createAuctionFolder()) == "-1") return -1;
-    cout << "auctionId  = " << auctionId << endl; // Debug
-    if (!createAuctionAssetFolder(auctionId)) return -1;
-    if (!writeAsset(auctionId, Fname, Fsize, Fdata)) return -1;
-    if (!createAuctionStartFile(auctionId, userId, name, start_value, timeactive, Fname)) return -1;
-    if (!createUserHostedFile(userId, auctionId)) return -1;
-    return stoi(auctionId);
+bool createAuction(string auctionId, string userId, string name, string start_value, string timeactive, string Fname, string Fsize, string Fdata) {
+    if (!createAuctionAssetFolder(auctionId)) return false;
+    if (!writeAsset(auctionId, Fname, Fsize, Fdata)) return false;
+    if (!createAuctionStartFile(auctionId, userId, name, start_value, timeactive, Fname)) return false;
+    if (!createUserHostedFile(userId, auctionId)) return false;
+    return true;
 }
 
 string showAsset(string auctionId) {
