@@ -17,7 +17,6 @@
 string myPort = "58000";
 bool verbose = false;
 
-
 string clientPort;
 string clientIP;
 
@@ -39,14 +38,28 @@ socklen_t addrlen;
 int ufd, tfd, new_tfd = -1;
 char host[NI_MAXHOST], service[NI_MAXSERV];
 
-void generalVerbose(string command, string ip, string port, string userId) {
+void generalVerbose(string command, string ip, string port, string userId, string auctionId) {
     string print = "";
-    print = "Received " + command + " command ";
-
-    if (!userId.empty()) {
-        print += "(with UID = " + userId + ")";
+    print = "Received command to " + command;
+    if (!auctionId.empty()) {
+        print += " auctionId = " + auctionId;
     }
-    print += "from " + ip + ":" + port;
+    if (!userId.empty()) {
+        print += " (with UID = " + userId + ")";
+    }
+    print += " from " + ip + ":" + port;
+    cout << print << endl;
+}
+
+void verboseUnknowCommand(string ip, string port) {
+    string print = "";
+    print = "Received unknown command from " + ip + ":" + port;
+    cout << print << endl;
+}
+
+void verboseResponse(string response, string ip, string port) {
+    string print = "Server will return \'";
+    print += response + "\' to " + ip + ":" + port;
     cout << print << endl;
 }
 
@@ -67,25 +80,20 @@ string getUDPCommand(string command, string ip, string port) {
     string whichCommand;
     iss >> whichCommand;
 
-    cout << "command->" << command << "<-" << endl;
+    // cout << "command->" << command << "<-" << endl; // Debug
 
     // checkExpiredAuctions();
 
     if (whichCommand == "LIN") {
-        /*string user, password, status;
-        iss >> user >> password;
-        response = login(user, password);*/
-
         if (endsWithNewLine(command)) {
 
             evalCommand = command.substr(0, command.size() - 1);
-            cout << "eval Command ->" << evalCommand << "<-\n";
             istringstream iss(evalCommand);
             string user, password, status;
 
             if (iss >> whichCommand >> user >> password && iss.eof()) {
                 if (isUID(user) && isPassword(password)) {
-                    if (verbose) generalVerbose("login", ip, port, user);
+                    if (verbose) generalVerbose("login", ip, port, user, "");
                     response = login(user, password);
                 }
                 else response = "RLI ERR";
@@ -96,21 +104,15 @@ string getUDPCommand(string command, string ip, string port) {
     }
 
     else if (whichCommand == "LOU") {
-        /*string user, password, status;
-        iss >> user >> password;
-        response = logout(user, password);*/
-
-
         if (endsWithNewLine(command)) {
 
             evalCommand = command.substr(0, command.size() - 1);
-            cout << "eval Command ->" << evalCommand << "<-\n";
             istringstream iss(evalCommand);
             string user, password, status;
 
             if (iss >> whichCommand >> user >> password && iss.eof()) {
                 if (isUID(user) && isPassword(password)) {
-                    if (verbose) generalVerbose("logout", ip, port, user);
+                    if (verbose) generalVerbose("logout", ip, port, user, "");
                     response = logout(user, password);
                 }
                 else response = "RLO ERR";
@@ -121,20 +123,15 @@ string getUDPCommand(string command, string ip, string port) {
     }
 
     else if (whichCommand == "UNR") {
-        /*string user, password, status;
-        iss >> user >> password;
-        response = unregister(user, password);*/
-
         if (endsWithNewLine(command)) {
 
             evalCommand = command.substr(0, command.size() - 1);
-            cout << "eval Command ->" << evalCommand << "<-\n";
             istringstream iss(evalCommand);
             string user, password, status;
 
             if (iss >> whichCommand >> user >> password && iss.eof()) {
                 if (isUID(user) && isPassword(password)) {
-                    if (verbose) generalVerbose("unregister", ip, port, user);
+                    if (verbose) generalVerbose("unregister", ip, port, user, "");
                     response = unregister(user, password);
                 }
                 else response = "RUR ERR";
@@ -146,20 +143,15 @@ string getUDPCommand(string command, string ip, string port) {
     }
 
     else if (whichCommand == "LMA") {
-        /*string user, status;
-        iss >> user;
-        response = getMyAuctions(user);*/
-
         if (endsWithNewLine(command)) {
 
             evalCommand = command.substr(0, command.size() - 1);
-            cout << "eval Command ->" << evalCommand << "<-\n";
             istringstream iss(evalCommand);
             string user, password, status;
 
             if (iss >> whichCommand >> user && iss.eof()) {
-                if (isUID(user)){
-                     if (verbose) generalVerbose("my_auctions", ip, port, user);
+                if (isUID(user)) {
+                    if (verbose) generalVerbose("my_auctions", ip, port, user, "");
                     response = getMyAuctions(user);
                 }
                 else response = "RMA ERR";
@@ -170,20 +162,15 @@ string getUDPCommand(string command, string ip, string port) {
     }
 
     else if (whichCommand == "LMB") {
-        /*string user, status;
-        iss >> user;
-        response = getMyBids(user);*/
-
         if (endsWithNewLine(command)) {
 
             evalCommand = command.substr(0, command.size() - 1);
-            cout << "eval Command ->" << evalCommand << "<-\n";
             istringstream iss(evalCommand);
             string user;
 
             if (iss >> whichCommand >> user && iss.eof()) {
-                if (isUID(user)){
-                    
+                if (isUID(user)) {
+                    if (verbose) generalVerbose("my_bids", ip, port, user, "");
                     response = getMyBids(user);
                 }
                 else response = "RMB ERR";
@@ -196,26 +183,23 @@ string getUDPCommand(string command, string ip, string port) {
 
     else if (whichCommand == "LST") {
         if (endsWithNewLine(command))
+        {
+            if (verbose) generalVerbose("list auctions", ip, port, "", "");
             response = listAuctions();
+        }
         else response = "RLS ERR";
     }
 
     else if (whichCommand == "SRC") {
-        /*string auctionId;
-        iss >> auctionId;
-        response = showRecord(auctionId);*/
-
-
         if (endsWithNewLine(command)) {
 
             evalCommand = command.substr(0, command.size() - 1);
-            cout << "eval Command ->" << evalCommand << "<-\n";
             istringstream iss(evalCommand);
             string aid;
 
             if (iss >> whichCommand >> aid && iss.eof()) {
-                if (isValidAID(aid)){
-                    
+                if (isValidAID(aid)) {
+                    if (verbose) generalVerbose("show record", ip, port, "", aid);
                     response = showRecord(aid);
                 }
                 else response = "RRC ERR";
@@ -225,13 +209,18 @@ string getUDPCommand(string command, string ip, string port) {
         else response = "RRC ERR";
 
     }
-    else response = "ERR";
+    else {
+        response = "ERR";
+        verboseUnknowCommand(ip, port);
+    }
+
+    int len = min((int)response.length(), 7);
+    if (verbose) verboseResponse(response.substr(0, len), ip, port);
     return response + "\n";
 }
 
 string getTCPCommand(string command) {
     string response, evalCommand;
-    cout << "Command is ->" << command << "<-" << endl;
     istringstream iss(command);
     string whichCommand;
     iss >> whichCommand;
@@ -239,21 +228,16 @@ string getTCPCommand(string command) {
     // checkExpiredAuctions();
 
     if (whichCommand == "SAS") {
-        /*string auctionId;
-        iss >> auctionId;
-        response = showAsset(auctionId);*/
-
         if (endsWithNewLine(command)) {
 
             evalCommand = command.substr(0, command.size() - 1);
-            cout << "eval Command ->" << evalCommand << "<-\n";
             istringstream iss(evalCommand);
             string aid;
 
             if (iss >> whichCommand >> aid && iss.eof()) {
-                if (isValidAID(aid)){
+                if (isValidAID(aid)) {
                     if (verbose)
-            generalVerbose("show_asset", clientIP, clientPort, "");
+                        generalVerbose("show asset", clientIP, clientPort, "", aid);
                     response = showAsset(aid);
                 }
                 else response = "RSA ERR";
@@ -264,20 +248,16 @@ string getTCPCommand(string command) {
     }
 
     else if (whichCommand == "CLS") {
-        /*string userId, password, auctionId;
-        iss >> userId >> password >> auctionId;
-        response = closeAuction(userId, password, auctionId);*/
-
         if (endsWithNewLine(command)) {
 
             evalCommand = command.substr(0, command.size() - 1);
-            cout << "eval Command ->" << evalCommand << "<-\n";
             istringstream iss(evalCommand);
             string uid, password, aid;
 
             if (iss >> whichCommand >> uid >> password >> aid && iss.eof()) {
-                if (isUID(uid) && isPassword(password) && isValidAID(aid)){
-                    
+                if (isUID(uid) && isPassword(password) && isValidAID(aid)) {
+                    if (verbose)
+                        generalVerbose("close auction", clientIP, clientPort, uid, aid);
                     response = closeAuction(uid, password, aid);
                 }
                 else response = "RCL ERR";
@@ -294,13 +274,13 @@ string getTCPCommand(string command) {
         if (endsWithNewLine(command)) {
 
             evalCommand = command.substr(0, command.size() - 1);
-            cout << "eval Command ->" << evalCommand << "<-\n";
             istringstream iss(evalCommand);
             string uid, password, aid, value;
 
             if (iss >> whichCommand >> uid >> password >> aid >> value && iss.eof()) {
-                if (isUID(uid) && isPassword(password) && isValidAID(aid) && isBidValue(value)){
-                    
+                if (isUID(uid) && isPassword(password) && isValidAID(aid) && isBidValue(value)) {
+                    if (verbose)
+                        generalVerbose("bid", clientIP, clientPort, uid, aid);
                     response = addBid(uid, password, aid, stoi(value));
                 }
                 else response = "RBD ERR";
@@ -310,7 +290,14 @@ string getTCPCommand(string command) {
         else response = "RBD ERR";
 
     }
-    else response = "ERR";
+    else {
+        response = "ERR";
+        verboseUnknowCommand(clientIP, clientPort);
+    }
+
+    int len = min((int)response.length(), 7);
+    if (verbose) verboseResponse(response.substr(0, len), clientIP, clientPort);
+
     return response + "\n";
 }
 
@@ -319,18 +306,18 @@ void dealWithUDP() {
     ret = recvfrom(ufd, prt_str, 80, 0, (struct sockaddr *)&udp_useraddr, &addrlen);
     if (ret > 0)
     {
-        if (strlen(prt_str) > 0)
-            //prt_str[ret - 1] = 0;
-            cout << "---UDP socket: " << prt_str << endl;
+        // if (strlen(prt_str) > 0)
+        //     //prt_str[ret - 1] = 0;
+        //     cout << "---UDP socket: " << prt_str << endl; // Debug
 
         errcode = getnameinfo((struct sockaddr *)&udp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
-        if (errcode == 0 && verbose)
-            cout << "       Sent by [" << host << ":" << service << "]" << endl;
+        // if (errcode == 0 && verbose)
+        //     cout << "       Sent by [" << host << ":" << service << "]" << endl;
 
         string returnString = getUDPCommand(prt_str, host, service);
 
 
-        cout << "vou devolver: " << returnString << endl;
+        // cout << "vou devolver: " << returnString << endl; // Debug
         n = sendto(ufd, returnString.c_str(), returnString.length(), 0, (struct sockaddr *)&udp_useraddr, addrlen); // Send message to client
         if (n == -1) /*error*/
             exit(1);
@@ -343,16 +330,16 @@ int acceptTCP() {
     {
         exit(1);
     }
-    cout << "Accepted TCP socket" << endl; // Debug
+    // cout << "Accepted TCP socket" << endl; // Debug
 
     errcode = getnameinfo((struct sockaddr *)&tcp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
-    if (errcode == 0 && verbose)
-        cout << "       Sent by [" << host << ":" << service << "]" << endl;
+    // if (errcode == 0 && verbose)
+    //     cout << "       Sent by [" << host << ":" << service << "]" << endl;
 
     clientIP = host;
     clientPort = service;
 
-    cout << "Entrei no read TCP" << endl; // Debug
+    // cout << "Entrei no read TCP" << endl; // Debug
     return new_tfd;
 }
 
@@ -371,8 +358,8 @@ void dealWithTCP() {
         finalBuffer.append(buffer, nRead);
 
         len = finalBuffer.length();
-        cout << "len" << endl;
-        cout << len << endl;
+        // cout << "len" << endl;  // Debug
+        // cout << len << endl; // Debug
         if (len >= 3) {
             string command = finalBuffer.substr(0, 3);
             if (command == "OPA") {
@@ -383,9 +370,9 @@ void dealWithTCP() {
                 smatch match; //Used to match with the patern
 
                 if (regex_search(finalBuffer, match, pattern)) {
-                    cout << "finalBuffer" << endl;
-                    cout << finalBuffer << endl;
-                    cout << "match.size() = " << match.size() << endl;
+                    // cout << "finalBuffer" << endl; // Debug
+                    // cout << finalBuffer << endl; // Debug
+                    // cout << "match.size() = " << match.size() << endl; // Debug
                     if (match.size() == 8) {
 
                         if (
@@ -400,6 +387,9 @@ void dealWithTCP() {
                             returnString = "ROA ERR";
                             break;
                         }
+
+                        if (verbose) generalVerbose("open asset", clientIP, clientPort, match[1], "");
+
                         fSize = match[7];
 
                         //+2 to make up for an extra two " "
@@ -427,20 +417,20 @@ void dealWithTCP() {
                             break;
                         }
                         string Ffile = finalBuffer.substr(matchedBytes, bytesRead);
-                        // cout << "Ffile" << endl;
-                        // cout << Ffile << endl;
-                        cout << "fileSize" << endl;
-                        cout << fileSize << endl;
+                        // cout << "Ffile" << endl; // Debug
+                        // cout << Ffile << endl; // Debug
+                        // cout << "fileSize" << endl; // Debug
+                        // cout << fileSize << endl; // Debug
                         while (bytesRead < fileSize) {
 
                             n = read(new_tfd, buffer, min(sizeof(buffer) - 1, fileSize - bytesRead));
 
                             Ffile.append(buffer, n);
                             bytesRead += n;
-                            // cout << "bytesRead" << endl;
-                            // cout << bytesRead << endl;
-                            // cout << "Ffile do while" << endl;
-                            // cout << Ffile << endl;
+                            // cout << "bytesRead" << endl; // Debug
+                            // cout << bytesRead << endl; // Debug
+                            // cout << "Ffile do while" << endl; // Debug
+                            // cout << Ffile << endl; // Debug
                         }
 
                         if (n == -1) {
@@ -452,8 +442,8 @@ void dealWithTCP() {
 
                         }
 
-                        cout << "match: ";
-                        cout << match[0] << " - " << match[1] << " - " << match[2] << " - " << match[3] << " - " << match[4] << " - " << match[5] << " - " << match[6] << " - " << match[7] << endl;
+                        // cout << "match: "; // Debug
+                        // cout << match[0] << " - " << match[1] << " - " << match[2] << " - " << match[3] << " - " << match[4] << " - " << match[5] << " - " << match[6] << " - " << match[7] << endl; // Debug
                         returnString = open(match[1], match[2], match[3], match[4], match[5], match[6], match[7], Ffile) + '\n';
                         //cout << "returnString " << returnString << "<-\n";
                         break;
@@ -474,13 +464,17 @@ void dealWithTCP() {
             }
         }
 
-        if (nRead < 127 && buffer[nRead - 1] == '\n') break; // FIXME acho que não pode ser assim mas por enquanto está a funcionar :))
+        if (nRead < 127 && buffer[nRead - 1] == '\n') break; // FIXME not sure is this is working
     }
     // cout << "---TCP socket: " << finalBuffer << endl; // Debug
 
     if (!isOpen) returnString = getTCPCommand(finalBuffer);
+    else {
+        int len = min((int)returnString.length(), 10);
+        if (verbose) verboseResponse(returnString.substr(0, len), clientIP, clientPort);
+    }
 
-    cout << "vou devolver por TCP: ->" << returnString << "<-\n";
+    // cout << "vou devolver por TCP: ->" << returnString << "<-\n";  // Debug
 
     nWritten = write(new_tfd, returnString.c_str(), returnString.length()); // Send message to client
     if (nWritten == -1) // Will always get an error when using 'nc'
@@ -488,7 +482,7 @@ void dealWithTCP() {
         exit(1);
     }
     close(new_tfd); // Close socket
-    cout << "TCP socket closed" << endl; // Debug
+    // cout << "TCP socket closed" << endl; // Debug
 }
 
 
@@ -579,22 +573,18 @@ int main(int argc, char *argv[])
         switch (out_fds)
         {
         case 0:
-            cout << "\n ---------------Timeout event-----------------\n";
+            // cout << "\n ---------------Timeout event-----------------\n"; // Debug
             break;
         case -1:
             perror("select");
             exit(1);
         default:
-            // for (int i = 0;i < 3;i++) {
-            //     if (checkExpiredAuctions() >= 0) break;;
-            //     cout << "trying to check expired auction AGAIN";
-            // }
             checkExpiredAuctions();
 
             if (FD_ISSET(0, &testfds)) // Vê se a posição 0 foi ativada. Se foi, foi por causa do teclado.
             {
                 fgets(in_str, 50, stdin);
-                cout << "---Input at keyboard: " << in_str << endl;
+                // cout << "---Input at keyboard: " << in_str << endl;  // Debug
                 // FIXME -> check if its easy extra points :)
                 // in_str[strcspn(in_str, "\n")] = '\0';
                 if (!strcmp(in_str, "exit\n"))
@@ -610,7 +600,7 @@ int main(int argc, char *argv[])
                     exit(0);
                 }
                 else if (pid == -1) {
-                    cout << "error pid UDP";
+                    // cout << "error pid UDP"; // Debug
                     exit(1);
                 }
             }
@@ -624,7 +614,7 @@ int main(int argc, char *argv[])
                     exit(0);
                 }
                 else if (pid == -1) {
-                    cout << "error pid TCP";
+                    // cout << "error pid TCP"; // Debug
                     exit(1);
                 }
             }
@@ -638,5 +628,5 @@ int main(int argc, char *argv[])
             wait(NULL);
         }
     }
-exit_loop:; // FIXME: should i force to close all the sockets here?
+exit_loop:;
 }

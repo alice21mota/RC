@@ -3,16 +3,16 @@
 bool createFolder(filesystem::path directoryPath) {
     if (!filesystem::exists(directoryPath)) {
         if (filesystem::create_directories(directoryPath)) {
-            cout << "Directory " << directoryPath << " created successfully." << endl; // Debug
+            // cout << "Directory " << directoryPath << " created successfully." << endl; // Debug
             return true;
         }
         else {
-            cerr << "Error creating directory." << endl; // Debug
+            // cerr << "Error creating directory." << endl; // Debug
             return false;
         }
     }
     else {
-        cout << "The directory " << directoryPath << " already exists." << endl; // Debug
+        // cout << "The directory " << directoryPath << " already exists." << endl; // Debug
         return false;
     }
     return true;
@@ -26,11 +26,11 @@ bool createFile(string path, string content) {
             file << content;
         }
         file.close();
-        cout << "file created in " << path << endl; // Debug
+        // cout << "file created in " << path << endl; // Debug
         return true;
     }
     else {
-        cerr << "Erro ao criar o ficheiro: " << path << endl; // Debug
+        // cerr << "Erro ao criar o ficheiro: " << path << endl; // Debug
         return false;
     }
 }
@@ -39,7 +39,7 @@ string readFromFile(filesystem::path filePath) {
     // cout << filePath << endl; // Debug
     if (!filesystem::exists(filePath)) {
         cerr << "File don't exists" << endl;
-        return "-1"; // FIXME: throw std::runtime_error("Error opening file: " + filePath);
+        return "-1";
     }
     string content, line;
     ifstream file(filePath);
@@ -51,14 +51,12 @@ string readFromFile(filesystem::path filePath) {
         return content;
     }
     else {
-        cerr << "Error reading the file: " << filePath << endl; // Debug
-        // return -1; // FIXME: throw std::runtime_error("Error opening file: " + filePath);
+        // cerr << "Error reading the file: " << filePath << endl; // Debug
         return "-1";
     }
 }
 
 vector<string> getSortedFilesFromDirectory(filesystem::path directoryPath) {
-// vector<filesystem::directory_entry> getSortedFilesFromDirectory(filesystem::path directoryPath) {
     if (filesystem::is_directory(directoryPath)) {
         vector<filesystem::directory_entry> files;
         vector<string> filenames;
@@ -75,11 +73,10 @@ vector<string> getSortedFilesFromDirectory(filesystem::path directoryPath) {
             filenames.push_back(entry.path().filename());
         }
 
-        // return files;
         return filenames;
     }
-    else { // FIXME deal with the errors
-        cerr << "O caminho especificado não é um diretório válido." << std::endl;
+    else {
+        // cerr << "O caminho especificado não é um diretório válido." << std::endl;
         // exit(-1);
         return vector<string>();
     }
@@ -99,11 +96,11 @@ bool writeFile(filesystem::path filePath, string fileSize, string fileData) {
         // Close the file stream
         outputFile.close();
 
-        std::cout << "File \"" << filePath << "\" successfully written to disk." << std::endl;
+        // cout << "File \"" << filePath << "\" successfully written to disk." << endl; // Debug
         return true;
     }
     else {
-        std::cerr << "Error opening file: " << filePath << std::endl;
+        // cerr << "Error opening file: " << filePath << endl; // Debug
         return false;
     }
 }

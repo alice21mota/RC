@@ -101,33 +101,32 @@ echo "dddddddd" > USERS/444444/444444_pass.txt
 ```
 
 ```
-echo "193.136.128.108 58010 1" | nc tejo.tecnico.ulisboa.pt 59000 > report_01.html
-echo "193.136.128.108 58010 2" | nc tejo.tecnico.ulisboa.pt 59000 > report_02.html
-echo "193.136.128.108 58010 3" | nc tejo.tecnico.ulisboa.pt 59000 > report_03.html
+echo "193.136.128.104 58010 1" | nc tejo.tecnico.ulisboa.pt 59000 > report_01.html
+echo "193.136.128.104 58010 2" | nc tejo.tecnico.ulisboa.pt 59000 > report_02.html
+echo "193.136.128.104 58010 3" | nc tejo.tecnico.ulisboa.pt 59000 > report_03.html
 
-echo "193.136.128.109 58011 4" | nc tejo.tecnico.ulisboa.pt 59000 > report_04.html
+echo "193.136.128.104 58010 4" | nc tejo.tecnico.ulisboa.pt 59000 > report_04.html
 
-echo "193.136.128.108 58011 5" | nc tejo.tecnico.ulisboa.pt 59000 > report_05.html
-echo "193.136.128.108 58011 6" | nc tejo.tecnico.ulisboa.pt 59000 > report_06.html
-echo "193.136.128.108 58011 7" | nc tejo.tecnico.ulisboa.pt 59000 > report_07.html
-echo "193.136.128.108 58011 8" | nc tejo.tecnico.ulisboa.pt 59000 > report_08.html
-echo "193.136.128.108 58011 9" | nc tejo.tecnico.ulisboa.pt 59000 > report_09.html
+echo "193.136.128.104 58010 5" | nc tejo.tecnico.ulisboa.pt 59000 > report_05.html
+echo "193.136.128.104 58010 6" | nc tejo.tecnico.ulisboa.pt 59000 > report_06.html
+echo "193.136.128.104 58010 7" | nc tejo.tecnico.ulisboa.pt 59000 > report_07.html
+echo "193.136.128.104 58010 8" | nc tejo.tecnico.ulisboa.pt 59000 > report_08.html
+echo "193.136.128.104 58010 9" | nc tejo.tecnico.ulisboa.pt 59000 > report_09.html
 
-echo "193.136.128.108 58010 10" | nc tejo.tecnico.ulisboa.pt 59000 > report_10.html
-echo "193.136.128.108 58012 11" | nc tejo.tecnico.ulisboa.pt 59000 > report_11.html
-echo "193.136.128.108 58011 12" | nc tejo.tecnico.ulisboa.pt 59000 > report_12.html
-echo "193.136.128.108 58011 13" | nc tejo.tecnico.ulisboa.pt 59000 > report_13.html
-echo "193.136.128.108 58011 14" | nc tejo.tecnico.ulisboa.pt 59000 > report_14.html
-echo "193.136.128.108 58011 15" | nc tejo.tecnico.ulisboa.pt 59000 > report_15.html
+echo "193.136.128.104 58011 10" | nc tejo.tecnico.ulisboa.pt 59000 > report_10.html
+echo "193.136.128.104 58010 11" | nc tejo.tecnico.ulisboa.pt 59000 > report_11.html
+echo "193.136.128.104 58012 12" | nc tejo.tecnico.ulisboa.pt 59000 > report_12.html
+echo "193.136.128.104 58012 13" | nc tejo.tecnico.ulisboa.pt 59000 > report_13.html
+echo "193.136.128.104 58012 14" | nc tejo.tecnico.ulisboa.pt 59000 > report_14.html
+echo "193.136.128.104 58010 15" | nc tejo.tecnico.ulisboa.pt 59000 > report_15.html
 
-echo "193.136.128.103 58010 21" | nc tejo.tecnico.ulisboa.pt 59000 > report_21.html
-echo "193.136.128.103 58010 22" | nc tejo.tecnico.ulisboa.pt 59000 > report_22.html
-echo "193.136.128.103 58010 23" | nc tejo.tecnico.ulisboa.pt 59000 > report_23.html
-echo "193.136.128.103 58010 24" | nc tejo.tecnico.ulisboa.pt 59000 > report_24.html
-
-echo "193.136.128.103 58001 25" | nc tejo.tecnico.ulisboa.pt 59000 > report_25.html
-echo "193.136.128.103 58001 26" | nc tejo.tecnico.ulisboa.pt 59000 > report_26.html
-echo "193.136.128.103 58001 27" | nc tejo.tecnico.ulisboa.pt 59000 > report_27.html
-echo "193.136.128.103 58001 28" | nc tejo.tecnico.ulisboa.pt 59000 > report_28.html
-echo "193.136.128.103 58001 29" | nc tejo.tecnico.ulisboa.pt 59000 > report_29.html
+echo "193.136.128.104 58010 21" | nc tejo.tecnico.ulisboa.pt 59000 > report_21.html
+echo "193.136.128.104 58010 22" | nc tejo.tecnico.ulisboa.pt 59000 > report_22.html
+echo "193.136.128.104 58010 23" | nc tejo.tecnico.ulisboa.pt 59000 > report_23.html
+echo "193.136.128.104 58010 24" | nc tejo.tecnico.ulisboa.pt 59000 > report_24.html
+echo "193.136.128.104 58011 25" | nc tejo.tecnico.ulisboa.pt 59000 > report_25.html
+echo "193.136.128.104 58011 26" | nc tejo.tecnico.ulisboa.pt 59000 > report_26.html
+echo "193.136.128.104 58011 27" | nc tejo.tecnico.ulisboa.pt 59000 > report_27.html
+echo "193.136.128.104 58011 28" | nc tejo.tecnico.ulisboa.pt 59000 > report_28.html
+echo "193.136.128.104 58011 29" | nc tejo.tecnico.ulisboa.pt 59000 > report_29.html
 ```

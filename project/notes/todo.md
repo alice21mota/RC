@@ -47,3 +47,6 @@
 - Aceitamos mais do que um espaço entre as cenas
   - Mas verificamos a existencia de um unico \n no fim
 - Admitimos `.`, `-`, `_`
+- Returns do server estão pela ordem do enunciado
+- Mesmo que não esteja no enunciado, verificamos a password se a recebermos
+- Do lado do server quando se faz exit assumimos que o próprio user fecha os sockets
