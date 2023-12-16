@@ -31,8 +31,6 @@ string readCommands() {
         return command;
     }
 
-    //cout << "Received command: " << command << endl;
-
     return command;
 }
 
