@@ -65,7 +65,7 @@ string unregister(string userId, string password) {
 
 string getMyAuctions(string userId) {
     string status;
-    if (!hasOngoingAuctions(userId)) status = "NOK"; // FIXME check what sould return if is an *unlogged* user *without* bids
+    if (!hasOngoingAuctions(userId)) status = "NOK";
     else if (!isLoggedIn(userId)) status = "NLG";
     else {
         status = "OK";
@@ -86,7 +86,7 @@ string getMyAuctions(string userId) {
 
 string getMyBids(string userId) {
     string status;
-    if (!hasOngoingBids(userId)) status = "NOK";    // FIXME check what sould return if is an *unlogged* user *without* bids
+    if (!hasOngoingBids(userId)) status = "NOK";
     else if (!isLoggedIn(userId)) status = "NLG";
     else {
         status = "OK";
@@ -106,7 +106,7 @@ string getMyBids(string userId) {
 
 string listAuctions() {
     string status;
-    if (!existAuctions()) status = "NOK";    // FIXME check what sould return if is an *unlogged* user *without* bids
+    if (!existAuctions()) status = "NOK";
     else {
         status = "OK";
         filesystem::path directoryPath("AUCTIONS/");

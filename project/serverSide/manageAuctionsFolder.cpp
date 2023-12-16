@@ -105,7 +105,7 @@ bool createAuctionBidFile(string auctionId, int bid_value, string userId) {
 }
 
 int getAuctionStartFullTime(string auctionId) {
-    cout << "getAuctionStartFullTime " << auctionId << endl; // Debug
+    // cout << "getAuctionStartFullTime " << auctionId << endl; // Debug
     filesystem::path startFilePath("AUCTIONS/" + auctionId + "/START_" + auctionId + ".txt");
     string infos = readFromFile(startFilePath);
     if (infos == "-1") return -1;
@@ -115,7 +115,7 @@ int getAuctionStartFullTime(string auctionId) {
 }
 
 int getAuctionTimeactive(string auctionId) {
-    cout << "getAuctionTimeactive " << auctionId << endl; // Debug
+    // cout << "getAuctionTimeactive " << auctionId << endl; // Debug
     filesystem::path startFilePath("AUCTIONS/" + auctionId + "/START_" + auctionId + ".txt");
     string infos = readFromFile(startFilePath);
     if (infos == "-1") return -1;
@@ -131,7 +131,7 @@ int getAuctionTimeactive(string auctionId) {
 }
 
 string getAuctionOwner(string auctionId) {
-    cout << "getAuctionOwner " << auctionId << endl; // Debug
+    // cout << "getAuctionOwner " << auctionId << endl; // Debug
     filesystem::path startFilePath("AUCTIONS/" + auctionId + "/START_" + auctionId + ".txt");
     string infos = readFromFile(startFilePath);
     if (infos == "-1") return "-1";
@@ -155,7 +155,7 @@ int checkExpiredAuctions() {
 
             long int now = getSeconds();
 
-            if (now > startFulltime + timeactive) {    // FIXME: deal with all of -1
+            if (now > startFulltime + timeactive) {
                 if (!createAuctionEndFile(auctionId)) return -1;
                 sumExpired++;
             }
