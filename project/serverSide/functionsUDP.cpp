@@ -154,7 +154,7 @@ string getBidsString(string auctionId) {
     string bid;
     filesystem::path directotyPath = "AUCTIONS/" + auctionId + "/BIDS/";
     vector<string> bids = getSortedFilesFromDirectory(directotyPath);
-    int nBids = bids.size();
+    int nBids = min((int)bids.size(), 50);
     for (int i = 0;i < nBids; i++) {
         filesystem::path bidFilePath = directotyPath / bids[i];
         bid = "";
