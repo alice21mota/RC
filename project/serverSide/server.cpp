@@ -17,6 +17,9 @@
 string myPort = "58000";
 bool verbose = false;
 
+string clientPort;
+string clientIP;
+
 bool logged_in;     //Not being used, only to ble able to make
 bool shouldExit;        //Not being used, only to ble able to make
 bool signalReceived;        //Not being used, only to ble able to make
@@ -35,6 +38,17 @@ socklen_t addrlen;
 int ufd, tfd, new_tfd = -1;
 char host[NI_MAXHOST], service[NI_MAXSERV];
 
+void generalVerbose(string command, string ip, string port, string userId) {
+    string print = "";
+    print = "Received " + command + " command ";
+
+    if (!userId.empty()) {
+        print += "(with UID = " + userId + ")";
+    }
+    print += "from " + ip + ":" + port;
+    cout << print << endl;
+}
+
 void getArgs(int argc, char *argv[])
 {
     for (int i = 1; i < argc; i += 2)
@@ -46,7 +60,7 @@ void getArgs(int argc, char *argv[])
     }
 }
 
-string getUDPCommand(string command) {
+string getUDPCommand(string command, string ip, string port) {
     string response, evalCommand;
     istringstream iss(command);
     string whichCommand;
@@ -69,7 +83,8 @@ string getUDPCommand(string command) {
             string user, password, status;
 
             if (iss >> whichCommand >> user >> password && iss.eof()) {
-                if (isUID(user) && isPassword(password)){
+                if (isUID(user) && isPassword(password)) {
+                    if (verbose) generalVerbose("login", ip, port, user);
                     response = login(user, password);
                 }
                 else response = "RLI ERR";
@@ -92,8 +107,8 @@ string getUDPCommand(string command) {
             string user, password, status;
 
             if (iss >> whichCommand >> user >> password && iss.eof()) {
-                if (isUID(user) && isPassword(password)){
-                    
+                if (isUID(user) && isPassword(password)) {
+                    if (verbose) generalVerbose("logout", ip, port, user);
                     response = logout(user, password);
                 }
                 else response = "RLO ERR";
@@ -116,8 +131,8 @@ string getUDPCommand(string command) {
             string user, password, status;
 
             if (iss >> whichCommand >> user >> password && iss.eof()) {
-                if (isUID(user) && isPassword(password)){
-                    
+                if (isUID(user) && isPassword(password)) {
+                    if (verbose) generalVerbose("unregister", ip, port, user);
                     response = unregister(user, password);
                 }
                 else response = "RUR ERR";
@@ -140,8 +155,8 @@ string getUDPCommand(string command) {
             string user, password, status;
 
             if (iss >> whichCommand >> user && iss.eof()) {
-                if (isUID(user)){
-                    
+                if (isUID(user)) {
+                    if (verbose) generalVerbose("my_auctions", ip, port, user);
                     response = getMyAuctions(user);
                 }
                 else response = "RUR ERR";
@@ -176,16 +191,11 @@ string getTCPCommand(string command) {
 
     // checkExpiredAuctions();
 
-    if (whichCommand == "OPA") {
-        string user, password, name, start_value, timeactive, Fname, Fsize, Fdata;
-        iss >> user >> password >> name >> start_value >> timeactive >> Fname >> Fsize;
-        cout << "command.size() = " << command.size() << "\nstoi(Fsize) = " << stoi(Fsize) << endl; // Debug
-        Fdata = command.substr(command.size() - stoi(Fsize) - 1, stoi(Fsize));
-        response = open(user, password, name, start_value, timeactive, Fname, Fsize, Fdata);
-    }
-    else if (whichCommand == "SAS") {
+    if (whichCommand == "SAS") {
         string auctionId;
         iss >> auctionId;
+        if (verbose)
+            generalVerbose("show_asset", clientIP, clientPort, "");
         response = showAsset(auctionId);
     }
     else if (whichCommand == "CLS") {
@@ -211,11 +221,12 @@ void dealWithUDP() {
             //prt_str[ret - 1] = 0;
             cout << "---UDP socket: " << prt_str << endl;
 
-        string returnString = getUDPCommand(prt_str);
-
         errcode = getnameinfo((struct sockaddr *)&udp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
         if (errcode == 0 && verbose)
             cout << "       Sent by [" << host << ":" << service << "]" << endl;
+
+        string returnString = getUDPCommand(prt_str, host, service);
+
 
         cout << "vou devolver: " << returnString << endl;
         n = sendto(ufd, returnString.c_str(), returnString.length(), 0, (struct sockaddr *)&udp_useraddr, addrlen); // Send message to client
@@ -235,6 +246,9 @@ int acceptTCP() {
     errcode = getnameinfo((struct sockaddr *)&tcp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
     if (errcode == 0 && verbose)
         cout << "       Sent by [" << host << ":" << service << "]" << endl;
+
+    clientIP = host;
+    clientPort = service;
 
     cout << "Entrei no read TCP" << endl; // Debug
     return new_tfd;

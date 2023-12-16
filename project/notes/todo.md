@@ -25,6 +25,8 @@
 - [ ] Aceitar files com `-` e com `_` (ver email `Projecto - caracteres especiais admitidos em nome de leilão`)
 - [ ] '\n'
 - [ ] Checkar se o file asset exist para ver se jáhá aqueça auction (ao invés de só checkar a pasta da auction)
+- [ ] list quando não dá auctions
+- [ ] quando dá algum erro no open auction, tenho de retroceder o que está para trás
 
 - Testar
 - [ ] correr o `isCorrectPassword()` com um user que não existe
