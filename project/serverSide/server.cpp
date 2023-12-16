@@ -368,10 +368,11 @@ int main(int argc, char *argv[])
             perror("select");
             exit(1);
         default:
-            for (int i = 0;i < 3;i++) {
-                if (checkExpiredAuctions() >= 0) break;;
-                cout << "trying to check expired auction AGAIN";
-            }
+            // for (int i = 0;i < 3;i++) {
+            //     if (checkExpiredAuctions() >= 0) break;;
+            //     cout << "trying to check expired auction AGAIN";
+            // }
+            checkExpiredAuctions();
 
             if (FD_ISSET(0, &testfds)) // Vê se a posição 0 foi ativada. Se foi, foi por causa do teclado.
             {
