@@ -17,6 +17,10 @@
 string myPort = "58000";
 bool verbose = false;
 
+bool logged_in;     //Not being used, only to ble able to make
+bool shouldExit;        //Not being used, only to ble able to make
+bool signalReceived;        //Not being used, only to ble able to make
+
 char in_str[128];
 fd_set inputs, testfds; // fd_set -> mascara. Corresponde a descritores.
 struct timeval timeout;
@@ -43,33 +47,110 @@ void getArgs(int argc, char *argv[])
 }
 
 string getUDPCommand(string command) {
-    string response;
+    string response, evalCommand;
     istringstream iss(command);
     string whichCommand;
     iss >> whichCommand;
 
+    cout << "command->" << command << "<-" << endl;
+
     // checkExpiredAuctions();
 
     if (whichCommand == "LIN") {
-        string user, password, status;
+        /*string user, password, status;
         iss >> user >> password;
-        response = login(user, password);
+        response = login(user, password);*/
+
+        if (endsWithNewLine(command)) {
+
+            evalCommand = command.substr(0, command.size() - 1);
+            cout << "eval Command ->" << evalCommand << "<-\n";
+            istringstream iss(evalCommand);
+            string user, password, status;
+
+            if (iss >> whichCommand >> user >> password && iss.eof()) {
+                if (isUID(user) && isPassword(password)){
+                    response = login(user, password);
+                }
+                else response = "RLI ERR";
+            }
+            else response = "RLI ERR";
+        }
+        else response = "RLI ERR";
     }
     else if (whichCommand == "LOU") {
-        string user, password, status;
+        /*string user, password, status;
         iss >> user >> password;
-        response = logout(user, password);
+        response = logout(user, password);*/
+
+
+        if (endsWithNewLine(command)) {
+
+            evalCommand = command.substr(0, command.size() - 1);
+            cout << "eval Command ->" << evalCommand << "<-\n";
+            istringstream iss(evalCommand);
+            string user, password, status;
+
+            if (iss >> whichCommand >> user >> password && iss.eof()) {
+                if (isUID(user) && isPassword(password)){
+                    
+                    response = logout(user, password);
+                }
+                else response = "RLO ERR";
+            }
+            else response = "RLO ERR";
+        }
+        else response = "RLO ERR";
     }
+
     else if (whichCommand == "UNR") {
-        string user, password, status;
+        /*string user, password, status;
         iss >> user >> password;
-        response = unregister(user, password);
+        response = unregister(user, password);*/
+
+        if (endsWithNewLine(command)) {
+
+            evalCommand = command.substr(0, command.size() - 1);
+            cout << "eval Command ->" << evalCommand << "<-\n";
+            istringstream iss(evalCommand);
+            string user, password, status;
+
+            if (iss >> whichCommand >> user >> password && iss.eof()) {
+                if (isUID(user) && isPassword(password)){
+                    
+                    response = unregister(user, password);
+                }
+                else response = "RUR ERR";
+            }
+            else response = "RUR ERR";
+        }
+        else response = "RUR ERR";
+
     }
     else if (whichCommand == "LMA") {
-        string user, status;
+        /*string user, status;
         iss >> user;
-        response = getMyAuctions(user);
+        response = getMyAuctions(user);*/
+
+        if (endsWithNewLine(command)) {
+
+            evalCommand = command.substr(0, command.size() - 1);
+            cout << "eval Command ->" << evalCommand << "<-\n";
+            istringstream iss(evalCommand);
+            string user, password, status;
+
+            if (iss >> whichCommand >> user && iss.eof()) {
+                if (isUID(user)){
+                    
+                    response = getMyAuctions(user);
+                }
+                else response = "RUR ERR";
+            }
+            else response = "RUR ERR";
+        }
+        else response = "RUR ERR";
     }
+
     else if (whichCommand == "LMB") {
         string user, status;
         iss >> user;
@@ -127,8 +208,8 @@ void dealWithUDP() {
     if (ret > 0)
     {
         if (strlen(prt_str) > 0)
-            prt_str[ret - 1] = 0;
-        cout << "---UDP socket: " << prt_str << endl;
+            //prt_str[ret - 1] = 0;
+            cout << "---UDP socket: " << prt_str << endl;
 
         string returnString = getUDPCommand(prt_str);
 
