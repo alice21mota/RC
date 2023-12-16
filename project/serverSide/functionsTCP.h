@@ -13,7 +13,7 @@ using namespace std;
 
 string open(string userId, string password, string name, string start_value, string timeactive, string Fname, string Fsize, string Fdata);
 
-bool createAuction(string auctionId, string userId, string name, string start_value, string timeactive, string Fname, string Fsize, string Fdata);
+int createAuction(string userId, string name, string start_value, string timeactive, string Fname, string Fsize, string Fdata);
 
 string showAsset(string auctionId);
 
