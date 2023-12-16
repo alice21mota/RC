@@ -12,9 +12,24 @@
 #include <regex>
 
 #include "server.h"
+#include <sys/wait.h>
 
 string myPort = "58000";
 bool verbose = false;
+
+char in_str[128];
+fd_set inputs, testfds; // fd_set -> mascara. Corresponde a descritores.
+struct timeval timeout;
+int i, out_fds, n, errcode, ret;
+char prt_str[90];
+char buffer[128];
+
+// socket variables
+struct addrinfo hints, *res;
+struct sockaddr_in udp_useraddr, tcp_useraddr;
+socklen_t addrlen;
+int ufd, tfd, new_tfd = -1;
+char host[NI_MAXHOST], service[NI_MAXSERV];
 
 void getArgs(int argc, char *argv[])
 {
@@ -33,7 +48,7 @@ string getUDPCommand(string command) {
     string whichCommand;
     iss >> whichCommand;
 
-    checkExpiredAuctions();
+    // checkExpiredAuctions();
 
     if (whichCommand == "LIN") {
         string user, password, status;
@@ -78,7 +93,7 @@ string getTCPCommand(string command) {
     string whichCommand;
     iss >> whichCommand;
 
-    checkExpiredAuctions();
+    // checkExpiredAuctions();
 
     if (whichCommand == "OPA") {
         string user, password, name, start_value, timeactive, Fname, Fsize, Fdata;
@@ -106,30 +121,171 @@ string getTCPCommand(string command) {
     return response + "\n";
 }
 
+void dealWithUDP() {
+    addrlen = sizeof(udp_useraddr);
+    ret = recvfrom(ufd, prt_str, 80, 0, (struct sockaddr *)&udp_useraddr, &addrlen);
+    if (ret > 0)
+    {
+        if (strlen(prt_str) > 0)
+            prt_str[ret - 1] = 0;
+        cout << "---UDP socket: " << prt_str << endl;
+
+        string returnString = getUDPCommand(prt_str);
+
+        errcode = getnameinfo((struct sockaddr *)&udp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
+        if (errcode == 0 && verbose)
+            cout << "       Sent by [" << host << ":" << service << "]" << endl;
+
+        cout << "vou devolver: " << returnString << endl;
+        n = sendto(ufd, returnString.c_str(), returnString.length(), 0, (struct sockaddr *)&udp_useraddr, addrlen); // Send message to client
+        if (n == -1) /*error*/
+            exit(1);
+    }
+}
+
+int acceptTCP() {
+    addrlen = sizeof(tcp_useraddr);
+    if ((new_tfd = accept(tfd, (struct sockaddr *)&tcp_useraddr, &addrlen)) == -1)
+    {
+        exit(1);
+    }
+    cout << "Accepted TCP socket" << endl; // Debug
+
+    errcode = getnameinfo((struct sockaddr *)&tcp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
+    if (errcode == 0 && verbose)
+        cout << "       Sent by [" << host << ":" << service << "]" << endl;
+
+    cout << "Entrei no read TCP" << endl; // Debug
+    return new_tfd;
+}
+
+void dealWithTCP() {
+    int nWritten, nRead;
+    string finalBuffer, fSize;
+    ssize_t bytesRead, matchedBytes;
+    size_t fileSize;
+    int len;
+    bool isOpen = false;
+    string returnString;
+    while ((nRead = read(new_tfd, buffer, 127)) != 0)
+    {
+        if (nRead < 0)
+            exit(1);
+        finalBuffer.append(buffer, nRead);
+
+        len = finalBuffer.length();
+        cout << "len" << endl;
+        cout << len << endl;
+        if (len >= 3) {
+            string command = finalBuffer.substr(0, 3);
+            if (command == "OPA") {
+                //pattern of the beggining of the response, up until file Size 
+                regex pattern(R"(OPA (\d{6}) ([a-zA-Z0-9]{8}) ([a-zA-Z0-9_-]{1,10}) (\d{1,6}) (\d{1,5}) ([a-zA-Z0-9_.-]+) (\d+) )");
+                smatch match; //Used to match with the patern
+
+                if (regex_search(finalBuffer, match, pattern)) {
+                    cout << "finalBuffer" << endl;
+                    cout << finalBuffer << endl;
+                    cout << "match.size() = " << match.size() << endl;
+                    if (match.size() == 8) {
+                        fSize = match[7];
+
+                        //+2 to make up for an extra two " "
+                        matchedBytes = match.position(0) + match.length(0);
+
+                        // cout << "matchedBytes" << endl;
+                        // cout << matchedBytes << endl;
+
+                        bytesRead = len;
+                        bytesRead -= matchedBytes;
+
+                    }
+                    else {
+                        cerr << "Unexpected number of matches." << endl;
+                        // return "ERROR";
+                        exit(1);
+                    }
+                }
+                else {
+                    cerr << "Failed to match pattern." << endl;
+                    // return "ERROR";
+                    exit(1);
+                }
+
+                //TODO CHECK THIS
+                try {
+                    fileSize = stoll(fSize);
+                }
+                catch (const invalid_argument& e) {
+                    cerr << "Invalid argument: " << e.what() << endl;
+                }
+                catch (const out_of_range& e) {
+                    cerr << "Out of range: " << e.what() << endl;
+                }
+                string Ffile = finalBuffer.substr(matchedBytes, bytesRead);
+                // cout << "Ffile" << endl;
+                // cout << Ffile << endl;
+                cout << "fileSize" << endl;
+                cout << fileSize << endl;
+                while (bytesRead < fileSize) {
+
+                    n = read(new_tfd, buffer, min(sizeof(buffer) - 1, fileSize - bytesRead));
+
+                    Ffile.append(buffer, n);
+                    bytesRead += n;
+                    // cout << "bytesRead" << endl;
+                    // cout << bytesRead << endl;
+                    // cout << "Ffile do while" << endl;
+                    // cout << Ffile << endl;
+                }
+
+                if (n == -1) {
+
+                    cerr << "Error reading response." << endl;
+                    close(new_tfd);
+                    // return "ERROR";
+                    exit(1);
+
+                }
+
+                cout << "match: ";
+                cout << match[0] << " - " << match[1] << " - " << match[2] << " - " << match[3] << " - " << match[4] << " - " << match[5] << " - " << match[6] << " - " << match[7] << endl;
+                isOpen = true;
+                returnString = open(match[1], match[2], match[3], match[4], match[5], match[6], match[7], Ffile) + '\n';
+                //cout << "returnString " << returnString << "<-\n";
+                break;
+            }
+        }
+
+        if (nRead < 127 && buffer[nRead - 1] == '\n') break; // FIXME acho que não pode ser assim mas por enquanto está a funcionar :))
+    }
+    // cout << "---TCP socket: " << finalBuffer << endl; // Debug
+
+    if (!isOpen) returnString = getTCPCommand(finalBuffer);
+
+    cout << "vou devolver por TCP: ->" << returnString << "<-\n";
+
+    nWritten = write(new_tfd, returnString.c_str(), returnString.length()); // Send message to client
+    if (nWritten == -1) // Will always get an error when using 'nc'
+    {
+        exit(1);
+    }
+    close(new_tfd); // Close socket
+    cout << "TCP socket closed" << endl; // Debug
+}
+
+
 
 int main(int argc, char *argv[])
 {
     getArgs(argc, argv);
 
-    // vector<string> files = getSortedFilesFromDirectory("AUCTIONS/");
     // for (int i = 0;i < files.size();i++) {
     //     cout << "aaaa ";
     //     cout << files[i] << endl;
     // }
 
-    char in_str[128];
-    fd_set inputs, testfds; // fd_set -> mascara. Corresponde a descritores.
-    struct timeval timeout;
-    int i, out_fds, n, errcode, ret;
-    char prt_str[90];
-    char buffer[128];
-
-    // socket variables
-    struct addrinfo hints, *res;
-    struct sockaddr_in udp_useraddr, tcp_useraddr;
-    socklen_t addrlen;
-    int ufd, tfd, new_tfd = -1;
-    char host[NI_MAXHOST], service[NI_MAXSERV];
+    // signal(SIGCHLD, SIG_IGN);
 
     // UDP SERVER SECTION
     memset(&hints, 0, sizeof(hints));
@@ -212,6 +368,12 @@ int main(int argc, char *argv[])
             perror("select");
             exit(1);
         default:
+            // for (int i = 0;i < 3;i++) {
+            //     if (checkExpiredAuctions() >= 0) break;;
+            //     cout << "trying to check expired auction AGAIN";
+            // }
+            checkExpiredAuctions();
+
             if (FD_ISSET(0, &testfds)) // Vê se a posição 0 foi ativada. Se foi, foi por causa do teclado.
             {
                 fgets(in_str, 50, stdin);
@@ -225,163 +387,38 @@ int main(int argc, char *argv[])
             }
             if (FD_ISSET(ufd, &testfds)) // Vê se foi pelo socket do UDP
             {
-                addrlen = sizeof(udp_useraddr);
-
-                // FIXME: read with an while loop
-                ret = recvfrom(ufd, prt_str, 80, 0, (struct sockaddr *)&udp_useraddr, &addrlen);
-                if (ret > 0)
-                {
-                    if (strlen(prt_str) > 0)
-                        prt_str[ret - 1] = 0;
-                    cout << "---UDP socket: " << prt_str << endl;
-
-                    string returnString = getUDPCommand(prt_str);
-
-                    errcode = getnameinfo((struct sockaddr *)&udp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
-                    if (errcode == 0 && verbose)
-                        cout << "       Sent by [" << host << ":" << service << "]" << endl;
-
-                    cout << "vou devolver: " << returnString << endl;
-                    n = sendto(ufd, returnString.c_str(), returnString.length(), 0, (struct sockaddr *)&udp_useraddr, addrlen); // Send message to client
-                    if (n == -1) /*error*/
-                        exit(1);
+                pid_t pid = fork();
+                if (pid == 0) {
+                    dealWithUDP();
+                    exit(0);
+                }
+                else if (pid == -1) {
+                    cout << "error pid UDP";
+                    exit(1);
                 }
             }
             if (FD_ISSET(tfd, &testfds)) // Vê se foi pelo socket do TCP
             {
-                addrlen = sizeof(tcp_useraddr);
-                if ((new_tfd = accept(tfd, (struct sockaddr *)&tcp_useraddr, &addrlen)) == -1)
-                {
+                pid_t pid = fork();
+                if (pid == 0) {
+                    new_tfd = acceptTCP();
+                    dealWithTCP();
+                    // FD_SET(new_tfd, &inputs); // Set TCP read channel on
+                    exit(0);
+                }
+                else if (pid == -1) {
+                    cout << "error pid TCP";
                     exit(1);
                 }
-                cout << "Accepted TCP socket" << endl; // Debug
-
-                errcode = getnameinfo((struct sockaddr *)&tcp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
-                if (errcode == 0 && verbose)
-                    cout << "       Sent by [" << host << ":" << service << "]" << endl;
-
-                FD_SET(new_tfd, &inputs); // Set TCP read channel on
             }
-            else if (FD_ISSET(new_tfd, &testfds)) // Depois do accept tem de voltar a entrar no select
-            {
-                cout << "Entrei no read TCP" << endl; // Debug
-
-                int nWritten, nRead;
-                string finalBuffer, fSize;
-                ssize_t bytesRead, matchedBytes;
-                size_t fileSize;
-                int len;
-                bool isOpen = false;
-                string returnString;
-                while ((nRead = read(new_tfd, buffer, 127)) != 0)
-                {
-                    if (nRead < 0)
-                        exit(1);
-                    finalBuffer.append(buffer, nRead);
-
-                    len = finalBuffer.length();
-                    cout << "len" << endl;
-                    cout << len << endl;
-                    if (len >= 3) {
-                        string command = finalBuffer.substr(0, 3);
-                        if (command == "OPA") {
-                            //pattern of the beggining of the response, up until file Size 
-                            regex pattern(R"(OPA (\d{6}) ([a-zA-Z0-9]{8}) ([a-zA-Z0-9_-]{1,10}) (\d{1,6}) (\d{1,5}) ([a-zA-Z0-9_.-]+) (\d+) )");
-                            smatch match; //Used to match with the patern
-
-                            if (regex_search(finalBuffer, match, pattern)) {
-                                cout << "finalBuffer" << endl;
-                                cout << finalBuffer << endl;
-                                cout << "match.size() = " << match.size() << endl;
-                                if (match.size() == 8) {
-                                    fSize = match[7];
-
-                                    //+2 to make up for an extra two " "
-                                    matchedBytes = match.position(0) + match.length(0);
-
-                                    cout << "matchedBytes" << endl;
-                                    cout << matchedBytes << endl;
-
-                                    bytesRead = len;
-                                    bytesRead -= matchedBytes;
-
-                                }
-                                else {
-                                    cerr << "Unexpected number of matches." << endl;
-                                    // return "ERROR";
-                                    exit(1);
-                                }
-                            }
-                            else {
-                                cerr << "Failed to match pattern." << endl;
-                                // return "ERROR";
-                                exit(1);
-                            }
-
-                             //TODO CHECK THIS
-                            try {
-                                fileSize = stoll(fSize);
-                            }
-                            catch (const invalid_argument& e) {
-                                cerr << "Invalid argument: " << e.what() << endl;
-                            }
-                            catch (const out_of_range& e) {
-                                cerr << "Out of range: " << e.what() << endl;
-                            }
-                            string Ffile = finalBuffer.substr(matchedBytes, bytesRead);
-                            // cout << "Ffile" << endl;
-                            // cout << Ffile << endl;
-                            cout << "fileSize" << endl;
-                            cout << fileSize << endl;
-                            while (bytesRead < fileSize) {
-
-                                n = read(new_tfd, buffer, min(sizeof(buffer) - 1, fileSize - bytesRead));
-
-                                Ffile.append(buffer, n);
-                                bytesRead += n;
-                                cout << "bytesRead" << endl;
-                                cout << bytesRead << endl;
-                                // cout << "Ffile do while" << endl;
-                                // cout << Ffile << endl;
-                            }
-
-                            if (n == -1) {
-
-                                cerr << "Error reading response." << endl;
-                                close(new_tfd);
-                                // return "ERROR";
-                                exit(1);
-
-                            }
-
-                            cout << "match: ";
-                            cout << match[0] << " - " << match[1] << " - " << match[2] << " - " << match[3] << " - " << match[4] << " - " << match[5] << " - " << match[6] << " - " << match[7] << endl;
-                            isOpen = true;
-                            returnString = open(match[1], match[2], match[3], match[4], match[5], match[6], match[7], Ffile) + '\n';
-                            //cout << "returnString " << returnString << "<-\n";
-                            break;
-                        }
-                    }
-
-                    if (nRead < 127 && buffer[nRead - 1] == '\n') break; // FIXME acho que não pode ser assim mas por enquanto está a funcionar :))
-                }
-                // cout << "---TCP socket: " << finalBuffer << endl; // Debug
-
-                if (!isOpen) returnString = getTCPCommand(finalBuffer);
-
-                cout << "vou devolver por TCP: ->" << returnString << "<-\n";
-
-                nWritten = write(new_tfd, returnString.c_str(), returnString.length()); // Send message to client
-                if (nWritten == -1) // Will always get an error when using 'nc'
-                {
-                    exit(1);
-                }
-
-
-                // close(new_tfd); // Close socket
-                FD_CLR(new_tfd, &inputs); // Set TCP read channel off
-                // cout << "TCP socket closed" << endl; // Debug
-            }
+            // else if (FD_ISSET(new_tfd, &testfds)) // Depois do accept tem de voltar a entrar no select
+            // {
+            //     dealWithTCP();               
+            //     close(new_tfd); // Close socket
+            //     cout << "TCP socket closed" << endl; // Debug
+            //     FD_CLR(new_tfd, &inputs); // Set TCP read channel off
+            // }
+            wait(NULL);
         }
     }
 exit_loop:; // FIXME: should i force to close all the sockets here?

@@ -87,3 +87,27 @@ RUR OK
 LIN 102618 aaaaaaaa
 RLI REG
 ```
+
+```
+mkdir USERS
+mkdir USERS/111111
+mkdir USERS/222222
+mkdir USERS/333333
+mkdir USERS/444444
+echo "aaaaaaaa" > USERS/111111/111111_pass.txt
+echo "bbbbbbbb" > USERS/222222/222222_pass.txt
+echo "cccccccc" > USERS/333333/333333_pass.txt
+echo "dddddddd" > USERS/444444/444444_pass.txt
+```
+
+```
+echo "193.136.128.103 58010 21" | nc tejo.tecnico.ulisboa.pt 59000 > report_21.html
+echo "193.136.128.103 58010 22" | nc tejo.tecnico.ulisboa.pt 59000 > report_22.html
+echo "193.136.128.103 58010 23" | nc tejo.tecnico.ulisboa.pt 59000 > report_23.html
+echo "193.136.128.103 58010 24" | nc tejo.tecnico.ulisboa.pt 59000 > report_24.html
+echo "193.136.128.103 58001 25" | nc tejo.tecnico.ulisboa.pt 59000 > report_25.html
+echo "193.136.128.103 58001 26" | nc tejo.tecnico.ulisboa.pt 59000 > report_26.html
+echo "193.136.128.103 58001 27" | nc tejo.tecnico.ulisboa.pt 59000 > report_27.html
+echo "193.136.128.103 58001 28" | nc tejo.tecnico.ulisboa.pt 59000 > report_28.html
+echo "193.136.128.103 58001 29" | nc tejo.tecnico.ulisboa.pt 59000 > report_29.html
+```
