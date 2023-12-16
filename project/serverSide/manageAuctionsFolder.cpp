@@ -57,7 +57,11 @@ bool createAuctionEndFile(string auctionId) {
     filesystem::path endFilePath = "AUCTIONS/" + auctionId + "/END_" + auctionId + ".txt";
 
     int timeactive = getAuctionTimeactive(auctionId);
+    if (timeactive == -1) return false;
+
     int startFulltime = getAuctionStartFullTime(auctionId);
+    if (startFulltime == -1) return false;
+
     long int now = getSeconds();
 
     int end_time;
@@ -83,12 +87,18 @@ bool createAuctionBidsFolder(string auctionId) {
 }
 
 bool createAuctionBidFile(string auctionId, int bid_value, string userId) {
-    if (!hasAnyBid(auctionId)) createAuctionBidsFolder(auctionId);
+    if (!hasAnyBid(auctionId))
+        if (!createAuctionBidsFolder(auctionId)) return false;
+
     filesystem::path bidFilePath = "AUCTIONS/" + auctionId + "/BIDS/" + to_string(bid_value) + ".txt";
 
     time_t bid_fulltime = getSeconds();
     string bid_datetime = secondsToDate(bid_fulltime);
-    int bid_sec_time = bid_fulltime - getAuctionStartFullTime(auctionId);
+
+    int auctionStartFullTime = getAuctionStartFullTime(auctionId);
+    if (auctionStartFullTime == -1) return false;
+
+    int bid_sec_time = bid_fulltime - auctionStartFullTime;
 
     string content = userId + " " + to_string(bid_value) + " " + bid_datetime + " " + to_string(bid_sec_time);
     return createFile(bidFilePath, content);
@@ -98,6 +108,7 @@ int getAuctionStartFullTime(string auctionId) {
     cout << "getAuctionStartFullTime " << auctionId << endl; // Debug
     filesystem::path startFilePath("AUCTIONS/" + auctionId + "/START_" + auctionId + ".txt");
     string infos = readFromFile(startFilePath);
+    if (infos == "-1") return -1;
     int infosLen = infos.length();
     string start_fulltime = infos.substr(infosLen - FULLTIME_NCHARS, FULLTIME_NCHARS);
     return stoi(start_fulltime);
@@ -107,6 +118,7 @@ int getAuctionTimeactive(string auctionId) {
     cout << "getAuctionTimeactive " << auctionId << endl; // Debug
     filesystem::path startFilePath("AUCTIONS/" + auctionId + "/START_" + auctionId + ".txt");
     string infos = readFromFile(startFilePath);
+    if (infos == "-1") return -1;
 
     int startPosition = 0;
     for (int i = 0; i < 4;i++) {
@@ -122,6 +134,7 @@ string getAuctionOwner(string auctionId) {
     cout << "getAuctionOwner " << auctionId << endl; // Debug
     filesystem::path startFilePath("AUCTIONS/" + auctionId + "/START_" + auctionId + ".txt");
     string infos = readFromFile(startFilePath);
+    if (infos == "-1") return "-1";
     return infos.substr(0, USERID_NCHARS);
 }
 
@@ -135,10 +148,15 @@ int checkExpiredAuctions() {
         string auctionId = auctionsIds[i];
         if (isAuctionActive(auctionId)) {
             int timeactive = getAuctionTimeactive(auctionId);
+            if (timeactive == -1) return -1;
+
             int startFulltime = getAuctionStartFullTime(auctionId);
+            if (startFulltime == -1) return -1;
+
             long int now = getSeconds();
-            if (now > startFulltime + timeactive) {
-                createAuctionEndFile(auctionId);
+
+            if (now > startFulltime + timeactive) {    // FIXME: deal with all of -1
+                if (!createAuctionEndFile(auctionId)) return -1;
                 sumExpired++;
             }
         }
