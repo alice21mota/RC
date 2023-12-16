@@ -51,6 +51,18 @@ void generalVerbose(string command, string ip, string port, string userId, strin
     cout << print << endl;
 }
 
+void verboseUnknowCommand(string ip, string port) {
+    string print = "";
+    print = "Received unknown command from " + ip + ":" + port;
+    cout << print << endl;
+}
+
+void verboseResponse(string response, string ip, string port) {
+    string print = "Server will return \'";
+    print += response + "\' to " + ip + ":" + port;
+    cout << print << endl;
+}
+
 void getArgs(int argc, char *argv[])
 {
     for (int i = 1; i < argc; i += 2)
@@ -197,7 +209,13 @@ string getUDPCommand(string command, string ip, string port) {
         else response = "RRC ERR";
 
     }
-    else response = "ERR";
+    else {
+        response = "ERR";
+        verboseUnknowCommand(ip, port);
+    }
+
+    int len = min((int)response.length(), 7);
+    if (verbose) verboseResponse(response.substr(0, len), ip, port);
     return response + "\n";
 }
 
@@ -272,7 +290,14 @@ string getTCPCommand(string command) {
         else response = "RBD ERR";
 
     }
-    else response = "ERR";
+    else {
+        response = "ERR";
+        verboseUnknowCommand(clientIP, clientPort);
+    }
+
+    int len = min((int)response.length(), 7);
+    if (verbose) verboseResponse(response.substr(0, len), clientIP, clientPort);
+
     return response + "\n";
 }
 
@@ -444,6 +469,10 @@ void dealWithTCP() {
     // cout << "---TCP socket: " << finalBuffer << endl; // Debug
 
     if (!isOpen) returnString = getTCPCommand(finalBuffer);
+    else {
+        int len = min((int)returnString.length(), 10);
+        if (verbose) verboseResponse(returnString.substr(0, len), clientIP, clientPort);
+    }
 
     // cout << "vou devolver por TCP: ->" << returnString << "<-\n";  // Debug
 
