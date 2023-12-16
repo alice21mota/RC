@@ -214,7 +214,7 @@ string getUDPCommand(string command) {
 }
 
 string getTCPCommand(string command) {
-    string response;
+    string response, evalCommand;
     cout << "Command is ->" << command << "<-" << endl;
     istringstream iss(command);
     string whichCommand;
@@ -223,14 +223,51 @@ string getTCPCommand(string command) {
     // checkExpiredAuctions();
 
     if (whichCommand == "SAS") {
-        string auctionId;
+        /*string auctionId;
         iss >> auctionId;
-        response = showAsset(auctionId);
+        response = showAsset(auctionId);*/
+
+        if (endsWithNewLine(command)) {
+
+            evalCommand = command.substr(0, command.size() - 1);
+            cout << "eval Command ->" << evalCommand << "<-\n";
+            istringstream iss(evalCommand);
+            string aid;
+
+            if (iss >> whichCommand >> aid && iss.eof()) {
+                if (isValidAID(aid)){
+                    
+                    response = showAsset(aid);
+                }
+                else response = "RSA ERR";
+            }
+            else response = "RSA ERR";
+        }
+        else response = "RSA ERR";
     }
+
     else if (whichCommand == "CLS") {
-        string userId, password, auctionId;
+        /*string userId, password, auctionId;
         iss >> userId >> password >> auctionId;
-        response = closeAuction(userId, password, auctionId);
+        response = closeAuction(userId, password, auctionId);*/
+
+        if (endsWithNewLine(command)) {
+
+            evalCommand = command.substr(0, command.size() - 1);
+            cout << "eval Command ->" << evalCommand << "<-\n";
+            istringstream iss(evalCommand);
+            string uid, password, aid;
+
+            if (iss >> whichCommand >> uid >> password >> aid && iss.eof()) {
+                if (isUID(uid) && isPassword(password) && isValidAID(aid)){
+                    
+                    response = closeAuction(uid, password, aid);
+                }
+                else response = "RCL ERR";
+            }
+            else response = "RCL ERR";
+        }
+        else response = "RCL ERR";
     }
     else if (whichCommand == "BID") {
         string userId, password, auctionId, value;

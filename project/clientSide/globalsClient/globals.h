@@ -28,11 +28,16 @@
 
 #include "../../common/validations.h"
 #include "../../common/auxFuncs.h"
+#include "../commServer/sendProtocols.h"
+#include "../commands/commandsUDP.h"
+#include "../commands/commandsTCP.h"
+#include "../status/processStatus.h"
+#include "../signalControl/signal.h"
 
-#define TCP_READ_TIMEOUT_SECONDS (1) // 1 minute
-#define TCP_WRITE_TIMEOUT_SECONDS (1)  // 20 minutes
-#define UDP_READ_TIMEOUT_SECONDS (1) // 1 minute
-#define UDP_WRITE_TIMEOUT_SECONDS (1)  // 20 minutes
+#define TCP_READ_TIMEOUT_SECONDS (5) 
+#define TCP_WRITE_TIMEOUT_SECONDS (5) 
+#define UDP_READ_TIMEOUT_SECONDS (5) 
+#define UDP_WRITE_TIMEOUT_SECONDS (5) 
 
 using namespace std;
 

@@ -22,8 +22,8 @@ string open(string userId, string password, string name, string start_value, str
 
 bool createAuction(string auctionId, string userId, string name, string start_value, string timeactive, string Fname, string Fsize, string Fdata) {
     if (!createAuctionAssetFolder(auctionId)) return false;
-    if (!writeAsset(auctionId, Fname, Fsize, Fdata)) return false;
     if (!createAuctionStartFile(auctionId, userId, name, start_value, timeactive, Fname)) return false;
+    if (!writeAsset(auctionId, Fname, Fsize, Fdata)) return false;
     if (!createUserHostedFile(userId, auctionId)) return false;
     return true;
 }
