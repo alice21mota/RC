@@ -52,7 +52,6 @@ void exitUserApp(int sig) {
             }
 
             else {
-                //cout << stat << endl;
                 cout << "Problems logging out in server. Exiting User Application anyway" << endl;
                 logged_in = false;
 
