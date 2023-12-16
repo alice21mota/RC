@@ -4,8 +4,11 @@
  * Cria todas as diretorias e ficheiros necessários para guardar as informações do utilizador.
 */
 bool createUser(string userId, string password) {
+    filesystem::path directoryPath("USERS/" + userId);
+    if (!filesystem::exists(directoryPath))
+        if (!createUserFolder(userId))
+            return false;
     return
-        createUserFolder(userId) &&
         createUserPasswordFile(userId, password) &&
         createUserLoginFile(userId);
 }
