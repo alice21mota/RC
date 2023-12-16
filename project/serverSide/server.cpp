@@ -362,6 +362,10 @@ void dealWithTCP() {
                             returnString = "ROA ERR";
                             break;
                         }
+
+                        if (verbose) generalVerbose("open asset", ip, port, match[1], "");
+
+
                         fSize = match[7];
 
                         //+2 to make up for an extra two " "
