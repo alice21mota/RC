@@ -17,7 +17,6 @@
 string myPort = "58000";
 bool verbose = false;
 
-
 string clientPort;
 string clientIP;
 
@@ -39,14 +38,16 @@ socklen_t addrlen;
 int ufd, tfd, new_tfd = -1;
 char host[NI_MAXHOST], service[NI_MAXSERV];
 
-void generalVerbose(string command, string ip, string port, string userId) {
+void generalVerbose(string command, string ip, string port, string userId, string auctionId) {
     string print = "";
-    print = "Received " + command + " command ";
-
-    if (!userId.empty()) {
-        print += "(with UID = " + userId + ")";
+    print = "Received command to " + command;
+    if (!auctionId.empty()) {
+        print += " auctionId = " + auctionId;
     }
-    print += "from " + ip + ":" + port;
+    if (!userId.empty()) {
+        print += " (with UID = " + userId + ")";
+    }
+    print += " from " + ip + ":" + port;
     cout << print << endl;
 }
 
@@ -72,10 +73,6 @@ string getUDPCommand(string command, string ip, string port) {
     // checkExpiredAuctions();
 
     if (whichCommand == "LIN") {
-        /*string user, password, status;
-        iss >> user >> password;
-        response = login(user, password);*/
-
         if (endsWithNewLine(command)) {
 
             evalCommand = command.substr(0, command.size() - 1);
@@ -85,7 +82,7 @@ string getUDPCommand(string command, string ip, string port) {
 
             if (iss >> whichCommand >> user >> password && iss.eof()) {
                 if (isUID(user) && isPassword(password)) {
-                    if (verbose) generalVerbose("login", ip, port, user);
+                    if (verbose) generalVerbose("login", ip, port, user, "");
                     response = login(user, password);
                 }
                 else response = "RLI ERR";
@@ -96,11 +93,6 @@ string getUDPCommand(string command, string ip, string port) {
     }
 
     else if (whichCommand == "LOU") {
-        /*string user, password, status;
-        iss >> user >> password;
-        response = logout(user, password);*/
-
-
         if (endsWithNewLine(command)) {
 
             evalCommand = command.substr(0, command.size() - 1);
@@ -110,7 +102,7 @@ string getUDPCommand(string command, string ip, string port) {
 
             if (iss >> whichCommand >> user >> password && iss.eof()) {
                 if (isUID(user) && isPassword(password)) {
-                    if (verbose) generalVerbose("logout", ip, port, user);
+                    if (verbose) generalVerbose("logout", ip, port, user, "");
                     response = logout(user, password);
                 }
                 else response = "RLO ERR";
@@ -121,10 +113,6 @@ string getUDPCommand(string command, string ip, string port) {
     }
 
     else if (whichCommand == "UNR") {
-        /*string user, password, status;
-        iss >> user >> password;
-        response = unregister(user, password);*/
-
         if (endsWithNewLine(command)) {
 
             evalCommand = command.substr(0, command.size() - 1);
@@ -134,7 +122,7 @@ string getUDPCommand(string command, string ip, string port) {
 
             if (iss >> whichCommand >> user >> password && iss.eof()) {
                 if (isUID(user) && isPassword(password)) {
-                    if (verbose) generalVerbose("unregister", ip, port, user);
+                    if (verbose) generalVerbose("unregister", ip, port, user, "");
                     response = unregister(user, password);
                 }
                 else response = "RUR ERR";
@@ -146,10 +134,6 @@ string getUDPCommand(string command, string ip, string port) {
     }
 
     else if (whichCommand == "LMA") {
-        /*string user, status;
-        iss >> user;
-        response = getMyAuctions(user);*/
-
         if (endsWithNewLine(command)) {
 
             evalCommand = command.substr(0, command.size() - 1);
@@ -158,8 +142,8 @@ string getUDPCommand(string command, string ip, string port) {
             string user, password, status;
 
             if (iss >> whichCommand >> user && iss.eof()) {
-                if (isUID(user)){
-                     if (verbose) generalVerbose("my_auctions", ip, port, user);
+                if (isUID(user)) {
+                    if (verbose) generalVerbose("my_auctions", ip, port, user, "");
                     response = getMyAuctions(user);
                 }
                 else response = "RMA ERR";
@@ -170,10 +154,6 @@ string getUDPCommand(string command, string ip, string port) {
     }
 
     else if (whichCommand == "LMB") {
-        /*string user, status;
-        iss >> user;
-        response = getMyBids(user);*/
-
         if (endsWithNewLine(command)) {
 
             evalCommand = command.substr(0, command.size() - 1);
@@ -182,8 +162,8 @@ string getUDPCommand(string command, string ip, string port) {
             string user;
 
             if (iss >> whichCommand >> user && iss.eof()) {
-                if (isUID(user)){
-                    
+                if (isUID(user)) {
+                    if (verbose) generalVerbose("my_bids", ip, port, user, "");
                     response = getMyBids(user);
                 }
                 else response = "RMB ERR";
@@ -196,16 +176,14 @@ string getUDPCommand(string command, string ip, string port) {
 
     else if (whichCommand == "LST") {
         if (endsWithNewLine(command))
+        {
+            if (verbose) generalVerbose("list auctions", ip, port, "", "");
             response = listAuctions();
+        }
         else response = "RLS ERR";
     }
 
     else if (whichCommand == "SRC") {
-        /*string auctionId;
-        iss >> auctionId;
-        response = showRecord(auctionId);*/
-
-
         if (endsWithNewLine(command)) {
 
             evalCommand = command.substr(0, command.size() - 1);
@@ -214,8 +192,8 @@ string getUDPCommand(string command, string ip, string port) {
             string aid;
 
             if (iss >> whichCommand >> aid && iss.eof()) {
-                if (isValidAID(aid)){
-                    
+                if (isValidAID(aid)) {
+                    if (verbose) generalVerbose("show record", ip, port, "", aid);
                     response = showRecord(aid);
                 }
                 else response = "RRC ERR";
@@ -239,10 +217,6 @@ string getTCPCommand(string command) {
     // checkExpiredAuctions();
 
     if (whichCommand == "SAS") {
-        /*string auctionId;
-        iss >> auctionId;
-        response = showAsset(auctionId);*/
-
         if (endsWithNewLine(command)) {
 
             evalCommand = command.substr(0, command.size() - 1);
@@ -251,9 +225,9 @@ string getTCPCommand(string command) {
             string aid;
 
             if (iss >> whichCommand >> aid && iss.eof()) {
-                if (isValidAID(aid)){
+                if (isValidAID(aid)) {
                     if (verbose)
-            generalVerbose("show_asset", clientIP, clientPort, "");
+                        generalVerbose("show asset", clientIP, clientPort, "", aid);
                     response = showAsset(aid);
                 }
                 else response = "RSA ERR";
@@ -264,10 +238,6 @@ string getTCPCommand(string command) {
     }
 
     else if (whichCommand == "CLS") {
-        /*string userId, password, auctionId;
-        iss >> userId >> password >> auctionId;
-        response = closeAuction(userId, password, auctionId);*/
-
         if (endsWithNewLine(command)) {
 
             evalCommand = command.substr(0, command.size() - 1);
@@ -276,8 +246,9 @@ string getTCPCommand(string command) {
             string uid, password, aid;
 
             if (iss >> whichCommand >> uid >> password >> aid && iss.eof()) {
-                if (isUID(uid) && isPassword(password) && isValidAID(aid)){
-                    
+                if (isUID(uid) && isPassword(password) && isValidAID(aid)) {
+                    if (verbose)
+                        generalVerbose("close auction", clientIP, clientPort, uid, aid);
                     response = closeAuction(uid, password, aid);
                 }
                 else response = "RCL ERR";
@@ -299,8 +270,9 @@ string getTCPCommand(string command) {
             string uid, password, aid, value;
 
             if (iss >> whichCommand >> uid >> password >> aid >> value && iss.eof()) {
-                if (isUID(uid) && isPassword(password) && isValidAID(aid) && isBidValue(value)){
-                    
+                if (isUID(uid) && isPassword(password) && isValidAID(aid) && isBidValue(value)) {
+                    if (verbose)
+                        generalVerbose("bid", clientIP, clientPort, uid, aid);
                     response = addBid(uid, password, aid, stoi(value));
                 }
                 else response = "RBD ERR";
@@ -324,8 +296,8 @@ void dealWithUDP() {
             cout << "---UDP socket: " << prt_str << endl;
 
         errcode = getnameinfo((struct sockaddr *)&udp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
-        if (errcode == 0 && verbose)
-            cout << "       Sent by [" << host << ":" << service << "]" << endl;
+        // if (errcode == 0 && verbose)
+        //     cout << "       Sent by [" << host << ":" << service << "]" << endl;
 
         string returnString = getUDPCommand(prt_str, host, service);
 
@@ -346,8 +318,8 @@ int acceptTCP() {
     cout << "Accepted TCP socket" << endl; // Debug
 
     errcode = getnameinfo((struct sockaddr *)&tcp_useraddr, addrlen, host, sizeof host, service, sizeof service, 0);
-    if (errcode == 0 && verbose)
-        cout << "       Sent by [" << host << ":" << service << "]" << endl;
+    // if (errcode == 0 && verbose)
+    //     cout << "       Sent by [" << host << ":" << service << "]" << endl;
 
     clientIP = host;
     clientPort = service;
