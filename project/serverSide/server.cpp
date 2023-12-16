@@ -363,8 +363,7 @@ void dealWithTCP() {
                             break;
                         }
 
-                        if (verbose) generalVerbose("open asset", ip, port, match[1], "");
-
+                        if (verbose) generalVerbose("open asset", clientIP, clientPort, match[1], "");
 
                         fSize = match[7];
 
