@@ -14,7 +14,7 @@
 #include "server.h"
 #include <sys/wait.h>
 
-string myPort = "58000";
+string myPort = "58068";
 bool verbose = false;
 
 string clientPort;

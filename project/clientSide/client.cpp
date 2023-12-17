@@ -2,7 +2,7 @@
 
 using namespace std;
 
-string port = "58000";
+string port = "58068";
 string ip = "localhost";
 string userID, password;
 string fName, fData, tempAID, filePath;
