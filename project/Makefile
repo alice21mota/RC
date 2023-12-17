@@ -5,10 +5,10 @@ CLIENT_SRC = clientSide/client.cpp clientSide/status/processStatus.cpp clientSid
 all: $(TARGETS)
 
 server: $(SERVER_SRC)
-	g++ -std=c++17 -Wno-deprecated-declarations $(SERVER_SRC) -o server
+	g++ -std=c++17 -Wno-deprecated-declarations $(SERVER_SRC) -o AS
 
 client: $(CLIENT_SRC)
-	g++ -std=c++17 $(CLIENT_SRC) -o client
+	g++ -std=c++17 $(CLIENT_SRC) -o user
 
 clean:
 	rm -f $(TARGETS)
